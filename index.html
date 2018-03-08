@@ -1,0 +1,109 @@
+<style>
+#buttons {
+}
+
+.btn {
+  position: relative;
+  width: 100px;
+  height: 32px;
+  background-color: darkgray;
+  color: black;
+  border: 1px solid black;
+  cursor: pointer;
+  text-align: center;
+  line-height: 32px;
+  display: inline-block;
+}
+.btn:active {
+  background-color: lightgray;
+}
+
+.no-select {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+#btn-screenshot {
+}
+
+#btn-quit {
+}
+</style>
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Frost Frame</title>
+    <script>if (typeof module === "object") {window.module = module; module = undefined;}</script>
+    <script src="./node_modules/jquery/dist/jquery.js"></script>
+  </head>
+  <body>
+    <div id="buttons">
+      <div id="btn-screenshot" class="btn no-select">Screenshot</div>
+      <div id="btn-quit"       class="btn no-select">Quit</div>
+    </div>
+    <!-- <h1>Hello World!</h1>
+    Using Node: <script>document.write(process.versions.node)</script><br>
+    Using Chrome: <script>document.write(process.versions.chrome)</script><br>
+    Using Electron: <script>document.write(process.versions.electron)</script><br> -->
+
+    <div>
+      <div>-----------------------------------------------------</div>
+      <div id="url-here"></div>
+      <div>-----------------------------------------------------</div>
+    </div>
+
+    <div>
+      <table id="form-login">
+        <tr>
+          <td><input value="" name="username" type="text"></td>
+        </tr>
+        <tr>
+          <td><input value="" name="password" type="password"></td>
+        </tr>
+        <tr>
+          <td><div id="login" class="btn no-select">Submit</div></td>
+        </tr>
+      </table>
+    </div>
+
+  </body>
+</html>
+
+<script>
+const ipc         = require("electron").ipcRenderer;
+const EmitMessage = require("electron").remote.app.emit;
+
+function SendMessage(func, data=null){
+  EmitMessage("message", {
+    "function": func,
+    "data"    : JSON.stringify(data)
+  });
+}
+
+// Receiving a message from main.js
+ipc.on("message", (event, msg) => {
+  $("#url-here").html(`<a href="${msg}">${msg}</a>`);
+})
+
+// Sending messages to main.js
+$("#btn-screenshot").click(function(){
+  SendMessage("TakeScreenshot");
+});
+
+$("#btn-quit").click(function(){
+  SendMessage("Quit");
+});
+
+$("#login").click(function(){
+  var data = {
+    "username": $("#form-login [name='username']").val(),
+    "password": $("#form-login [name='password']").val()
+  };
+  SendMessage("Login", data);
+});
+
+</script>

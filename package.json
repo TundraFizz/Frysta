@@ -1,0 +1,29 @@
+{
+  "name": "electron-hello-world",
+  "version": "1.0.0",
+  "gypfile": true,
+  "description": "Sample hello world example for Electron.",
+  "main": "bindings.js",
+  "author": "Tundra Fizz",
+  "license": "ISC",
+  "dependencies": {
+    "electron": "latest",
+    "electron-rebuild": "^1.7.3",
+    "form-data": "^2.3.2",
+    "jquery": "latest",
+    "nan": "latest"
+  },
+  "devDependencies": {
+    "electron-rebuild": "^1.7.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/TundraFizz/Tundra-Fizz"
+  },
+  "scripts": {
+    "a": "cls && npm run clean && npm run compile && npm start",
+    "clean": "node-gyp clean",
+    "compile": "./node_modules/.bin/electron-rebuild",
+    "start": "electron ./main.js"
+  }
+}
