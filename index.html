@@ -59,13 +59,20 @@
     <div>
       <table id="form-login">
         <tr>
+          <td>Email</td>
+          <td><input value="" name="email" type="text"></td>
+        </tr>
+        <tr>
+          <td>Username</td>
           <td><input value="" name="username" type="text"></td>
         </tr>
         <tr>
+          <td>Password</td>
           <td><input value="" name="password" type="password"></td>
         </tr>
         <tr>
-          <td><div id="login" class="btn no-select">Submit</div></td>
+          <td><div id="login" class="btn no-select">Login</div></td>
+          <td><div id="create-account" class="btn no-select">Create Account</div></td>
         </tr>
       </table>
     </div>
@@ -98,12 +105,29 @@ $("#btn-quit").click(function(){
   SendMessage("Quit");
 });
 
+$("#create-account").click(function(){
+  var data = {
+    "email"   : $("#form-login [name='email']").val(),
+    "username": $("#form-login [name='username']").val(),
+    "password": $("#form-login [name='password']").val()
+  };
+  SendMessage("CreateAccount", data);
+});
+
 $("#login").click(function(){
   var data = {
     "username": $("#form-login [name='username']").val(),
     "password": $("#form-login [name='password']").val()
   };
   SendMessage("Login", data);
+});
+
+$("#test-save").click(function(){
+  SendMessage("TestSave");
+});
+
+$("#test-load").click(function(){
+  SendMessage("TestLoad");
 });
 
 </script>

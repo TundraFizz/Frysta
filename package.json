@@ -8,8 +8,10 @@
   "license": "ISC",
   "dependencies": {
     "electron": "latest",
-    "electron-rebuild": "^1.7.3",
-    "form-data": "^2.3.2",
+    "electron-rebuild": "latest",
+    "electron-json-storage": "latest",
+    "bcrypt": "latest",
+    "form-data": "latest",
     "jquery": "latest",
     "nan": "latest"
   },

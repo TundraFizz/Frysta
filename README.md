@@ -27,3 +27,8 @@ git push -u origin --tags master
 ==================================================
 
 Frost Frame is a Node.JS application that easily captures screenshots and uploads them to a webserver
+
+==================================================
+
+openssl rsa -in priv.key -pubout -out public.key
+openssl genrsa -out private.key 2048

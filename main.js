@@ -1,10 +1,13 @@
-const {app, BrowserWindow, Tray, Menu, globalShortcut, ipcMain, clipboard} = require("electron");
-const path  = require("path");
-const url   = require("url");
+var path    = require("path");    // -
+var url     = require("url");     // -
 var fs      = require("fs");      // File system
+var crypto  = require("crypto");  // -
+var bcrypt  = require("bcrypt");  // -
 var $       = require("jquery");  // jQuery
-var request = require("request"); // POST request to the server
 var m       = require("./");      // C++ module
+var request = require("request"); // POST request to the server
+var storage = require("electron-json-storage");
+var {app, BrowserWindow, Tray, Menu, globalShortcut, ipcMain, clipboard} = require("electron");
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -12,6 +15,19 @@ var win  = null;
 var tray = null;
 var quit = false;
 var clickedOnButton = null;
+
+storage.setDataPath(__dirname);
+
+// storage.set("foobar", {"foo": "bar"}, function(error){
+//   storage.get("foobar", function(error, data){
+//     if(error)
+//       throw error;
+//     console.log(data);
+//   });
+// });
+
+const dataPath = storage.getDataPath();
+console.log(dataPath);
 
 function createWindow(){
   // Create the browser window
@@ -147,11 +163,15 @@ ipcMain.on("message", (event, msg) => {
 
 app.on("message", (arg) => {
   var func = arg["function"];
-  var data = JSON.parse(arg["data"]);
+  var data = arg["data"];
+  // var data = JSON.parse(arg["data"]);
 
   if     (func == "TakeScreenshot") TakeScreenshotButton(data);
   else if(func == "Quit")           Quit                (data);
+  else if(func == "CreateAccount")  CreateAccount       (data);
   else if(func == "Login")          Login               (data);
+  else if(func == "TestSave")       TestSave            (data);
+  else if(func == "TestLoad")       TestLoad            (data);
 });
 
 function Quit(){
@@ -202,9 +222,91 @@ function TakeScreenshot(){
   });
 }
 
+function TestSave(data){
+  console.log("========== TestSave ==========");
+}
+
+function TestLoad(data){
+  console.log("========== TestLoad ==========");
+}
+
+function EncryptData(data){
+  var publicKeyFile = path.resolve("public.key");
+  var publicKey = fs.readFileSync(publicKeyFile, "utf-8");
+  var buffer = new Buffer(data);
+  return crypto.publicEncrypt(publicKey, buffer);
+}
+
+function CreateAccount(data){
+  var encryptedData = EncryptData(data);
+  ServerHandlesCreateAccount(encryptedData);
+}
+
 function Login(data){
-  console.log("========== Login ==========");
-  console.log(data["username"]);
-  console.log(data["password"]);
-  console.log();
+  var encryptedData = EncryptData(data);
+  ServerHandlesLogin(encryptedData);
+}
+
+///////////////////////////////
+// EXAMPLE CODE FOR A SERVER //
+///////////////////////////////
+
+function ServerDecryptsData(data){
+  var privateKeyFile = path.resolve("private.key");
+  var privateKey = fs.readFileSync(privateKeyFile, "utf-8");
+  var buffer = new Buffer(data, "base64");
+  var decryptedData = crypto.privateDecrypt(privateKey, buffer);
+  var decryptedData = decryptedData.toString("utf-8");
+  return JSON.parse(decryptedData);
+}
+
+function ServerHandlesCreateAccount(data){
+  data = ServerDecryptsData(data);
+
+  var email    = data["email"];
+  var username = data["username"];
+  var password = data["password"];
+
+  bcrypt.hash(password, 10, function(err, hash){
+    console.log("Hashed password");
+    console.log(hash);
+
+    var temp = {
+      "email"   : email,
+      "password": hash
+    };
+
+    // Store information into database
+    storage.get("data-server", function(error, data){
+      data[username] = temp;
+
+      storage.set("data-server", data, function(error){
+        console.log("Info stored!");
+      });
+    });
+  });
+}
+
+function ServerHandlesLogin(data){
+  data = ServerDecryptsData(data);
+  var username = data["username"];
+  var password = data["password"];
+
+  storage.get("data-server", function(error, data){
+    var userData = data[username];
+
+    if(typeof userData != "undefined"){
+      console.log("User exists!");
+
+      bcrypt.compare(password, userData["password"], function(err, res){
+        if(res)
+          console.log("User has been authenticated");
+        else
+          console.log("That was the wrong password");
+        }
+      );
+    }else{
+      console.log("User doesn't exist");
+    }
+  });
 }
