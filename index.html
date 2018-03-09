@@ -92,30 +92,45 @@ body {
 }
 
 #lioca {
-
+  cursor: default;
 }
 
 #menu-buttons{
   width: 100%;
   font-size: 0px;
+  height: 30px;
+  display: table;
 }
 
-#menu-buttons > div {
+.menu-button {
   display: inline-block;
   width: 50%;
-}
-
-#menu-buttons > div > div {
   font-size: 16px;
   text-align: center;
+  display: table-cell;
+  vertical-align: middle;
 }
 
-#menu-line {
+.menu-button[active="true"] {
+
+}
+
+.menu-button[active="false"] {
+  cursor: pointer;
+  color: rgba(0, 0, 0, 0.4);
+}
+
+.menu-button[active="false"]:hover {
+  cursor: pointer;
+  color: rgba(0, 0, 0, 0.7);
+}
+
+#menu-line-bg {
   background-color: lightgray;
   height: 1px;
 }
 
-#line-thing {
+#menu-line-fg {
   position: relative;
   background-color: #5c666f;
   height: 1px;
@@ -136,22 +151,18 @@ body {
   </head>
   <body>
     <div id="titlebar">
-      <div>Logo Here</div>
+      <div class="no-select">Logo Here</div>
       <div id="btn-quit"     class="button"></div>
       <div id="btn-minimize" class="button"></div>
     </div>
 
-    <div id="lioca">
+    <div id="lioca" class="no-select">
       <div id="menu-buttons">
-        <div id="menu-login">
-          <div>Login</div>
-        </div>
-        <div id="menu-create-account">
-          <div>Create Account</div>
-        </div>
+        <div id="menu-login"          class="menu-button" active="true">Login</div>
+        <div id="menu-create-account" class="menu-button" active="false">Create Account</div>
       </div>
-      <div id="menu-line">
-        <div id="line-thing"></div>
+      <div id="menu-line-bg">
+        <div id="menu-line-fg"></div>
       </div>
     </div>
 
@@ -276,6 +287,28 @@ $("input").on("input", function(){
     $(span).hide();
   else
     $(span).show();
+});
+
+$("#menu-login").click(function(){
+  if($(this).attr("active") == "false"){
+    $("#menu-login").attr("active", "true");
+    $("#menu-create-account").attr("active", "false");
+
+    $("#menu-line-fg").animate({
+      left: "0%"
+    }, 250, function(){});
+  }
+});
+
+$("#menu-create-account").click(function(){
+  if($(this).attr("active") == "false"){
+    $("#menu-login").attr("active", "false");
+    $("#menu-create-account").attr("active", "true");
+
+    $("#menu-line-fg").animate({
+      left: "50%"
+    }, 250, function(){});
+  }
 });
 
 </script>
