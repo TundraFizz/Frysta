@@ -27,7 +27,6 @@ storage.setDataPath(__dirname);
 // });
 
 const dataPath = storage.getDataPath();
-console.log(dataPath);
 
 function createWindow(){
   // Create the browser window
@@ -35,9 +34,12 @@ function createWindow(){
     width: 400,
     height: 300,
     show: false,
-    resizable: false,
+    frame: false,
+    // resizable: false,
     icon: path.join(__dirname, "icon64x64.png")
   });
+
+  win.toggleDevTools();
 
   win.setMenu(null);
 
@@ -167,12 +169,17 @@ app.on("message", (arg) => {
   // var data = JSON.parse(arg["data"]);
 
   if     (func == "TakeScreenshot") TakeScreenshotButton(data);
+  else if(func == "Minimize")       Minimize            (data);
   else if(func == "Quit")           Quit                (data);
   else if(func == "CreateAccount")  CreateAccount       (data);
   else if(func == "Login")          Login               (data);
   else if(func == "TestSave")       TestSave            (data);
   else if(func == "TestLoad")       TestLoad            (data);
 });
+
+function Minimize(){
+  win.hide();
+}
 
 function Quit(){
   quit = true;
@@ -230,21 +237,31 @@ function TestLoad(data){
   console.log("========== TestLoad ==========");
 }
 
-function EncryptData(data){
-  var publicKeyFile = path.resolve("public.key");
-  var publicKey = fs.readFileSync(publicKeyFile, "utf-8");
+// It's important that crypto.publicEncrypt is called one time on startup in
+// order to prime it for future calls. The reason why this is important is
+// because the client lags/freezes for half a second the first time it's
+// called which is bad user experience. By doing this initial dry run, the
+// lag that normally would have been experienced by the user is prevented.
+var publicKey = null;
+fs.readFile("public.key", (err, data) => {
+  publicKey = data;
+  crypto.publicEncrypt(publicKey, new Buffer(""));
+});
+
+EncryptData = function(data){return new Promise((resolve) => {
   var buffer = new Buffer(data);
-  return crypto.publicEncrypt(publicKey, buffer);
-}
+  var encryptedData = crypto.publicEncrypt(publicKey, buffer);
+  resolve(encryptedData);
+})}
 
 function CreateAccount(data){
-  var encryptedData = EncryptData(data);
-  ServerHandlesCreateAccount(encryptedData);
+  EncryptData(data)
+  .then((data) => ServerHandlesCreateAccount(data));
 }
 
 function Login(data){
-  var encryptedData = EncryptData(data);
-  ServerHandlesLogin(encryptedData);
+  EncryptData(data)
+  .then((data) => ServerHandlesLogin(data));
 }
 
 ///////////////////////////////
@@ -262,6 +279,7 @@ function ServerDecryptsData(data){
 
 function ServerHandlesCreateAccount(data){
   data = ServerDecryptsData(data);
+  console.log(data)
 
   var email    = data["email"];
   var username = data["username"];

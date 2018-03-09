@@ -1,4 +1,13 @@
 <style>
+
+html {
+  font: 14px/24px "lato", sans-serif;
+}
+
+body {
+  margin: 0;
+}
+
 #buttons {
 }
 
@@ -28,53 +37,165 @@
 #btn-screenshot {
 }
 
-#btn-quit {
+
+
+
+#titlebar {
+  -webkit-user-select: none;
+  -webkit-app-region: drag;
+  height: 18px;
+  border: solid black;
+  border-width: 0px 0px 1px 0px;
 }
+
+#titlebar > div {
+  display: inline-block;
+}
+
+#titlebar > .button {
+  -webkit-app-region: no-drag;
+  width: 22px;
+  height: 18px;
+  float: right;
+  cursor: pointer;
+}
+
+#btn-minimize {
+  background-color: #a0a0ff;
+}
+
+#btn-minimize:hover {
+  background-color: #8888ff;
+}
+
+#btn-minimize:active {
+  background-color: #0000ff;
+}
+
+#btn-quit {
+  background-color: #ffa0a0;
+}
+
+#btn-quit:hover {
+  background-color: #ff8888;
+}
+
+#btn-quit:active {
+  background-color: #ff0000;
+}
+
+.input-field {
+  position: absolute;
+  left: 6px;
+  color: rgba(0, 0, 0, 0.7);
+  pointer-events: none;
+}
+
+#lioca {
+
+}
+
+#menu-buttons{
+  width: 100%;
+  font-size: 0px;
+}
+
+#menu-buttons > div {
+  display: inline-block;
+  width: 50%;
+}
+
+#menu-buttons > div > div {
+  font-size: 16px;
+  text-align: center;
+}
+
+#menu-line {
+  background-color: lightgray;
+  height: 1px;
+}
+
+#line-thing {
+  position: relative;
+  background-color: #5c666f;
+  height: 1px;
+  width: 50%;
+  left: 0%;
+}
+
 </style>
 
 <!DOCTYPE html>
 <html>
   <head>
-    <meta charset="UTF-8">
+    <meta charset="utf-8">
+    <link href="http://fonts.googleapis.com/css?family=Lato:100,400,700|Playfair+Display:400italic|Source+Code+Pro" rel="stylesheet" type="text/css">
     <title>Frost Frame</title>
-    <script>if (typeof module === "object") {window.module = module; module = undefined;}</script>
+    <script>if(typeof module === "object") {window.module = module; module = undefined;}</script>
     <script src="./node_modules/jquery/dist/jquery.js"></script>
   </head>
   <body>
-    <div id="buttons">
-      <div id="btn-screenshot" class="btn no-select">Screenshot</div>
-      <div id="btn-quit"       class="btn no-select">Quit</div>
+    <div id="titlebar">
+      <div>Logo Here</div>
+      <div id="btn-quit"     class="button"></div>
+      <div id="btn-minimize" class="button"></div>
     </div>
-    <!-- <h1>Hello World!</h1>
-    Using Node: <script>document.write(process.versions.node)</script><br>
-    Using Chrome: <script>document.write(process.versions.chrome)</script><br>
-    Using Electron: <script>document.write(process.versions.electron)</script><br> -->
 
-    <div>
-      <div>-----------------------------------------------------</div>
-      <div id="url-here"></div>
-      <div>-----------------------------------------------------</div>
+    <div id="lioca">
+      <div id="menu-buttons">
+        <div id="menu-login">
+          <div>Login</div>
+        </div>
+        <div id="menu-create-account">
+          <div>Create Account</div>
+        </div>
+      </div>
+      <div id="menu-line">
+        <div id="line-thing"></div>
+      </div>
     </div>
 
     <div>
       <table id="form-login">
         <tr>
-          <td>Email</td>
-          <td><input value="" name="email" type="text"></td>
+          <td>
+            <div>
+              <span class="input-field no-select">Email address</span>
+              <input value="" name="email" type="text">
+            </div>
+          </td>
         </tr>
         <tr>
-          <td>Username</td>
-          <td><input value="" name="username" type="text"></td>
+          <td>
+            <div>
+              <span class="input-field no-select">Username</span>
+              <input value="" name="username" type="text">
+            </div>
+          </td>
         </tr>
         <tr>
-          <td>Password</td>
-          <td><input value="" name="password" type="password"></td>
+          <td>
+            <div>
+              <span class="input-field no-select">Password</span>
+              <input value="" name="password" type="password">
+            </div>
+          </td>
         </tr>
         <tr>
           <td><div id="login" class="btn no-select">Login</div></td>
           <td><div id="create-account" class="btn no-select">Create Account</div></td>
         </tr>
       </table>
+    </div>
+
+    <div id="buttons">
+      <div id="btn-screenshot" class="btn no-select">Screenshot</div>
+    </div>
+
+    <div>
+      <div>-----------------------------------------------------</div>
+      <div id="url-here"></div>
+      <div>-----------------------------------------------------</div>
     </div>
 
   </body>
@@ -99,6 +220,10 @@ ipc.on("message", (event, msg) => {
 // Sending messages to main.js
 $("#btn-screenshot").click(function(){
   SendMessage("TakeScreenshot");
+});
+
+$("#btn-minimize").click(function(){
+  SendMessage("Minimize");
 });
 
 $("#btn-quit").click(function(){
@@ -128,6 +253,29 @@ $("#test-save").click(function(){
 
 $("#test-load").click(function(){
   SendMessage("TestLoad");
+});
+
+$("input").on("click",function(){
+  var text = $(this).val();
+  var span = $("span", $(this).parent())[0];
+  if(!text)
+    $(span).css("color", "rgba(0, 0, 0, 0.4)");
+});
+
+$("input").on("blur",function(){
+  var text = $(this).val();
+  var span = $("span", $(this).parent())[0];
+  if(!text)
+    $(span).css("color", "rgba(0, 0, 0, 0.7)");
+});
+
+$("input").on("input", function(){
+  var text = $(this).val();
+  var span = $("span", $(this).parent())[0];
+  if(text)
+    $(span).hide();
+  else
+    $(span).show();
 });
 
 </script>
