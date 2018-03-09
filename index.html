@@ -84,7 +84,7 @@ body {
   background-color: #ff0000;
 }
 
-.input-field {
+.input-label {
   position: absolute;
   left: 6px;
   color: rgba(0, 0, 0, 0.7);
@@ -95,7 +95,7 @@ body {
   cursor: default;
 }
 
-#menu-buttons{
+#menu-buttons {
   width: 100%;
   font-size: 0px;
   height: 30px;
@@ -138,6 +138,41 @@ body {
   left: 0%;
 }
 
+#input-field-container {
+  width: 100%;
+  margin: 12px 0px;
+  height: 78px;
+}
+
+.input-field {
+  margin: 0 auto;
+  width: 50%;
+  position: relative;
+  height: 26px;
+  top: 12px;
+}
+
+input {
+  width: 100%;
+}
+
+#login-button-container {
+  text-align: center;
+}
+
+.btn2 {
+  border-radius: 22px;
+  position: relative;
+  width: 22px;
+  height: 22px;
+  background-color: darkgray;
+  color: black;
+  border: 1px solid black;
+  cursor: pointer;
+  text-align: center;
+  line-height: 22px;
+  display: inline-block;
+}
 </style>
 
 <!DOCTYPE html>
@@ -166,38 +201,28 @@ body {
       </div>
     </div>
 
-    <div>
-      <table id="form-login">
-        <tr>
-          <td>
-            <div>
-              <span class="input-field no-select">Email address</span>
-              <input value="" name="email" type="text">
-            </div>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <div>
-              <span class="input-field no-select">Username</span>
-              <input value="" name="username" type="text">
-            </div>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <div>
-              <span class="input-field no-select">Password</span>
-              <input value="" name="password" type="password">
-            </div>
-          </td>
-        </tr>
-        <tr>
-          <td><div id="login" class="btn no-select">Login</div></td>
-          <td><div id="create-account" class="btn no-select">Create Account</div></td>
-        </tr>
-      </table>
+    <div id="input-field-container">
+      <div id="input-field-email" class="input-field" style="display: none; height: 0px;">
+        <span class="input-label no-select">Email address</span>
+        <input value="" name="email" type="text">
+      </div>
+      <div id="input-field-username" class="input-field">
+        <span class="input-label no-select">Username</span>
+        <input value="" name="username" type="text">
+      </div>
+      <div id="input-field-password" class="input-field">
+        <span class="input-label no-select">Password</span>
+        <input value="" name="password" type="password">
+      </div>
     </div>
+
+    <div id="login-button-container">
+      <div id="login" class="btn2 no-select">-></div>
+    </div>
+
+    <br><br><br><br><br>
+
+    <!-- <div id="create-account" class="btn no-select">Create Account</div> -->
 
     <div id="buttons">
       <div id="btn-screenshot" class="btn no-select">Screenshot</div>
@@ -294,20 +319,47 @@ $("#menu-login").click(function(){
     $("#menu-login").attr("active", "true");
     $("#menu-create-account").attr("active", "false");
 
+    // Animate the line
     $("#menu-line-fg").animate({
       left: "0%"
-    }, 250, function(){});
+    }, {duration: 250, queue: false}, function(){});
+
+    // Animate the input fields
+    $(".input-field").animate({
+      top: "12px"
+    }, {duration: 250, queue: false}, function(){});
+
+    // Hide the email field
+    $("#input-field-email").animate({
+      height: "0px"
+    }, {duration: 250, queue: false}, function(){
+      $("#input-field-email").css("display", "none");
+    });
   }
 });
 
 $("#menu-create-account").click(function(){
   if($(this).attr("active") == "false"){
+    // Show the email field
+    $("#input-field-email").css("display", "block");
+
     $("#menu-login").attr("active", "false");
     $("#menu-create-account").attr("active", "true");
 
+    // Animate the line
     $("#menu-line-fg").animate({
       left: "50%"
-    }, 250, function(){});
+    }, {duration: 250, queue: false}, function(){});
+
+    // Animate the input fields
+    $(".input-field").animate({
+      top: "0px"
+    }, {duration: 250, queue: false}, function(){});
+
+    // Have the email field appear
+    $("#input-field-email").animate({
+      height: "26px"
+    }, {duration: 250, queue: false}, function(){});
   }
 });
 
