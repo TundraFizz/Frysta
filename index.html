@@ -3,7 +3,6 @@
 html {
   font: 14px/24px "lato", sans-serif;
   background-color: #33363f;
-  /*DARKER: #272a31 */
   color: #c0c0c0;
 }
 
@@ -62,7 +61,7 @@ body {
   display: inline-block;
 }
 
-#titlebar > .button {
+.titlebar-button {
   -webkit-app-region: no-drag;
   width: 22px;
   height: 18px;
@@ -71,27 +70,29 @@ body {
 }
 
 #btn-minimize {
-  background-color: #3336c8;
+  text-align: center;
+  line-height: 1.25;
 }
 
 #btn-minimize:hover {
-  background-color: #3336e1;
+  background-color: #3336c8;
 }
 
 #btn-minimize:active {
-  background-color: #3336fa;
+  background-color: #3336e1;
 }
 
 #btn-quit {
-  background-color: #c8363f;
+  text-align: center;
+  line-height: 1.25;
 }
 
 #btn-quit:hover {
-  background-color: #e1363f;
+  background-color: #c8363f;
 }
 
 #btn-quit:active {
-  background-color: #fa363f;
+  background-color: #e1363f;
 }
 
 #lioca {
@@ -205,6 +206,15 @@ body {
 .btn2:active {
   box-shadow: 0px 0px 0px 0px #5fb9ff;
 }*/
+
+#loading {
+  position: relative;
+  top: -26px;
+  width: 28px;
+  margin: 0 auto;
+  opacity: 0;
+  visibility: hidden;
+}
 </style>
 
 <!DOCTYPE html>
@@ -215,12 +225,13 @@ body {
     <title>Frost Frame</title>
     <script>if(typeof module === "object") {window.module = module; module = undefined;}</script>
     <script src="./node_modules/jquery/dist/jquery.js"></script>
+    <script src="./jquery-animate-shadow.js"></script>
   </head>
   <body>
     <div id="titlebar">
       <div id="title-text"   class="no-select">Frysta</div>
-      <div id="btn-quit"     class="button"></div>
-      <div id="btn-minimize" class="button"></div>
+      <div id="btn-quit"     class="no-select titlebar-button">⨉</div>
+      <div id="btn-minimize" class="no-select titlebar-button">—</div>
     </div>
 
     <div id="lioca" class="no-select">
@@ -236,20 +247,25 @@ body {
     <div id="input-field-container">
       <div id="input-field-email" class="input-field">
         <span class="input-label no-select">Email address</span>
-        <input value="" name="email" type="text">
+        <input name="email" type="text">
       </div>
       <div id="input-field-username" class="input-field">
         <span class="input-label no-select">Username</span>
-        <input value="" name="username" type="text">
+        <input name="username" type="text">
       </div>
       <div id="input-field-password" class="input-field">
         <span class="input-label no-select">Password</span>
-        <input value="" name="password" type="password">
+        <input name="password" type="password">
       </div>
     </div>
 
     <div id="login-button-container">
-      <div id="login" class="btn2 no-select">Submit</div>
+      <div id="submit" class="btn2 no-select">
+        <div>Submit</div>
+      </div>
+      <div id="loading">
+        <img src="loading.svg">
+      </div>
     </div>
 
     <br><br><br><br><br>
@@ -274,9 +290,23 @@ body {
 $(".btn2").hover(function(){
   $(this).animate({
     "box-shadow": "0px 0px 10px 0px #5fb9ff"
-  }, 200);
+  }, 50);
 }, function(){
-  alert("REEEEEEEEEE");
+  $(this).animate({
+    "box-shadow": "0px 0px 5px 0px #5fb9ff"
+  }, 50);
+});
+
+$(".btn2").mousedown(function(){
+  $(this).animate({
+    "box-shadow": "0px 0px 0px 0px #5fb9ff"
+  }, 50);
+});
+
+$(".btn2").mouseup(function(){
+  $(this).animate({
+    "box-shadow": "0px 0px 5px 0px #5fb9ff"
+  }, 50);
 });
 
 const ipc         = require("electron").ipcRenderer;
@@ -307,21 +337,40 @@ $("#btn-quit").click(function(){
   SendMessage("Quit");
 });
 
-$("#create-account").click(function(){
-  var data = {
-    "email"   : $("#form-login [name='email']").val(),
-    "username": $("#form-login [name='username']").val(),
-    "password": $("#form-login [name='password']").val()
-  };
-  SendMessage("CreateAccount", data);
-});
+$("#submit").click(function(){
+  $("div", this).animate({
+    "opacity": "0"
+  }, 100);
 
-$("#login").click(function(){
-  var data = {
-    "username": $("#form-login [name='username']").val(),
-    "password": $("#form-login [name='password']").val()
-  };
-  SendMessage("Login", data);
+  $(this).animate({
+    "width": "22px",
+    "border-radius": "12px"
+  }, 100, function(){
+    $(this).animate({
+      "opacity": "0"
+    }, 100);
+    $("#loading").animate({
+      "opacity": "1"
+    }, 100);
+
+    $("#loading").css("visibility", "visible");
+  });
+
+  return;
+
+  var selection = $($(".menu-button[active='true']")[0]).text();
+  var data      = {};
+
+  if(selection == "Login"){
+    data["username"] = $("input[name='username']").val();
+    data["password"] = $("input[name='password']").val();
+    SendMessage("Login", data);
+  }else if(selection == "Create Account"){
+    data["email"]    = $("input[name='email']").val();
+    data["username"] = $("input[name='username']").val();
+    data["password"] = $("input[name='password']").val();
+    SendMessage("CreateAccount", data);
+  }
 });
 
 $("#test-save").click(function(){
@@ -332,7 +381,7 @@ $("#test-load").click(function(){
   SendMessage("TestLoad");
 });
 
-$("input").on("click",function(){
+$("input").on("focus",function(){
   var text = $(this).val();
   var span = $("span", $(this).parent())[0];
   if(!text)
@@ -356,6 +405,28 @@ $("input").on("input", function(){
 });
 
 $("#menu-login").click(function(){
+  // TEST //
+  $("#loading").animate({
+    "opacity": "0"
+  }, 100, function(){
+    $("#loading").css("visibility", "hidden");
+  });
+
+  $("#submit").animate({
+    "opacity": "1"
+  }, 100, function(){
+
+    $("#submit").animate({
+      "width": "54px",
+      "border-radius": "4px"
+    }, 100);
+
+    $("#submit > div").animate({
+      "opacity": "1"
+    }, 100);
+  });
+  // TEST //
+
   if($(this).attr("active") == "false"){
     $("#menu-login").attr("active", "true");
     $("#menu-create-account").attr("active", "false");
@@ -367,7 +438,7 @@ $("#menu-login").click(function(){
 
     $("#input-field-username").animate({
       "top": "14px"
-    }, {duration: 250, queue: false}, function(){});
+    }, {duration: 250, queue: false});
 
     $("#input-field-password").animate({
       "top": "48px"

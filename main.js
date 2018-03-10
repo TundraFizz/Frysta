@@ -77,7 +77,7 @@ function createWindow(){
       }
     },
     {
-      "label": "Quit Frost Frame",
+      "label": "Quit Frysta",
       "click": function(){
         quit = true;
         win.close();
