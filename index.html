@@ -2,6 +2,9 @@
 
 html {
   font: 14px/24px "lato", sans-serif;
+  background-color: #33363f;
+  /*DARKER: #272a31 */
+  color: #c0c0c0;
 }
 
 body {
@@ -37,15 +40,22 @@ body {
 #btn-screenshot {
 }
 
-
-
-
 #titlebar {
   -webkit-user-select: none;
   -webkit-app-region: drag;
   height: 18px;
   border: solid black;
   border-width: 0px 0px 1px 0px;
+  box-shadow: 0px 0px 6px 0px #5fb9ff;
+}
+
+#title-text {
+  position: relative;
+  top: -3px;
+  left: 4px;
+  height: 18px;
+  font-size: 12px;
+  font-weight: bold;
 }
 
 #titlebar > div {
@@ -61,34 +71,27 @@ body {
 }
 
 #btn-minimize {
-  background-color: #a0a0ff;
+  background-color: #3336c8;
 }
 
 #btn-minimize:hover {
-  background-color: #8888ff;
+  background-color: #3336e1;
 }
 
 #btn-minimize:active {
-  background-color: #0000ff;
+  background-color: #3336fa;
 }
 
 #btn-quit {
-  background-color: #ffa0a0;
+  background-color: #c8363f;
 }
 
 #btn-quit:hover {
-  background-color: #ff8888;
+  background-color: #e1363f;
 }
 
 #btn-quit:active {
-  background-color: #ff0000;
-}
-
-.input-label {
-  position: absolute;
-  left: 6px;
-  color: rgba(0, 0, 0, 0.7);
-  pointer-events: none;
+  background-color: #fa363f;
 }
 
 #lioca {
@@ -112,48 +115,69 @@ body {
 }
 
 .menu-button[active="true"] {
-
+  text-shadow: 0px 0px 8px #5fff79;
 }
 
 .menu-button[active="false"] {
   cursor: pointer;
-  color: rgba(0, 0, 0, 0.4);
+  /*color: rgba(0, 0, 0, 0.4);*/
 }
 
 .menu-button[active="false"]:hover {
   cursor: pointer;
-  color: rgba(0, 0, 0, 0.7);
+  /*color: rgba(0, 0, 0, 0.7);*/
 }
 
 #menu-line-bg {
-  background-color: lightgray;
+  background-color: black;
   height: 1px;
 }
 
 #menu-line-fg {
   position: relative;
-  background-color: #5c666f;
+  background-color: #c0c0c0;
   height: 1px;
   width: 50%;
   left: 0%;
 }
 
 #input-field-container {
+  position: relative;
   width: 100%;
-  margin: 12px 0px;
-  height: 78px;
+  height: 82px;
+}
+
+#input-field-email {
+  top: 4px;
+  visibility: hidden;
+  opacity: 0;
+}
+
+#input-field-username {
+  top: 14px;
+}
+
+#input-field-password {
+  top: 48px;
 }
 
 .input-field {
-  margin: 0 auto;
+  position: absolute;
   width: 50%;
-  position: relative;
-  height: 26px;
-  top: 12px;
+  left: 25%;
 }
 
-input {
+.input-label {
+  position: absolute;
+  left: 6px;
+  color: rgba(0, 0, 0, 0.7);
+  pointer-events: none;
+  height: 100%;
+}
+
+.input-field > input {
   width: 100%;
+  display: block;
 }
 
 #login-button-container {
@@ -161,18 +185,26 @@ input {
 }
 
 .btn2 {
-  border-radius: 22px;
+  border-radius: 4px;
   position: relative;
-  width: 22px;
+  width: 54px;
   height: 22px;
-  background-color: darkgray;
-  color: black;
-  border: 1px solid black;
+  background-color: #3e424e;
+  border: 1px solid #4d515c;
   cursor: pointer;
   text-align: center;
   line-height: 22px;
   display: inline-block;
+  box-shadow: 0px 0px 5px 0px #5fb9ff;
 }
+
+/*.btn2:hover {
+  box-shadow: 0px 0px 10px 0px #5fb9ff;
+}
+
+.btn2:active {
+  box-shadow: 0px 0px 0px 0px #5fb9ff;
+}*/
 </style>
 
 <!DOCTYPE html>
@@ -186,7 +218,7 @@ input {
   </head>
   <body>
     <div id="titlebar">
-      <div class="no-select">Logo Here</div>
+      <div id="title-text"   class="no-select">Frysta</div>
       <div id="btn-quit"     class="button"></div>
       <div id="btn-minimize" class="button"></div>
     </div>
@@ -202,7 +234,7 @@ input {
     </div>
 
     <div id="input-field-container">
-      <div id="input-field-email" class="input-field" style="display: none; height: 0px;">
+      <div id="input-field-email" class="input-field">
         <span class="input-label no-select">Email address</span>
         <input value="" name="email" type="text">
       </div>
@@ -217,7 +249,7 @@ input {
     </div>
 
     <div id="login-button-container">
-      <div id="login" class="btn2 no-select">-></div>
+      <div id="login" class="btn2 no-select">Submit</div>
     </div>
 
     <br><br><br><br><br>
@@ -238,6 +270,15 @@ input {
 </html>
 
 <script>
+
+$(".btn2").hover(function(){
+  $(this).animate({
+    "box-shadow": "0px 0px 10px 0px #5fb9ff"
+  }, 200);
+}, function(){
+  alert("REEEEEEEEEE");
+});
+
 const ipc         = require("electron").ipcRenderer;
 const EmitMessage = require("electron").remote.app.emit;
 
@@ -321,45 +362,48 @@ $("#menu-login").click(function(){
 
     // Animate the line
     $("#menu-line-fg").animate({
-      left: "0%"
+      "left": "0%"
+    }, {duration: 250, queue: false});
+
+    $("#input-field-username").animate({
+      "top": "14px"
     }, {duration: 250, queue: false}, function(){});
 
-    // Animate the input fields
-    $(".input-field").animate({
-      top: "12px"
-    }, {duration: 250, queue: false}, function(){});
+    $("#input-field-password").animate({
+      "top": "48px"
+    }, {duration: 250, queue: false});
 
-    // Hide the email field
     $("#input-field-email").animate({
-      height: "0px"
-    }, {duration: 250, queue: false}, function(){
-      $("#input-field-email").css("display", "none");
-    });
+      "opacity": "0"
+    }, {duration: 250, queue: false, complete: function(){
+      $("#input-field-email").css("visibility", "hidden", "important");
+    }});
   }
 });
 
 $("#menu-create-account").click(function(){
   if($(this).attr("active") == "false"){
-    // Show the email field
-    $("#input-field-email").css("display", "block");
-
     $("#menu-login").attr("active", "false");
     $("#menu-create-account").attr("active", "true");
 
     // Animate the line
     $("#menu-line-fg").animate({
-      left: "50%"
-    }, {duration: 250, queue: false}, function(){});
+      "left": "50%"
+    }, {duration: 250, queue: false});
 
-    // Animate the input fields
-    $(".input-field").animate({
-      top: "0px"
-    }, {duration: 250, queue: false}, function(){});
+    $("#input-field-username").animate({
+      "top": "30px"
+    }, {duration: 250, queue: false});
 
-    // Have the email field appear
+    $("#input-field-password").animate({
+      "top": "56px"
+    }, {duration: 250, queue: false});
+
     $("#input-field-email").animate({
-      height: "26px"
-    }, {duration: 250, queue: false}, function(){});
+      "opacity": "1"
+    }, {duration: 250, queue: false});
+
+    $("#input-field-email").css("visibility", "visible", "important");
   }
 });
 
