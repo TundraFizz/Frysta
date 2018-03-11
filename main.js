@@ -9,6 +9,14 @@ var request = require("request"); // POST request to the server
 var storage = require("electron-json-storage");
 var {app, BrowserWindow, Tray, Menu, globalShortcut, ipcMain, clipboard} = require("electron");
 
+// var Growl          = require("node-notifier").Growl;
+// var Growl = require("growly");
+// var WindowsToaster = require("node-notifier").WindowsToaster;
+// var NotificationCenter = require("node-notifier").NotificationCenter;
+// var notification = require("node-notifier");
+// var balloon      = require("node-notifier").WindowsBalloon;
+// var NotifySend = require('node-notifier').NotifySend;
+
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 var win  = null;
@@ -37,6 +45,7 @@ function createWindow(){
     height: 600,
     show: false,
     frame: false,
+    backgroundColor: "#33363f",
     // resizable: false,
     icon: path.join(__dirname, "icon64x64.png")
   });
@@ -159,16 +168,9 @@ app.on("activate", () => {
   }
 });
 
-// This isn't used anymore
-ipcMain.on("message", (event, msg) => {
-  console.log(msg);
-  event.sender.send("async-reply", 2);
-});
-
 app.on("message", (msg) => {
   var func = msg["function"];
   var data = msg["data"];
-  // var data = JSON.parse(msg["data"]);
 
   if     (func == "TakeScreenshot") TakeScreenshotButton(data);
   else if(func == "Minimize")       Minimize            (data);
@@ -217,7 +219,7 @@ function TakeScreenshot(){
       "file": fs.createReadStream(result)
     };
 
-    request.post({url:"https://fizz.gg/qwerty", formData: formData, json: true}, function(err, res, body){
+    request.post({url:"https://fizz.gg/send-screenshot", formData: formData, json: true}, function(err, res, body){
       if(err)
         return console.error("FAILED:", err);
 
@@ -226,10 +228,72 @@ function TakeScreenshot(){
 
       clipboard.write({"text": body["url"]});
 
-      // win.webContents.send("message", body["url"]);
+      // var notifier = new Growl({
+      //   name: 'Growl Name Used', // Defaults as 'Node'
+      //   host: 'localhost',
+      //   port: 23053
+      // });
+
+      // Growl.notify('Stuffs broken!', function(err, action) {
+      //   console.log('Action:', action);
+      //   console.log('Err   :', err);
+      // });
+      // growly.notify('This is as easy as it gets', { title: 'Hello, World!' });
+
+
+      // var notifier = new Growl({
+      //   name: 'Growl Name Used', // Defaults as 'Node'
+      //   host: 'localhost',
+      //   port: 23053
+      // });
+
+      // notifier.notify({
+      //   title: 'Foo',
+      //   message: 'Hello World',
+      //   icon: path.join(__dirname, "icon64x64.png"),
+      //   wait: false, // Wait for User Action against Notification
+
+      //   // and other growl options like sticky etc.
+      //   sticky: false,
+      //   label: void 0,
+      //   priority: void 0
+      // });
+
+      // var notifier = new WindowsToaster({
+      //   // withFallback: true
+      // });
+
+      // notifier.notify(
+      //   {
+      //     title: "Title",
+      //     message: "Message",
+      //     icon: path.join(__dirname, "icon64x64.png"),
+      //     sound: "Default", // http://msdn.microsoft.com/en-us/library/windows/apps/hh761492.aspx
+      //     wait: true, // Bool. Wait for User Action against Notification or times out
+      //     id: void 0, // Number. ID to use for closing notification.
+      //     appID: void 0, // String. App.ID and app Name. Defaults to no value, causing SnoreToast text to be visible.
+      //     remove: void 0, // Number. Refer to previously created notification to close.
+      //     install: void 0 // String (path, application, app id).  Creates a shortcut <path> in the start menu which point to the executable <application>, appID used for the notifications.
+      //   },
+      //   function(error, response) {
+      //     console.log(response);
+      //     console.log(error);
+      //   }
+      // );
+
+
+
     });
   });
 }
+
+// notification.on("click", function(notifierObject, options){
+//   console.log("CLICK");
+// });
+
+// notification.on("timeout", function(notifierObject, options){
+//   console.log("TIMEOUT");
+// });
 
 function TestSave(data){
   console.log("========== TestSave ==========");
@@ -272,88 +336,17 @@ function SendMessage(func, data=null){
 function CreateAccount(data){
   EncryptData(data)
   .then((data) => {
-    request.post({url:"https://fizz.gg/create-account", form: {"data":data}}, function(err, res, body){
-      console.log("GOT SOMETHING!");
-      console.log(body);
-      SendMessage("YoloSwag", body);
+    request.post({url:"https://fizz.gg/create-account", form: {"data":data}}, function(err, res, msg){
+      SendMessage("YoloSwag", msg);
     });
   });
 }
 
 function Login(data){
   EncryptData(data)
-  .then((data) => ServerHandlesLogin(data));
-}
-
-///////////////////////////////
-// EXAMPLE CODE FOR A SERVER //
-///////////////////////////////
-
-function ServerDecryptsData(data){
-  var privateKeyFile = path.resolve("private.key");
-  var privateKey = fs.readFileSync(privateKeyFile, "utf-8");
-  var buffer = new Buffer(data, "base64");
-  var decryptedData = crypto.privateDecrypt(privateKey, buffer);
-  var decryptedData = decryptedData.toString("utf-8");
-  return JSON.parse(decryptedData);
-}
-
-function ServerHandlesCreateAccount(data){
-  data = ServerDecryptsData(data);
-  console.log(data)
-
-  var email    = data["email"];
-  var username = data["username"];
-  var password = data["password"];
-
-  bcrypt.hash(password, 10, function(err, hash){
-    console.log("Hashed password");
-    console.log(hash);
-
-    var temp = {
-      "email"   : email,
-      "password": hash
-    };
-
-    // Store information into database
-    storage.get("data-server", function(error, data){
-      data[username] = temp;
-
-      storage.set("data-server", data, function(error){
-        console.log("Info stored!");
-      });
+  .then((data) => {
+    request.post({url:"https://fizz.gg/login", form: {"data":data}}, function(err, res, msg){
+      SendMessage("YoloSwag", msg);
     });
   });
 }
-
-function ServerHandlesLogin(data){
-  data = ServerDecryptsData(data);
-  var username = data["username"];
-  var password = data["password"];
-
-  storage.get("data-server", function(error, data){
-    var userData = data[username];
-
-    if(typeof userData != "undefined"){
-      console.log("User exists!");
-
-      bcrypt.compare(password, userData["password"], function(err, res){
-        if(res)
-          console.log("User has been authenticated");
-        else
-          console.log("That was the wrong password");
-        }
-      );
-    }else{
-      console.log("User doesn't exist");
-    }
-  });
-}
-
-// storage.get("data-server", function(error, data){
-//   data[username] = temp;
-
-//   storage.set("data-server", data, function(error){
-//     console.log("Info stored!");
-//   });
-// });

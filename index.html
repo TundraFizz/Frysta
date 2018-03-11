@@ -245,6 +245,9 @@ body {
   box-shadow: 0px 0px 5px 0px #ff4040;
 }
 
+#app-1 {}
+#app-2 {display: none;}
+
 </style>
 
 <!DOCTYPE html>
@@ -252,7 +255,7 @@ body {
   <head>
     <meta charset="utf-8">
     <link href="http://fonts.googleapis.com/css?family=Lato:100,400,700|Playfair+Display:400italic|Source+Code+Pro" rel="stylesheet" type="text/css">
-    <title>Frost Frame</title>
+    <title>Frysta</title>
     <script>if(typeof module === "object") {window.module = module; module = undefined;}</script>
     <script src="./node_modules/jquery/dist/jquery.js"></script>
     <script src="./jquery-animate-shadow.js"></script>
@@ -264,56 +267,57 @@ body {
       <div id="btn-minimize" class="no-select titlebar-button">—</div>
     </div>
 
-    <div id="lioca" class="no-select">
-      <div id="menu-buttons">
-        <div id="menu-login"          class="menu-button" active="true">Login</div>
-        <div id="menu-create-account" class="menu-button" active="false">Create Account</div>
+    <div id="app-1">
+      <div id="lioca" class="no-select">
+        <div id="menu-buttons">
+          <div id="menu-login"          class="menu-button" active="true">Login</div>
+          <div id="menu-create-account" class="menu-button" active="false">Create Account</div>
+        </div>
+        <div id="menu-line-bg">
+          <div id="menu-line-fg"></div>
+        </div>
       </div>
-      <div id="menu-line-bg">
-        <div id="menu-line-fg"></div>
+
+      <div id="input-field-container">
+        <div id="input-field-email" class="input-field">
+          <span class="input-label no-select">Email address</span>
+          <input name="email" type="text">
+        </div>
+        <div id="input-field-username" class="input-field">
+          <span class="input-label no-select">Username</span>
+          <input name="username" type="text">
+        </div>
+        <div id="input-field-password" class="input-field">
+          <span class="input-label no-select">Password</span>
+          <input name="password" type="password">
+        </div>
+      </div>
+
+      <div id="login-button-container">
+        <div id="submit" class="btn2 no-select">
+          <div>Submit</div>
+        </div>
+        <div id="loading"></div>
+      </div>
+
+      <div id="message-container" class="no-select">
+        <div id="message"></div>
       </div>
     </div>
 
-    <div id="input-field-container">
-      <div id="input-field-email" class="input-field">
-        <span class="input-label no-select">Email address</span>
-        <input name="email" type="text">
+    <div id="app-2">
+      <div>dsjfkhsd kjsdfhksd kjhk</div>
+
+      <div id="buttons">
+        <div id="btn-screenshot" class="btn no-select">Screenshot</div>
       </div>
-      <div id="input-field-username" class="input-field">
-        <span class="input-label no-select">Username</span>
-        <input name="username" type="text">
-      </div>
-      <div id="input-field-password" class="input-field">
-        <span class="input-label no-select">Password</span>
-        <input name="password" type="password">
+
+      <div>
+        <div>-----------------------------------------------------</div>
+        <div id="url-here"></div>
+        <div>-----------------------------------------------------</div>
       </div>
     </div>
-
-    <div id="login-button-container">
-      <div id="submit" class="btn2 no-select">
-        <div>Submit</div>
-      </div>
-      <div id="loading"></div>
-    </div>
-
-    <div id="message-container" class="no-select">
-      <div id="message"></div>
-    </div>
-
-    <br><br><br><br><br>
-
-    <!-- <div id="create-account" class="btn no-select">Create Account</div> -->
-
-    <div id="buttons">
-      <div id="btn-screenshot" class="btn no-select">Screenshot</div>
-    </div>
-
-    <div>
-      <div>-----------------------------------------------------</div>
-      <div id="url-here"></div>
-      <div>-----------------------------------------------------</div>
-    </div>
-
   </body>
 </html>
 
@@ -514,12 +518,18 @@ function LoadingToSubmit(data){
       $("#message").addClass("alert-red");
     }else if(err == "false"){
       $("#message").addClass("alert-green");
+      setTimeout(TransitionToMain, 1);
     }
 
     $("#message").text(msg);
   });
 }
 
+function TransitionToMain(){
+  $("#app-1").css("display", "none");
+  $("#app-2").css("display", "block");
+}
+$("#app-2").css("display", "block");
 // Receiving a message from main.js
 ipc.on("message", (event, msg) => {
   var func = msg["function"];
