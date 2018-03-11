@@ -165,10 +165,10 @@ ipcMain.on("message", (event, msg) => {
   event.sender.send("async-reply", 2);
 });
 
-app.on("message", (arg) => {
-  var func = arg["function"];
-  var data = arg["data"];
-  // var data = JSON.parse(arg["data"]);
+app.on("message", (msg) => {
+  var func = msg["function"];
+  var data = msg["data"];
+  // var data = JSON.parse(msg["data"]);
 
   if     (func == "TakeScreenshot") TakeScreenshotButton(data);
   else if(func == "Minimize")       Minimize            (data);
@@ -226,7 +226,7 @@ function TakeScreenshot(){
 
       clipboard.write({"text": body["url"]});
 
-      win.webContents.send("message", body["url"]);
+      // win.webContents.send("message", body["url"]);
     });
   });
 }
@@ -251,14 +251,33 @@ fs.readFile("public.key", (err, data) => {
 });
 
 EncryptData = function(data){return new Promise((resolve) => {
-  var buffer = new Buffer(data);
-  var encryptedData = crypto.publicEncrypt(publicKey, buffer);
+  var encryptedData = crypto.publicEncrypt(publicKey, Buffer.from(data));
+  encryptedData = Buffer.from(encryptedData).toString("base64");
   resolve(encryptedData);
 })}
 
+function SendMessage(func, data=null){
+  win.webContents.send("message", {
+    "function": func,
+    "data"    : data
+    // "data"    : JSON.stringify(data)
+  });
+
+  // EmitMessage("message", {
+  //   "function": func,
+  //   "data"    : JSON.stringify(data)
+  // });
+}
+
 function CreateAccount(data){
   EncryptData(data)
-  .then((data) => ServerHandlesCreateAccount(data));
+  .then((data) => {
+    request.post({url:"https://fizz.gg/create-account", form: {"data":data}}, function(err, res, body){
+      console.log("GOT SOMETHING!");
+      console.log(body);
+      SendMessage("YoloSwag", body);
+    });
+  });
 }
 
 function Login(data){
@@ -330,3 +349,11 @@ function ServerHandlesLogin(data){
     }
   });
 }
+
+// storage.get("data-server", function(error, data){
+//   data[username] = temp;
+
+//   storage.set("data-server", data, function(error){
+//     console.log("Info stored!");
+//   });
+// });

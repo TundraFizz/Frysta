@@ -183,6 +183,7 @@ body {
 
 #login-button-container {
   text-align: center;
+  height: 32px;
 }
 
 .btn2 {
@@ -211,10 +212,39 @@ body {
   position: relative;
   top: -26px;
   width: 28px;
+  height: 28px;
   margin: 0 auto;
   opacity: 0;
   visibility: hidden;
+  background-image: url(loading.svg);
 }
+
+#message-container{
+  text-align: center;
+  height: 28px;
+}
+
+#message {
+  border-radius: 4px;
+  cursor: default;
+  line-height: 18px;
+  display: inline-block;
+  padding: 0px 2px;
+  opacity: 0;
+}
+
+.alert-green {
+  background-color: #194e1f;
+  border: #2eb13c;
+  box-shadow: 0px 0px 5px 0px #24dc48;
+}
+
+.alert-red {
+  background-color: #630000;
+  border: #900000;
+  box-shadow: 0px 0px 5px 0px #ff4040;
+}
+
 </style>
 
 <!DOCTYPE html>
@@ -263,9 +293,11 @@ body {
       <div id="submit" class="btn2 no-select">
         <div>Submit</div>
       </div>
-      <div id="loading">
-        <img src="loading.svg">
-      </div>
+      <div id="loading"></div>
+    </div>
+
+    <div id="message-container" class="no-select">
+      <div id="message"></div>
     </div>
 
     <br><br><br><br><br>
@@ -319,11 +351,6 @@ function SendMessage(func, data=null){
   });
 }
 
-// Receiving a message from main.js
-ipc.on("message", (event, msg) => {
-  $("#url-here").html(`<a href="${msg}">${msg}</a>`);
-})
-
 // Sending messages to main.js
 $("#btn-screenshot").click(function(){
   SendMessage("TakeScreenshot");
@@ -355,8 +382,6 @@ $("#submit").click(function(){
 
     $("#loading").css("visibility", "visible");
   });
-
-  return;
 
   var selection = $($(".menu-button[active='true']")[0]).text();
   var data      = {};
@@ -405,28 +430,6 @@ $("input").on("input", function(){
 });
 
 $("#menu-login").click(function(){
-  // TEST //
-  $("#loading").animate({
-    "opacity": "0"
-  }, 100, function(){
-    $("#loading").css("visibility", "hidden");
-  });
-
-  $("#submit").animate({
-    "opacity": "1"
-  }, 100, function(){
-
-    $("#submit").animate({
-      "width": "54px",
-      "border-radius": "4px"
-    }, 100);
-
-    $("#submit > div").animate({
-      "opacity": "1"
-    }, 100);
-  });
-  // TEST //
-
   if($(this).attr("active") == "false"){
     $("#menu-login").attr("active", "true");
     $("#menu-create-account").attr("active", "false");
@@ -477,5 +480,52 @@ $("#menu-create-account").click(function(){
     $("#input-field-email").css("visibility", "visible", "important");
   }
 });
+
+function LoadingToSubmit(data){
+  var msg = data["msg"];
+  var err = data["err"];
+
+  $("#loading").animate({
+    "opacity": "0"
+  }, 100, function(){
+    $("#loading").css("visibility", "hidden");
+  });
+
+  $("#submit").animate({
+    "opacity": "1"
+  }, 100, function(){
+
+    $("#submit").animate({
+      "width": "54px",
+      "border-radius": "4px"
+    }, 100);
+
+    $("#submit > div").animate({
+      "opacity": "1"
+    }, 100);
+
+    $("#message").animate({
+      "opacity": "1"
+    }, 100);
+
+    $("#message").removeClass();
+
+    if(err == "true"){
+      $("#message").addClass("alert-red");
+    }else if(err == "false"){
+      $("#message").addClass("alert-green");
+    }
+
+    $("#message").text(msg);
+  });
+}
+
+// Receiving a message from main.js
+ipc.on("message", (event, msg) => {
+  var func = msg["function"];
+  var data = JSON.parse(msg["data"]);
+
+  if(func == "YoloSwag") LoadingToSubmit(data);
+})
 
 </script>
