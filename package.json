@@ -25,7 +25,7 @@
     "all": "cls && npm run clean && npm run compile && npm start",
     "clean": "node-gyp clean",
     "compile": "./node_modules/.bin/electron-rebuild",
-    "start": "electron ./src/main.js"
+    "start": "electron ./src/app.js"
   },
   "license": "ISC"
 }
