@@ -274,7 +274,7 @@ function CreateAccount(data){
   EncryptData(data)
   .then((data) => {
     request.post({url:"https://fizz.gg/create-account", form: {"data":data}}, function(err, res, msg){
-      SendMessage("YoloSwag", msg);
+      SendMessage("AccountWasCreated", msg);
     });
   });
 }
@@ -283,7 +283,7 @@ function Login(data){
   EncryptData(data)
   .then((data) => {
     request.post({url:"https://fizz.gg/login", form: {"data":data}}, function(err, res, msg){
-      SendMessage("YoloSwag", msg);
+      SendMessage("LoginPageToMainApp", msg);
     });
   });
 }

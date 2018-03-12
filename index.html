@@ -374,16 +374,59 @@ $("#btn-quit").click(function(){
   SendMessage("Quit");
 });
 
-$("#submit").click(function(){
-  $("div", this).animate({
+function SubmitLogin(username, password){
+  if(username.length == 0 && password.length == 0){
+    ShowSubmitMessage("Username/password fields are empty", true);
+    return false;
+  }else if(username.length == 0){
+    ShowSubmitMessage("Username field is empty", true);
+    return false;
+  }else if(password.length == 0){
+    ShowSubmitMessage("Password field is empty", true);
+    return false;
+  }else{
+    SendMessage("Login", {
+      "username": username,
+      "password": password
+    });
+    return true;
+  }
+}
+
+function SubmitCreateAccount(email, username, password){
+  if(email.length == 0 || username.length == 0 || password.length == 0){
+    ShowSubmitMessage("All fields must be filled in", true);
+    return false;
+  }else if(false){
+    // Check if email address is valid
+    ShowSubmitMessage("Email address isn't valid", true);
+    return false;
+  }else if(username.length < 3){
+    ShowSubmitMessage("Username must be at least three characters", true);
+    return false;
+  }else if(password.length < 6){
+    ShowSubmitMessage("Password must be at least six characters", true);
+    return false;
+  }else{
+    SendMessage("CreateAccount", {
+      "email"   : email,
+      "username": username,
+      "password": password
+    });
+    return true;
+  }
+}
+
+function AnimateSubmitButtonToLoading(){
+  $("#submit > div").animate({
     "opacity": "0"
   }, 100);
 
-  $(this).animate({
+  $("#submit").animate({
     "width": "22px",
     "border-radius": "12px"
   }, 100, function(){
-    $(this).animate({
+    $("#submit").animate({
       "opacity": "0"
     }, 100);
     $("#loading").animate({
@@ -392,19 +435,36 @@ $("#submit").click(function(){
 
     $("#loading").css("visibility", "visible");
   });
+}
 
+function AnimateLoadingToSubmitButton(){
+  $("#submit").animate({
+    "opacity": "1"
+  }, 100, function(){
+    $("#submit").animate({
+      "width": "54px",
+      "border-radius": "4px"
+    }, 100);
+
+    $("#submit > div").animate({
+      "opacity": "1"
+    }, 100);
+  });
+}
+
+$("#submit").click(function(){
   var selection = $($(".menu-button[active='true']")[0]).text();
-  var data      = {};
+  var email     = $("input[name='email']").val();
+  var username  = $("input[name='username']").val();
+  var password  = $("input[name='password']").val();
 
   if(selection == "Login"){
-    data["username"] = $("input[name='username']").val();
-    data["password"] = $("input[name='password']").val();
-    SendMessage("Login", data);
-  }else if(selection == "Create Account"){
-    data["email"]    = $("input[name='email']").val();
-    data["username"] = $("input[name='username']").val();
-    data["password"] = $("input[name='password']").val();
-    SendMessage("CreateAccount", data);
+    if(SubmitLogin(username, password))
+      AnimateSubmitButtonToLoading();
+  }
+  else if(selection == "Create Account"){
+    if(SubmitCreateAccount(email, username, password))
+      AnimateSubmitButtonToLoading();
   }
 });
 
@@ -491,57 +551,79 @@ $("#menu-create-account").click(function(){
   }
 });
 
-function LoadingToSubmit(data){
+function ShowSubmitMessage(msg, err){
+  // The error code may come from an external source which could
+  // means it enters as a string. If so, correct it here
+  if     (err == "true")  err = true;
+  else if(err == "false") err = false;
+
+  $("#message").text(msg);
+  $("#message").removeClass();
+
+  if     (err == true)  $("#message").addClass("alert-red");
+  else if(err == false) $("#message").addClass("alert-green");
+
+  $("#message").animate({
+    "opacity": "1"
+  }, 100);
+}
+
+function HideSubmitMessage(){
+  $("#message").animate({
+    "opacity": "0"
+  }, 100);
+}
+
+$("#message").click(HideSubmitMessage);
+
+function AccountWasCreated(data){
   var msg = data["msg"];
   var err = data["err"];
+  ShowSubmitMessage(msg, err);
+  AnimateLoadingToSubmitButton();
 
   $("#loading").animate({
     "opacity": "0"
   }, 100, function(){
     $("#loading").css("visibility", "hidden");
   });
+}
 
-  $("#submit").animate({
-    "opacity": "1"
-  }, 100, function(){
+function LoginPageToMainApp(data){
+  var msg = data["msg"];
+  var err = data["err"];
 
-    $("#submit").animate({
-      "width": "54px",
-      "border-radius": "4px"
-    }, 100);
+  if(err == "false"){
+    $("#loading").css("background-image", "url(ok.png)");
+    $("#loading").css("background-size", "cover");
+    setTimeout(TransitionToMain, 1000);
+  }else if(err == "true"){
+    $("#loading").animate({
+      "opacity": "0"
+    }, 100, function(){
+      $("#loading").css("visibility", "hidden");
+    });
+    AnimateLoadingToSubmitButton();
+  }
 
-    $("#submit > div").animate({
-      "opacity": "1"
-    }, 100);
-
-    $("#message").animate({
-      "opacity": "1"
-    }, 100);
-
-    $("#message").removeClass();
-
-    if(err == "true"){
-      $("#message").addClass("alert-red");
-    }else if(err == "false"){
-      $("#message").addClass("alert-green");
-      setTimeout(TransitionToMain, 1);
-    }
-
-    $("#message").text(msg);
-  });
+  ShowSubmitMessage(msg, err);
 }
 
 function TransitionToMain(){
   $("#app-1").css("display", "none");
   $("#app-2").css("display", "block");
 }
-$("#app-2").css("display", "block");
+
 // Receiving a message from main.js
 ipc.on("message", (event, msg) => {
   var func = msg["function"];
   var data = JSON.parse(msg["data"]);
 
-  if(func == "YoloSwag") LoadingToSubmit(data);
-})
+  if(func == "AccountWasCreated")  AccountWasCreated(data);
+  if(func == "LoginPageToMainApp") LoginPageToMainApp(data);
+});
 
+//////////////////////////////////////////////
+/**/ $("#app-2").css("display", "block"); /**/
+//////////////////////////////////////////////
 </script>
