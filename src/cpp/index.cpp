@@ -1,8 +1,8 @@
 #include <nan.h>
-#include "MyAsyncBinding.h"
+#include "screen-capture.h"
 
 NAN_MODULE_INIT(InitModule){
-  MyAsyncBinding::Init(target);
+  ScreenCapture::Init(target);
 }
 
 NODE_MODULE(myModule, InitModule);

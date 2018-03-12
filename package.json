@@ -1,11 +1,10 @@
 {
-  "name": "electron-hello-world",
-  "version": "1.0.0",
-  "gypfile": true,
-  "description": "Sample hello world example for Electron.",
-  "main": "bindings.js",
+  "name": "frysta",
+  "version": "0.1.0",
   "author": "Tundra Fizz",
-  "license": "ISC",
+  "description": "Sample Text",
+  "main": "binding.gyp",
+  "gypfile": true,
   "dependencies": {
     "bcrypt": "latest",
     "electron": "latest",
@@ -20,12 +19,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/TundraFizz/Tundra-Fizz"
+    "url": "https://github.com/TundraFizz/Frysta"
   },
   "scripts": {
-    "a": "cls && npm run clean && npm run compile && npm start",
+    "all": "cls && npm run clean && npm run compile && npm start",
     "clean": "node-gyp clean",
     "compile": "./node_modules/.bin/electron-rebuild",
-    "start": "electron ./main.js"
-  }
+    "start": "electron ./src/main.js"
+  },
+  "license": "ISC"
 }

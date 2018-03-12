@@ -8,7 +8,7 @@
 #include <gdiplus.h>
 #include <time.h>
 #include <locale> // Convert string to wstring
-#include "MyAsyncBinding.h"
+#include "screen-capture.h"
 #pragma comment (lib,"Gdiplus.lib")
 
 std::string directoryToSaveCopy = "FEATURE_TO_DO";
@@ -260,8 +260,6 @@ LRESULT CALLBACK WindowProcTop(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
       if  (selectY1 < selectY2) smallestY = selectY1;
       else                      smallestY = selectY2;
 
-      // int ssX = selectX1 + smallestLeft; // Subtract from the smallest top-left corner
-      // int ssY = selectY1 + smallestTop;  // Subtract from the smallest top-left corner
       smallestX += smallestLeft;
       smallestY += smallestTop;
 
@@ -475,12 +473,12 @@ void Reeeeeeeee(){
   }
 }
 
-NAN_MODULE_INIT(MyAsyncBinding::Init) {
+NAN_MODULE_INIT(ScreenCapture::Init) {
   Nan::SetMethod(target, "doSyncStuff", DoSyncStuff);
   Nan::SetMethod(target, "doAsyncStuff", DoAsyncStuff);
 }
 
-NAN_METHOD(MyAsyncBinding::DoSyncStuff) {
+NAN_METHOD(ScreenCapture::DoSyncStuff) {
   if(!info[0]->IsString()) {
     return Nan::ThrowError(Nan::New("expected arg 0: string workerId").ToLocalChecked());
   }
@@ -579,7 +577,7 @@ class MyAsyncWorker : public Nan::AsyncWorker {
   }
 };
 
-NAN_METHOD(MyAsyncBinding::DoAsyncStuff){
+NAN_METHOD(ScreenCapture::DoAsyncStuff){
   Nan::AsyncQueueWorker(new MyAsyncWorker(
     std::string(*Nan::Utf8String(info[0]->ToString())),
     info[1]->Int32Value(),

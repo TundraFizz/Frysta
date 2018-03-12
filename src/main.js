@@ -1,12 +1,12 @@
-var path    = require("path");    // -
-var url     = require("url");     // -
-var fs      = require("fs");      // File system
-var crypto  = require("crypto");  // -
-var bcrypt  = require("bcrypt");  // -
-var $       = require("jquery");  // jQuery
-var m       = require("./");      // C++ module
-var request = require("request"); // POST request to the server
-var storage = require("electron-json-storage");
+var path          = require("path");    // -
+var url           = require("url");     // -
+var fs            = require("fs");      // File system
+var crypto        = require("crypto");  // -
+var bcrypt        = require("bcrypt");  // -
+var $             = require("jquery");  // jQuery
+var request       = require("request"); // POST request to the server
+var storage       = require("electron-json-storage");
+var screenCapture = require("./cpp/binding.js"); // C++ module for screen capturing
 var {app, BrowserWindow, Tray, Menu, globalShortcut, ipcMain, clipboard, shell} = require("electron");
 
 // Keep a global reference of the window object, if you don't, the window will
@@ -40,7 +40,7 @@ function createWindow(){
     frame: false,
     backgroundColor: "#33363f",
     // resizable: false,
-    icon: path.join(__dirname, "icon64x64.png")
+    icon: path.join(__dirname, "img/icon64x64.png")
   });
 
   win.toggleDevTools();
@@ -51,13 +51,13 @@ function createWindow(){
     TakeScreenshotShortcut();
   });
 
-  tray = new Tray(path.join(__dirname, "icon64x64.png"));
+  tray = new Tray(path.join(__dirname, "img/icon64x64.png"));
 
   var contextMenu = Menu.buildFromTemplate([
     {
       "label": "Item 1",
       "type" : "radio",
-      "icon" : path.join(__dirname, "icon64x64.png")
+      "icon" : path.join(__dirname, "img/icon64x64.png")
     },
     {
       "label": "Item 2",
@@ -113,9 +113,9 @@ function createWindow(){
       win.show();
   });
 
-  // Load the index.html of the app
+  // Load main page of the application
   win.loadURL(url.format({
-    pathname: path.join(__dirname, "index.html"),
+    pathname: path.join(__dirname, "main.html"),
     protocol: "file:",
     slashes: true
   }));
@@ -201,7 +201,7 @@ function TakeScreenshot(){
   win.hide();
   // win.minimize();
 
-  m.doAsyncStuff(123, 5, true, function(result, error){
+  screenCapture.doAsyncStuff(123, 5, true, function(result, error){
 
     // If the user clicked on the "Screenshot" button, then we'll display the window again
     if(clickedOnButton)
@@ -225,7 +225,7 @@ function TakeScreenshot(){
 
       tray.displayBalloon({
         "title"  : "TESTING",
-        "icon"   : path.join(__dirname, "icon64x64.png"),
+        "icon"   : path.join(__dirname, "img/icon64x64.png"),
         "title"  : "Uploaded image",
         "content": lastUploadedScreenshotUrl
       });
@@ -247,7 +247,7 @@ function TestLoad(data){
 // called which is bad user experience. By doing this initial dry run, the
 // lag that normally would have been experienced by the user is prevented.
 var publicKey = null;
-fs.readFile("public.key", (err, data) => {
+fs.readFile(path.join(__dirname, "public-key/public.key"), (err, data) => {
   publicKey = data;
   crypto.publicEncrypt(publicKey, new Buffer(""));
 });

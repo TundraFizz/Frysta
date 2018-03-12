@@ -1,34 +1,23 @@
+# Frysta ![](https://img.shields.io/badge/Node.js-9.3-7fbd42.svg?style=plastic) ![](https://img.shields.io/badge/C++-17-2281e3.svg?style=plastic) ![](https://img.shields.io/badge/Status-In%20Development-EE7600.svg?style=plastic)
+
+```
+git clone https://github.com/TundraFizz/Frysta
+cd Frysta
+npm i
+npm run all
+```
+
+Frysta is an application that allows you to select regions of your computer screen which are then uploaded to a server. The image URL is copied to your clipboard to make the images easily shareable.
+
+## Other notes:
+
 Make sure you install the Windows build tools first, or else `npm run compile` will not work
 Installing the build tools must be done in a command prompt with administrative privileges
 
 npm i -g --production windows-build-tools
 npm i -g node-gyp
 
-==================================================
-
-npm i
-npm run everything
-
-==================================================
-
-node-gyp clean
-./node_modules/.bin/electron-rebuild
-electron .
-
-==================================================
-
-git init
-git add -A
-git commit -m "Initial files"
-git remote add origin https://github.com/TundraFizz/Frost-Frame.git
-git tag 1.0.0
-git push -u origin --tags master
-
-==================================================
-
-Frost Frame is a Node.JS application that easily captures screenshots and uploads them to a webserver
-
-==================================================
+Generating public and private keys
 
 openssl rsa -in priv.key -pubout -out public.key
 openssl genrsa -out private.key 2048
