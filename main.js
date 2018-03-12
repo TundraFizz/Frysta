@@ -232,14 +232,6 @@ function TakeScreenshot(){
   });
 }
 
-// notification.on("click", function(notifierObject, options){
-//   console.log("CLICK");
-// });
-
-// notification.on("timeout", function(notifierObject, options){
-//   console.log("TIMEOUT");
-// });
-
 function TestSave(data){
   console.log("========== TestSave ==========");
 }

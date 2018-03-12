@@ -10,9 +10,6 @@ body {
   margin: 0;
 }
 
-#buttons {
-}
-
 .btn {
   position: relative;
   width: 100px;
@@ -245,6 +242,18 @@ body {
   box-shadow: 0px 0px 5px 0px #ff4040;
 }
 
+.spacer {
+  height: 36px;
+}
+
+#buttons {
+  text-align: center;
+}
+
+.text-container {
+  text-align: center;
+}
+
 #app-1 {}
 #app-2 {display: none;}
 
@@ -306,16 +315,13 @@ body {
     </div>
 
     <div id="app-2">
-      <div>dsjfkhsd kjsdfhksd kjhk</div>
-
+      <div class="spacer"></div>
       <div id="buttons">
         <div id="btn-screenshot" class="btn no-select">Screenshot</div>
       </div>
 
-      <div>
-        <div>-----------------------------------------------------</div>
-        <div id="url-here"></div>
-        <div>-----------------------------------------------------</div>
+      <div class="text-container no-select">
+        <div>Shortcut: Ctrl+Shift+1</div>
       </div>
     </div>
   </body>
