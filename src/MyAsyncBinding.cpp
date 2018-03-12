@@ -248,14 +248,26 @@ LRESULT CALLBACK WindowProcTop(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
       // CloseWindow(hwndBot);
       // CloseWindow(hwndTop);
 
-      int width  = selectX2 - selectX1;
-      int height = selectY2 - selectY1;
+      int width  = abs(selectX1 - selectX2);
+      int height = abs(selectY1 - selectY2);
 
-      int ssX = selectX1 + smallestLeft; // Subtract from the smallest top-left corner
-      int ssY = selectY1 + smallestTop;  // Subtract from the smallest top-left corner
+      int smallestX;
+      int smallestY;
 
-      std::cout << selectX1 << ", " << selectY1 << ", " << width << ", " << height << "\n";
-      screenCapturePart(ssX, ssY, width, height);
+      if  (selectX1 < selectX2) smallestX = selectX1;
+      else                      smallestX = selectX2;
+
+      if  (selectY1 < selectY2) smallestY = selectY1;
+      else                      smallestY = selectY2;
+
+      // int ssX = selectX1 + smallestLeft; // Subtract from the smallest top-left corner
+      // int ssY = selectY1 + smallestTop;  // Subtract from the smallest top-left corner
+      smallestX += smallestLeft;
+      smallestY += smallestTop;
+
+      std::cout << "(" << selectX1 << ", " << selectY1 << "), (" << selectX2 << ", " << selectY2 << ")\n";
+      std::cout << "W: " << width << "   H: " << height << "\n";
+      screenCapturePart(smallestX, smallestY, width, height);
       ConvertBmpToPng();
 
       break;
@@ -276,13 +288,13 @@ LRESULT CALLBACK WindowProcTop(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
         else                    upperLeftX = selectX2;
 
         if(selectY1 < selectY2) upperLeftY = selectY1;
-        else        upperLeftY = selectY2;
+        else                    upperLeftY = selectY2;
 
         if(selectX1 > selectX2) lowerRightX = selectX1;
-        else        lowerRightX = selectX2;
+        else                    lowerRightX = selectX2;
 
         if(selectY1 > selectY2) lowerRightY = selectY1;
-        else        lowerRightY = selectY2;
+        else                    lowerRightY = selectY2;
 
         // std::cout << "===========================\n";
         // std::cout << "upperLeftX:   " << upperLeftX   << "\n";
@@ -299,7 +311,6 @@ LRESULT CALLBACK WindowProcTop(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
         WinRgn1 = CreateRectRgn(upperLeftX, upperLeftY, lowerRightX, lowerRightY);
         WinRgn2 = CreateRectRgn(smallestLeft, smallestTop, maskWidth, maskHeight);
 
-        // WinRgn2 = CreateRectRgn(-2560, 0, 2560, 1440);
         CombineRgn(WinRgn1, WinRgn1, WinRgn2, RGN_XOR);
         SetWindowRgn(hwndBot, WinRgn1, true);
         UpdateWindow(hwndBot);

@@ -224,6 +224,7 @@ function TakeScreenshot(){
       clipboard.write({"text": body["url"]});
 
       tray.displayBalloon({
+        "title"  : "TESTING",
         "icon"   : path.join(__dirname, "icon64x64.png"),
         "title"  : "Uploaded image",
         "content": lastUploadedScreenshotUrl
