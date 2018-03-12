@@ -7,15 +7,7 @@ var $       = require("jquery");  // jQuery
 var m       = require("./");      // C++ module
 var request = require("request"); // POST request to the server
 var storage = require("electron-json-storage");
-var {app, BrowserWindow, Tray, Menu, globalShortcut, ipcMain, clipboard} = require("electron");
-
-// var Growl          = require("node-notifier").Growl;
-// var Growl = require("growly");
-// var WindowsToaster = require("node-notifier").WindowsToaster;
-// var NotificationCenter = require("node-notifier").NotificationCenter;
-// var notification = require("node-notifier");
-// var balloon      = require("node-notifier").WindowsBalloon;
-// var NotifySend = require('node-notifier').NotifySend;
+var {app, BrowserWindow, Tray, Menu, globalShortcut, ipcMain, clipboard, shell} = require("electron");
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -23,6 +15,7 @@ var win  = null;
 var tray = null;
 var quit = false;
 var clickedOnButton = null;
+var lastUploadedScreenshotUrl = null;
 
 storage.setDataPath(__dirname);
 
@@ -97,17 +90,21 @@ function createWindow(){
   tray.setToolTip("App icon tooltip!");
   tray.setContextMenu(contextMenu);
 
-  tray.on("click", () => {
+  tray.on("click", function(){
     console.log("Single click");
     win.showInactive();
   });
 
-  tray.on("double-click", () => {
+  tray.on("double-click", function(){
     console.log("Double click");
     win.focus();
   });
 
-  win.once("ready-to-show", () => {
+  tray.on("balloon-click", function(){
+    shell.openExternal(lastUploadedScreenshotUrl);
+  });
+
+  win.once("ready-to-show", function(){
     var loggedIn = false; // DEBUG VARIABLE
 
     if(loggedIn)
@@ -223,66 +220,14 @@ function TakeScreenshot(){
       if(err)
         return console.error("FAILED:", err);
 
-      console.log("Copying the below URL to the clipboard");
-      console.log(body["url"]);
-
+      lastUploadedScreenshotUrl = body["url"];
       clipboard.write({"text": body["url"]});
 
-      // var notifier = new Growl({
-      //   name: 'Growl Name Used', // Defaults as 'Node'
-      //   host: 'localhost',
-      //   port: 23053
-      // });
-
-      // Growl.notify('Stuffs broken!', function(err, action) {
-      //   console.log('Action:', action);
-      //   console.log('Err   :', err);
-      // });
-      // growly.notify('This is as easy as it gets', { title: 'Hello, World!' });
-
-
-      // var notifier = new Growl({
-      //   name: 'Growl Name Used', // Defaults as 'Node'
-      //   host: 'localhost',
-      //   port: 23053
-      // });
-
-      // notifier.notify({
-      //   title: 'Foo',
-      //   message: 'Hello World',
-      //   icon: path.join(__dirname, "icon64x64.png"),
-      //   wait: false, // Wait for User Action against Notification
-
-      //   // and other growl options like sticky etc.
-      //   sticky: false,
-      //   label: void 0,
-      //   priority: void 0
-      // });
-
-      // var notifier = new WindowsToaster({
-      //   // withFallback: true
-      // });
-
-      // notifier.notify(
-      //   {
-      //     title: "Title",
-      //     message: "Message",
-      //     icon: path.join(__dirname, "icon64x64.png"),
-      //     sound: "Default", // http://msdn.microsoft.com/en-us/library/windows/apps/hh761492.aspx
-      //     wait: true, // Bool. Wait for User Action against Notification or times out
-      //     id: void 0, // Number. ID to use for closing notification.
-      //     appID: void 0, // String. App.ID and app Name. Defaults to no value, causing SnoreToast text to be visible.
-      //     remove: void 0, // Number. Refer to previously created notification to close.
-      //     install: void 0 // String (path, application, app id).  Creates a shortcut <path> in the start menu which point to the executable <application>, appID used for the notifications.
-      //   },
-      //   function(error, response) {
-      //     console.log(response);
-      //     console.log(error);
-      //   }
-      // );
-
-
-
+      tray.displayBalloon({
+        "icon"   : path.join(__dirname, "icon64x64.png"),
+        "title"  : "Uploaded image",
+        "content": lastUploadedScreenshotUrl
+      });
     });
   });
 }
