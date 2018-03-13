@@ -5,10 +5,6 @@
     <link href="http://fonts.googleapis.com/css?family=Lato:100,400,700|Playfair+Display:400italic|Source+Code+Pro" rel="stylesheet" type="text/css">
     <title>Frysta</title>
     <link rel="stylesheet" href="css/main.css">
-    <script>if(typeof module === "object") {window.module = module; module = undefined;}</script>
-    <script src="./js/jquery-3-3-1.js"></script>
-    <script src="./js/jquery-animate-shadow.js"></script>
-    <script src="./js/main.js"></script>
   </head>
 
   <body class="no-select">
@@ -57,6 +53,17 @@
     </div>
 
     <div id="app-2">
+      <div class="container">
+        <div class="menu-buttons">
+          <div class="menu-button" data="sample-1" active="false">Sample 1</div>
+          <div class="menu-button" data="sample-2" active="true">Sample 2</div>
+          <div class="menu-button" data="sample-3" active="false">Sample 3</div>
+        </div>
+        <div class="menu-line-bg">
+          <div class="menu-line-fg"></div>
+        </div>
+      </div>
+
       <div class="spacer"></div>
       <div id="buttons">
         <div id="btn-screenshot" class="button">Screenshot</div>
@@ -67,4 +74,11 @@
       </div>
     </div>
   </body>
+
+  <footer>
+    <script>if(typeof module === "object") {window.module = module; module = undefined;}</script>
+    <script src="./js/jquery-3-3-1.js"></script>
+    <script src="./js/jquery-animate-shadow.js"></script>
+    <script src="./js/main.js"></script>
+  </footer>
 </html>

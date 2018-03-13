@@ -194,7 +194,7 @@ $("#menu-login").click(function(){
   }
 });
 
-$("#menu-create-account").click(function(){
+$("[data='create-account']").click(function(){
   if($(this).attr("active") == "false"){
     $("#menu-login").attr("active", "false");
     $("#menu-create-account").attr("active", "true");
@@ -218,6 +218,46 @@ $("#menu-create-account").click(function(){
 
     $("#input-field-email").css("visibility", "visible", "important");
   }
+});
+
+$(".menu-button").click(function(){
+  $(".menu-button:visible").attr("active", "false");
+  $(this).attr("active", "true");
+});
+
+$(".menu-button").hover(function(){
+  var self  = this;
+  var index = 0;
+
+  $(".menu-button:visible").each(function(){
+    if(this == self)
+      return false;
+    else
+      index++;
+  });
+
+  var buttonCount = $(".menu-button:visible").length;
+  var left        = (100 / buttonCount) * index + "%";
+
+  $(".menu-line-fg:visible").animate({
+    "left": left
+  }, {duration: 200, queue: false});
+}, function(){
+  var index = 0;
+
+  $(".menu-button:visible").each(function(){
+    if($(this).attr("active") == "true")
+      return false;
+    else
+      index++;
+  });
+
+  var buttonCount = $(".menu-button:visible").length;
+  var left        = (100 / buttonCount) * index + "%";
+
+  $(".menu-line-fg:visible").animate({
+    "left": left
+  }, {duration: 200, queue: false});
 });
 
 function ShowSubmitMessage(msg, err){
@@ -293,5 +333,24 @@ ipc.on("message", (event, msg) => {
 });
 
 //////////////////////////////////////////////
-/**/ $("#app-2").css("display", "block"); /**/
+ // $("#app-2").css("display", "block"); /**/
 //////////////////////////////////////////////
+
+// Determine the width and starting position of the menu line forground
+$(".menu-line-fg").each(function(){
+  var menuButtons = $(".menu-button", $(this).parent().parent());
+  var index       = 0;
+
+  $(menuButtons).each(function(){
+    if($(this).attr("active") == "true")
+      return false;
+    else
+      index++;
+  });
+
+  var left  = (100 / menuButtons.length) * index + "%";
+  var width = (100 / menuButtons.length) + "%";
+
+  $(this).css("left", left);
+  $(this).css("width", width);
+});

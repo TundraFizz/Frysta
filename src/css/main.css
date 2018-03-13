@@ -86,11 +86,11 @@ body {
   font-size: 0px;
   height: 30px;
   display: table;
+  table-layout: fixed;
 }
 
 .menu-button {
   display: inline-block;
-  width: 50%;
   font-size: 16px;
   text-align: center;
   display: table-cell;
@@ -98,7 +98,8 @@ body {
 }
 
 .menu-button[active="true"] {
-  text-shadow: 0px 0px 8px #5fff79;
+  text-shadow: 0px 0px 10px #5fff79,
+               0px 0px 10px #5fff79;
 }
 
 .menu-button[active="false"] {
@@ -116,10 +117,10 @@ body {
 
 .menu-line-fg {
   position: relative;
-  background-color: #c0c0c0;
   height: 1px;
-  width: 50%;
-  left: 0%;
+  border-width: 0px 0px 1px 0px;
+  box-shadow: 0px 0px 6px 0.2px #5fb9ff;
+  background-color: #006fc5
 }
 
 /*********************/
