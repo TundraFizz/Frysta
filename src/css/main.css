@@ -164,7 +164,7 @@ body {
 /************/
 /* Unsorted */
 /************/
-.button {
+.submit-button {
   border-radius: 4px;
   position: relative;
   width: 54px;
@@ -178,14 +178,15 @@ body {
   box-shadow: 0px 0px 5px 0px #5fb9ff;
 }
 
-#loading {
+.loading {
   position: relative;
   top: -26px;
   width: 28px;
   height: 28px;
   margin: 0 auto;
   opacity: 0;
-  visibility: hidden;
+  display: none;
+  /*visibility: hidden;*/
   background-image: url(../img/loading.svg);
 }
 

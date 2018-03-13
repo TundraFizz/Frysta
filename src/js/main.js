@@ -1,25 +1,3 @@
-$(".btn2").hover(function(){
-  $(this).animate({
-    "box-shadow": "0px 0px 10px 0px #5fb9ff"
-  }, 50);
-}, function(){
-  $(this).animate({
-    "box-shadow": "0px 0px 5px 0px #5fb9ff"
-  }, 50);
-});
-
-$(".btn2").mousedown(function(){
-  $(this).animate({
-    "box-shadow": "0px 0px 0px 0px #5fb9ff"
-  }, 50);
-});
-
-$(".btn2").mouseup(function(){
-  $(this).animate({
-    "box-shadow": "0px 0px 5px 0px #5fb9ff"
-  }, 50);
-});
-
 const ipc         = require("electron").ipcRenderer;
 const EmitMessage = require("electron").remote.app.emit;
 
@@ -41,6 +19,52 @@ $("#btn-minimize").click(function(){
 
 $("#btn-quit").click(function(){
   SendMessage("Quit");
+});
+
+$(".menu-button").click(function(){
+  if($(this).attr("active") == "false"){
+    // Make all visible menu buttons inactive, except for the clicked one
+    $(".menu-button:visible").attr("active", "false");
+    $(this).attr("active", "true");
+
+    // Execute the menu button's function
+    window[$(this).attr("function")]();
+  }
+});
+
+$(".menu-button").hover(function(){
+  var self  = this;
+  var index = 0;
+
+  $(".menu-button:visible").each(function(){
+    if(this == self)
+      return false;
+    else
+      index++;
+  });
+
+  var buttonCount = $(".menu-button:visible").length;
+  var left        = (100 / buttonCount) * index + "%";
+
+  $(".menu-line-fg:visible").animate({
+    "left": left
+  }, {duration: 200, queue: false});
+}, function(){
+  var index = 0;
+
+  $(".menu-button:visible").each(function(){
+    if($(this).attr("active") == "true")
+      return false;
+    else
+      index++;
+  });
+
+  var buttonCount = $(".menu-button:visible").length;
+  var left        = (100 / buttonCount) * index + "%";
+
+  $(".menu-line-fg:visible").animate({
+    "left": left
+  }, {duration: 200, queue: false});
 });
 
 function SubmitLogin(username, password){
@@ -86,178 +110,114 @@ function SubmitCreateAccount(email, username, password){
   }
 }
 
-function AnimateSubmitButtonToLoading(){
-  $("#submit > div").animate({
+function AnimateSubmitButtonToLoading(app){
+  $(".submit-button > div", app).animate({
     "opacity": "0"
   }, 100);
 
-  $("#submit").animate({
+  $(".submit-button", app).animate({
     "width": "22px",
     "border-radius": "12px"
   }, 100, function(){
-    $("#submit").animate({
+    $(".submit-button", app).animate({
       "opacity": "0"
     }, 100);
-    $("#loading").animate({
+    $(".loading", app).animate({
       "opacity": "1"
     }, 100);
 
-    $("#loading").css("visibility", "visible");
+    $(".loading", app).css("display", "block");
   });
 }
 
-function AnimateLoadingToSubmitButton(){
-  $("#submit").animate({
+function AnimateLoadingToSubmitButton(app){
+  $(".submit-button", app).animate({
     "opacity": "1"
   }, 100, function(){
-    $("#submit").animate({
+    $(".submit-button", app).animate({
       "width": "54px",
       "border-radius": "4px"
     }, 100);
 
-    $("#submit > div").animate({
+    $(".submit-button > div", app).animate({
       "opacity": "1"
     }, 100);
   });
 }
 
-$("#submit").click(function(){
-  var selection = $($(".menu-button[active='true']")[0]).text();
-  var email     = $("input[name='email']").val();
-  var username  = $("input[name='username']").val();
-  var password  = $("input[name='password']").val();
+function MenuButtonLogin(){
+  $("[input-field='email']").animate({
+    "opacity": "0"
+  }, {duration: 250, queue: false, complete: function(){
+    $("[input-field='email']").css("display", "none");
+  }});
+
+  $("[input-field='username']").animate({
+    "top": "12.66px"
+  }, {duration: 250, queue: false});
+
+  $("[input-field='password']").animate({
+    "top": "47.33px"
+  }, {duration: 250, queue: false});
+}
+
+function MenuButtonCreateAccount(){
+  $("[input-field='email']").stop();
+  $("[input-field='email']").css("display", "block");
+
+  $("[input-field='email']").animate({
+    "opacity": "1"
+  }, {duration: 250, queue: false});
+
+  $("[input-field='username']").animate({
+    "top": "30px"
+  }, {duration: 250, queue: false});
+
+  $("[input-field='password']").animate({
+    "top": "56px"
+  }, {duration: 250, queue: false});
+}
+
+function SubmitApp1(){
+  var selection = $($(".menu-button[active='true']", "#app-1")[0]).text();
+  var email     = $("input[name='email']"   , "#app-1").val();
+  var username  = $("input[name='username']", "#app-1").val();
+  var password  = $("input[name='password']", "#app-1").val();
 
   if(selection == "Login"){
     if(SubmitLogin(username, password))
-      AnimateSubmitButtonToLoading();
+      AnimateSubmitButtonToLoading("#app-1");
   }
   else if(selection == "Create Account"){
     if(SubmitCreateAccount(email, username, password))
-      AnimateSubmitButtonToLoading();
+      AnimateSubmitButtonToLoading("#app-1");
   }
+}
+
+$(".submit-button").click(function(){
+  window[$(this).attr("function")]();
 });
 
-$("#test-save").click(function(){
-  SendMessage("TestSave");
-});
-
-$("#test-load").click(function(){
-  SendMessage("TestLoad");
-});
-
-$("input").on("focus",function(){
-  var text = $(this).val();
-  var span = $("span", $(this).parent())[0];
-  if(!text)
-    $(span).css("color", "rgba(0, 0, 0, 0.4)");
-});
-
-$("input").on("blur",function(){
-  var text = $(this).val();
-  var span = $("span", $(this).parent())[0];
-  if(!text)
-    $(span).css("color", "rgba(0, 0, 0, 0.7)");
-});
-
-$("input").on("input", function(){
-  var text = $(this).val();
-  var span = $("span", $(this).parent())[0];
-  if(text)
-    $(span).hide();
-  else
-    $(span).show();
-});
-
-$("#menu-login").click(function(){
-  if($(this).attr("active") == "false"){
-    $("#menu-login").attr("active", "true");
-    $("#menu-create-account").attr("active", "false");
-
-    // Animate the line
-    $("#menu-line-fg").animate({
-      "left": "0%"
-    }, {duration: 250, queue: false});
-
-    $("#input-field-username").animate({
-      "top": "14px"
-    }, {duration: 250, queue: false});
-
-    $("#input-field-password").animate({
-      "top": "48px"
-    }, {duration: 250, queue: false});
-
-    $("#input-field-email").animate({
-      "opacity": "0"
-    }, {duration: 250, queue: false, complete: function(){
-      $("#input-field-email").css("visibility", "hidden", "important");
-    }});
-  }
-});
-
-$("[data='create-account']").click(function(){
-  if($(this).attr("active") == "false"){
-    $("#menu-login").attr("active", "false");
-    $("#menu-create-account").attr("active", "true");
-
-    // Animate the line
-    $("#menu-line-fg").animate({
-      "left": "50%"
-    }, {duration: 250, queue: false});
-
-    $("#input-field-username").animate({
-      "top": "30px"
-    }, {duration: 250, queue: false});
-
-    $("#input-field-password").animate({
-      "top": "56px"
-    }, {duration: 250, queue: false});
-
-    $("#input-field-email").animate({
-      "opacity": "1"
-    }, {duration: 250, queue: false});
-
-    $("#input-field-email").css("visibility", "visible", "important");
-  }
-});
-
-$(".menu-button").click(function(){
-  $(".menu-button:visible").attr("active", "false");
-  $(this).attr("active", "true");
-});
-
-$(".menu-button").hover(function(){
-  var self  = this;
-  var index = 0;
-
-  $(".menu-button:visible").each(function(){
-    if(this == self)
-      return false;
-    else
-      index++;
-  });
-
-  var buttonCount = $(".menu-button:visible").length;
-  var left        = (100 / buttonCount) * index + "%";
-
-  $(".menu-line-fg:visible").animate({
-    "left": left
-  }, {duration: 200, queue: false});
+$(".submit-button").hover(function(){
+  $(this).animate({
+    "box-shadow": "0px 0px 10px 0px #5fb9ff"
+  }, 50);
 }, function(){
-  var index = 0;
+  $(this).animate({
+    "box-shadow": "0px 0px 5px 0px #5fb9ff"
+  }, 50);
+});
 
-  $(".menu-button:visible").each(function(){
-    if($(this).attr("active") == "true")
-      return false;
-    else
-      index++;
-  });
+$(".submit-button").mousedown(function(){
+  $(this).animate({
+    "box-shadow": "0px 0px 0px 0px #5fb9ff"
+  }, 50);
+});
 
-  var buttonCount = $(".menu-button:visible").length;
-  var left        = (100 / buttonCount) * index + "%";
-
-  $(".menu-line-fg:visible").animate({
-    "left": left
-  }, {duration: 200, queue: false});
+$(".submit-button").mouseup(function(){
+  $(this).animate({
+    "box-shadow": "0px 0px 5px 0px #5fb9ff"
+  }, 50);
 });
 
 function ShowSubmitMessage(msg, err){
@@ -289,12 +249,12 @@ function AccountWasCreated(data){
   var msg = data["msg"];
   var err = data["err"];
   ShowSubmitMessage(msg, err);
-  AnimateLoadingToSubmitButton();
+  AnimateLoadingToSubmitButton("#app-1");
 
-  $("#loading").animate({
+  $(".loading", "#app-1").animate({
     "opacity": "0"
   }, 100, function(){
-    $("#loading").css("visibility", "hidden");
+    $(".loading", "#app-1").css("display", "nonde");
   });
 }
 
@@ -312,7 +272,7 @@ function LoginPageToMainApp(data){
     }, 100, function(){
       $("#loading").css("visibility", "hidden");
     });
-    AnimateLoadingToSubmitButton();
+    AnimateLoadingToSubmitButton("#app-1");
   }
 
   ShowSubmitMessage(msg, err);
@@ -332,10 +292,6 @@ ipc.on("message", (event, msg) => {
   if(func == "LoginPageToMainApp") LoginPageToMainApp(data);
 });
 
-//////////////////////////////////////////////
- // $("#app-2").css("display", "block"); /**/
-//////////////////////////////////////////////
-
 // Determine the width and starting position of the menu line forground
 $(".menu-line-fg").each(function(){
   var menuButtons = $(".menu-button", $(this).parent().parent());
@@ -354,3 +310,40 @@ $(".menu-line-fg").each(function(){
   $(this).css("left", left);
   $(this).css("width", width);
 });
+
+
+$("input").on("focus",function(){
+  var text = $(this).val();
+  var span = $("span", $(this).parent())[0];
+  if(!text)
+    $(span).css("color", "rgba(0, 0, 0, 0.4)");
+});
+
+$("input").on("blur",function(){
+  var text = $(this).val();
+  var span = $("span", $(this).parent())[0];
+  if(!text)
+    $(span).css("color", "rgba(0, 0, 0, 0.7)");
+});
+
+$("input").on("input", function(){
+  var text = $(this).val();
+  var span = $("span", $(this).parent())[0];
+  if(text)
+    $(span).hide();
+  else
+    $(span).show();
+});
+
+
+$("#test-save").click(function(){
+  SendMessage("TestSave");
+});
+
+$("#test-load").click(function(){
+  SendMessage("TestLoad");
+});
+
+//////////////////////////////////////////
+// $("#app-2").css("display", "block"); //
+//////////////////////////////////////////
