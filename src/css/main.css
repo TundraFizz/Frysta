@@ -164,39 +164,46 @@ body {
 /************/
 /* Unsorted */
 /************/
-.submit-button {
-  border-radius: 4px;
+.submit-container {
   position: relative;
+  height: 28px;
+}
+
+.submit-button {
+  position: absolute;
+  transform: translateX(-50%);
+  left: 50%;
   width: 54px;
   height: 22px;
-  background-color: #3e424e;
+  border-radius: 4px;
   border: 1px solid #4d515c;
+  background-color: #3e424e;
+  box-shadow: 0px 0px 5px 0px #5fb9ff;
+  line-height: 22px;
   cursor: pointer;
   text-align: center;
-  line-height: 22px;
-  display: inline-block;
-  box-shadow: 0px 0px 5px 0px #5fb9ff;
 }
 
-.loading {
-  position: relative;
-  top: -26px;
-  width: 28px;
-  height: 28px;
-  margin: 0 auto;
+.loading-spinner {
+  position: absolute;
+  transform: translateX(-50%);
+  left: 50%;
+  width: 24px;
+  height: 24px;
+  background-image: url(../img/loading.svg);
   opacity: 0;
   display: none;
-  /*visibility: hidden;*/
-  background-image: url(../img/loading.svg);
 }
 
-#message {
+.message {
+  position: relative;
+  display: inline-block;
   border-radius: 4px;
   cursor: default;
   line-height: 18px;
-  display: inline-block;
   padding: 0px 2px;
   opacity: 0;
+  cursor: pointer;
 }
 
 .alert-green {
@@ -223,7 +230,7 @@ body {
   text-align: center;
 }
 
-/*********************/
+/********************
 /* Application Views */
 /*********************/
 [id*="app-"] {position: relative;}

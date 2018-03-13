@@ -68,69 +68,75 @@ $(".menu-button").hover(function(){
 });
 
 function SubmitLogin(username, password){
-  if(username.length == 0 && password.length == 0){
+  if(username.length == 0 && password.length == 0)
     ShowSubmitMessage("Username/password fields are empty", true);
-    return false;
-  }else if(username.length == 0){
+  else if(username.length == 0)
     ShowSubmitMessage("Username field is empty", true);
-    return false;
-  }else if(password.length == 0){
+  else if(password.length == 0)
     ShowSubmitMessage("Password field is empty", true);
-    return false;
-  }else{
-    SendMessage("Login", {
-      "username": username,
-      "password": password
+  else{
+    AnimateSubmitButtonToLoading().then(() => {
+      SendMessage("Login", {
+        "username": username,
+        "password": password
+      });
     });
-    return true;
   }
 }
 
 function SubmitCreateAccount(email, username, password){
   if(email.length == 0 || username.length == 0 || password.length == 0){
     ShowSubmitMessage("All fields must be filled in", true);
-    return false;
   }else if(false){
     // Check if email address is valid
     ShowSubmitMessage("Email address isn't valid", true);
-    return false;
   }else if(username.length < 3){
     ShowSubmitMessage("Username must be at least three characters", true);
-    return false;
   }else if(password.length < 6){
     ShowSubmitMessage("Password must be at least six characters", true);
-    return false;
   }else{
-    SendMessage("CreateAccount", {
-      "email"   : email,
-      "username": username,
-      "password": password
+    AnimateSubmitButtonToLoading().then(() => {
+      SendMessage("CreateAccount", {
+        "email"   : email,
+        "username": username,
+        "password": password
+      });
     });
-    return true;
   }
 }
 
-function AnimateSubmitButtonToLoading(app){
+AnimateSubmitButtonToLoading = function(username, password, app){return new Promise((resolve) => {
+  $(".loading-spinner", app).css("display", "block");
+
+  // Fade out the "Submit" text while shrinking the Submit button.
+  // Once the submit button has shrunk, had it out. All while this
+  // is happening, slowly fade the spinner in and resolve once
+  // the spinner is finished fading in.
+
   $(".submit-button > div", app).animate({
     "opacity": "0"
   }, 100);
 
+  // Shrink the submit button
   $(".submit-button", app).animate({
     "width": "22px",
     "border-radius": "12px"
   }, 100, function(){
     $(".submit-button", app).animate({
       "opacity": "0"
-    }, 100);
-    $(".loading", app).animate({
-      "opacity": "1"
-    }, 100);
-
-    $(".loading", app).css("display", "block");
+    }, 50);
   });
-}
+
+  $(".loading-spinner", app).animate({
+    "opacity": "1"
+  }, 150, function(){
+    resolve();
+  });
+})}
 
 function AnimateLoadingToSubmitButton(app){
+  $(".submit-button", app).css("display", "block");
+
   $(".submit-button", app).animate({
     "opacity": "1"
   }, 100, function(){
@@ -184,18 +190,21 @@ function SubmitApp1(){
   var username  = $("input[name='username']", "#app-1").val();
   var password  = $("input[name='password']", "#app-1").val();
 
-  if(selection == "Login"){
-    if(SubmitLogin(username, password))
-      AnimateSubmitButtonToLoading("#app-1");
-  }
-  else if(selection == "Create Account"){
-    if(SubmitCreateAccount(email, username, password))
-      AnimateSubmitButtonToLoading("#app-1");
-  }
+  if(selection == "Login")
+    SubmitLogin(username, password);
+  else if(selection == "Create Account")
+    SubmitCreateAccount(email, username, password);
 }
 
 $(".submit-button").click(function(){
-  window[$(this).attr("function")]();
+  if($(this).attr("busy") != undefined)
+    return;
+  else
+    $(this).attr("busy", "");
+
+  if($(this).attr("ready") == "true"){
+    window[$(this).attr("function")]();
+  }
 });
 
 $(".submit-button").hover(function(){
@@ -226,24 +235,23 @@ function ShowSubmitMessage(msg, err){
   if     (err == "true")  err = true;
   else if(err == "false") err = false;
 
-  $("#message").text(msg);
-  $("#message").removeClass();
+  $(".message").text(msg);
+  $(".message").removeClass("alert-red");
+  $(".message").removeClass("alert-green");
 
-  if     (err == true)  $("#message").addClass("alert-red");
-  else if(err == false) $("#message").addClass("alert-green");
+  if     (err == true)  $(".message").addClass("alert-red");
+  else if(err == false) $(".message").addClass("alert-green");
 
-  $("#message").animate({
+  $(".message").animate({
     "opacity": "1"
   }, 100);
 }
 
-function HideSubmitMessage(){
-  $("#message").animate({
+$(".message").click(function(){
+  $(this).animate({
     "opacity": "0"
   }, 100);
-}
-
-$("#message").click(HideSubmitMessage);
+});
 
 function AccountWasCreated(data){
   var msg = data["msg"];
@@ -251,10 +259,10 @@ function AccountWasCreated(data){
   ShowSubmitMessage(msg, err);
   AnimateLoadingToSubmitButton("#app-1");
 
-  $(".loading", "#app-1").animate({
+  $(".loading-spinner", "#app-1").animate({
     "opacity": "0"
   }, 100, function(){
-    $(".loading", "#app-1").css("display", "nonde");
+    $(".loading-spinner", "#app-1").css("display", "nonde");
   });
 }
 
@@ -263,14 +271,14 @@ function LoginPageToMainApp(data){
   var err = data["err"];
 
   if(err == "false"){
-    $("#loading").css("background-image", "url(ok.png)");
-    $("#loading").css("background-size", "cover");
+    $(".loading-spinner", "#app-1").css("background-image", "url(ok.png)");
+    $(".loading-spinner", "#app-1").css("background-size", "cover");
     setTimeout(TransitionToMain, 1000);
   }else if(err == "true"){
-    $("#loading").animate({
+    $(".loading-spinner", "#app-1").animate({
       "opacity": "0"
     }, 100, function(){
-      $("#loading").css("visibility", "hidden");
+      $(".loading-spinner", "#app-1").css("display", "none");
     });
     AnimateLoadingToSubmitButton("#app-1");
   }
@@ -311,7 +319,6 @@ $(".menu-line-fg").each(function(){
   $(this).css("width", width);
 });
 
-
 $("input").on("focus",function(){
   var text = $(this).val();
   var span = $("span", $(this).parent())[0];
@@ -335,7 +342,6 @@ $("input").on("input", function(){
     $(span).show();
 });
 
-
 $("#test-save").click(function(){
   SendMessage("TestSave");
 });
@@ -347,3 +353,4 @@ $("#test-load").click(function(){
 //////////////////////////////////////////
 // $("#app-2").css("display", "block"); //
 //////////////////////////////////////////
+$(".submit-button").attr("ready", "true");
