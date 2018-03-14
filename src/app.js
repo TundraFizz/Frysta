@@ -209,8 +209,6 @@ function TakeScreenshot(){
     else
       win.hide();
 
-    console.log(`Sending ${result} to the server`);
-
     var formData = {
       "key": "This is the user's secret",
       "file": fs.createReadStream(result)

@@ -263,8 +263,8 @@ LRESULT CALLBACK WindowProcTop(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
       smallestX += smallestLeft;
       smallestY += smallestTop;
 
-      std::cout << "(" << selectX1 << ", " << selectY1 << "), (" << selectX2 << ", " << selectY2 << ")\n";
-      std::cout << "W: " << width << "   H: " << height << "\n";
+      // std::cout << "(" << selectX1 << ", " << selectY1 << "), (" << selectX2 << ", " << selectY2 << ")\n";
+      // std::cout << "W: " << width << "   H: " << height << "\n";
       screenCapturePart(smallestX, smallestY, width, height);
       ConvertBmpToPng();
 

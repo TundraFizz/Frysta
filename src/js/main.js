@@ -70,7 +70,7 @@ function SubmitLogin(username, password){
   else if(password.length == 0)
     ShowSubmitMessage("Password field is empty", true);
   else{
-    AnimateSubmitButtonToLoading().then(() => {
+    AnimateSubmitButtonToLoading("#app-1 .submit-container").then(() => {
       SendMessage("Login", {
         "username": username,
         "password": password
@@ -90,7 +90,7 @@ function SubmitCreateAccount(email, username, password){
   }else if(password.length < 6){
     ShowSubmitMessage("Password must be at least six characters", true);
   }else{
-    AnimateSubmitButtonToLoading().then(() => {
+    AnimateSubmitButtonToLoading("#app-1 .submit-container").then(() => {
       SendMessage("CreateAccount", {
         "email"   : email,
         "username": username,
@@ -100,7 +100,7 @@ function SubmitCreateAccount(email, username, password){
   }
 }
 
-AnimateSubmitButtonToLoading = function(username, password, app){return new Promise((resolve) => {
+AnimateSubmitButtonToLoading = function(app){return new Promise((resolve) => {
   $(".loading-spinner", app).css("display", "block");
 
   // Fade out the "Submit" text while shrinking the Submit button.
@@ -144,6 +144,17 @@ function AnimateLoadingToSubmitButton(app){
       "opacity": "1"
     }, 100);
   });
+
+  $(".loading-spinner", app).animate({
+    "opacity": "0"
+  }, 100, function(){
+    $(".loading-spinner", app).css("display", "none");
+  });
+}
+
+function AnimateLoadingToOkIcon(app){
+  $(".loading-spinner", app).css("background-image", "url(img/ok.png)");
+  $(".loading-spinner", app).css("background-size",  "cover");
 }
 
 function MenuButtonLogin(){
@@ -261,33 +272,20 @@ function AccountWasCreated(data){
   var msg = data["msg"];
   var err = data["err"];
   ShowSubmitMessage(msg, err);
-  AnimateLoadingToSubmitButton("#app-1");
-
-  $(".loading-spinner", "#app-1").animate({
-    "opacity": "0"
-  }, 100, function(){
-    $(".loading-spinner", "#app-1").css("display", "nonde");
-  });
+  AnimateLoadingToSubmitButton("#app-1 .submit-container");
 }
 
 function LoginPageToMainApp(data){
   var msg = data["msg"];
   var err = data["err"];
+  ShowSubmitMessage(msg, err);
 
   if(err == "false"){
-    $(".loading-spinner", "#app-1").css("background-image", "url(ok.png)");
-    $(".loading-spinner", "#app-1").css("background-size", "cover");
+    AnimateLoadingToOkIcon("#app-1 .submit-container");
     setTimeout(TransitionToMain, 1000);
   }else if(err == "true"){
-    $(".loading-spinner", "#app-1").animate({
-      "opacity": "0"
-    }, 100, function(){
-      $(".loading-spinner", "#app-1").css("display", "none");
-    });
-    AnimateLoadingToSubmitButton("#app-1");
+    AnimateLoadingToSubmitButton("#app-1 .submit-container");
   }
-
-  ShowSubmitMessage(msg, err);
 }
 
 function TransitionToMain(){
