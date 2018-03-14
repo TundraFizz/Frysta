@@ -8,11 +8,6 @@ function SendMessage(func, data=null){
   });
 }
 
-// Sending messages to main.js
-$("#btn-screenshot").click(function(){
-  SendMessage("TakeScreenshot");
-});
-
 $("#btn-minimize").click(function(){
   SendMessage("Minimize");
 });
@@ -184,6 +179,7 @@ function MenuButtonCreateAccount(){
   }, {duration: 250, queue: false});
 }
 
+// Submit button functions (1/2)
 function SubmitApp1(){
   var selection = $($(".menu-button[active='true']", "#app-1")[0]).text();
   var email     = $("input[name='email']"   , "#app-1").val();
@@ -196,13 +192,19 @@ function SubmitApp1(){
     SubmitCreateAccount(email, username, password);
 }
 
+// Submit button functions (2/2)
+function TakeScreenshot(){
+  SendMessage("TakeScreenshot");
+  $(".submit-button").removeAttr("busy");
+}
+
 $(".submit-button").click(function(){
-  if($(this).attr("busy") != undefined)
+  if($(".submit-button").attr("busy") != undefined)
     return;
   else
-    $(this).attr("busy", "");
+    $(".submit-button").attr("busy", "");
 
-  if($(this).attr("ready") == "true"){
+  if($(".submit-button").attr("ready") == "true"){
     window[$(this).attr("function")]();
   }
 });
@@ -245,6 +247,8 @@ function ShowSubmitMessage(msg, err){
   $(".message").animate({
     "opacity": "1"
   }, 100);
+
+  $(".submit-button").removeAttr("busy");
 }
 
 $(".message").click(function(){
