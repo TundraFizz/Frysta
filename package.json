@@ -2,9 +2,8 @@
   "name": "frysta",
   "version": "0.1.0",
   "author": "Tundra Fizz",
-  "description": "Sample Text",
+  "description": "Desktop application to capture screenshots and send them to a server",
   "main": "binding.gyp",
-  "gypfile": true,
   "dependencies": {
     "bcrypt": "latest",
     "electron": "latest",
@@ -17,15 +16,16 @@
   "devDependencies": {
     "electron-rebuild": "^1.7.3"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/TundraFizz/Frysta"
-  },
   "scripts": {
     "all": "cls && npm run clean && npm run compile && npm start",
     "clean": "node-gyp clean",
     "compile": "./node_modules/.bin/electron-rebuild",
     "start": "electron ./src/app.js"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/TundraFizz/Frysta"
+  },
+  "gypfile": true,
   "license": "ISC"
 }
