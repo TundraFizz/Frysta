@@ -204,8 +204,8 @@ function SubmitApp1(){
 }
 
 // Submit button functions (2/2)
-function TakeScreenshot(){
-  SendMessage("TakeScreenshot");
+function TakeScreenshotButton(){
+  SendMessage("TakeScreenshotButton");
   $(".submit-button").removeAttr("busy");
 }
 
@@ -298,9 +298,14 @@ ipc.on("message", (event, msg) => {
   var func = msg["function"];
   var data = JSON.parse(msg["data"]);
 
-  if(func == "AccountWasCreated")  AccountWasCreated(data);
-  if(func == "LoginPageToMainApp") LoginPageToMainApp(data);
+  if(func == "AccountWasCreated")   AccountWasCreated(data);
+  if(func == "LoginPageToMainApp")  LoginPageToMainApp(data);
+  if(func == "PlaySfxNotification") PlaySfxNotification(data);
 });
+
+function PlaySfxNotification(){
+  $("#sfx-notification")[0].play();
+}
 
 // Determine the width and starting position of the menu line forground
 $(".menu-line-fg").each(function(){

@@ -165,18 +165,26 @@ app.on("activate", () => {
   }
 });
 
+// Messages received from the client
 app.on("message", (msg) => {
   var func = msg["function"];
   var data = msg["data"];
 
-  if     (func == "TakeScreenshot") TakeScreenshotButton(data);
-  else if(func == "Minimize")       Minimize            (data);
-  else if(func == "Quit")           Quit                (data);
-  else if(func == "CreateAccount")  CreateAccount       (data);
-  else if(func == "Login")          Login               (data);
-  else if(func == "TestSave")       TestSave            (data);
-  else if(func == "TestLoad")       TestLoad            (data);
+  if     (func == "TakeScreenshotButton") TakeScreenshotButton(data);
+  else if(func == "Minimize")             Minimize            (data);
+  else if(func == "Quit")                 Quit                (data);
+  else if(func == "CreateAccount")        CreateAccount       (data);
+  else if(func == "Login")                Login               (data);
+  else if(func == "TestSave")             TestSave            (data);
+  else if(func == "TestLoad")             TestLoad            (data);
 });
+
+// Functions for the messages received from the client
+
+function TakeScreenshotButton(){
+  clickedOnButton = true;
+  TakeScreenshot();
+}
 
 function Minimize(){
   win.hide();
@@ -187,13 +195,38 @@ function Quit(){
   win.close();
 }
 
-function TakeScreenshotShortcut(){
-  clickedOnButton = false;
-  TakeScreenshot();
+function CreateAccount(data){
+  EncryptData(data)
+  .then((data) => {
+    request.post({url:"https://fizz.gg/create-account", form: {"data":data}}, function(err, res, msg){
+      SendMessage("AccountWasCreated", msg);
+    });
+  });
 }
 
-function TakeScreenshotButton(){
-  clickedOnButton = true;
+function Login(data){
+  EncryptData(data)
+  .then((data) => {
+    request.post({url:"https://fizz.gg/login", form: {"data":data}}, function(err, res, msg){
+      SendMessage("LoginPageToMainApp", msg);
+    });
+  });
+}
+
+function TestSave(data){
+  console.log("========== TestSave ==========");
+}
+
+function TestLoad(data){
+  console.log("========== TestLoad ==========");
+}
+
+/////////////////////////////
+// Miscellaneous functions //
+/////////////////////////////
+
+function TakeScreenshotShortcut(){
+  clickedOnButton = false;
   TakeScreenshot();
 }
 
@@ -216,7 +249,7 @@ function TakeScreenshot(){
 
     request.post({url:"https://fizz.gg/send-screenshot", formData: formData, json: true}, function(err, res, body){
       if(err)
-        return console.error("FAILED:", err);
+        return console.log("FAILED:", err);
 
       lastUploadedScreenshotUrl = body["url"];
       clipboard.write({"text": body["url"]});
@@ -227,16 +260,10 @@ function TakeScreenshot(){
         "title"  : "Uploaded image",
         "content": lastUploadedScreenshotUrl
       });
+
+      SendMessage("PlaySfxNotification");
     });
   });
-}
-
-function TestSave(data){
-  console.log("========== TestSave ==========");
-}
-
-function TestLoad(data){
-  console.log("========== TestLoad ==========");
 }
 
 // It's important that crypto.publicEncrypt is called one time on startup in
@@ -261,28 +288,5 @@ function SendMessage(func, data=null){
     "function": func,
     "data"    : data
     // "data"    : JSON.stringify(data)
-  });
-
-  // EmitMessage("message", {
-  //   "function": func,
-  //   "data"    : JSON.stringify(data)
-  // });
-}
-
-function CreateAccount(data){
-  EncryptData(data)
-  .then((data) => {
-    request.post({url:"https://fizz.gg/create-account", form: {"data":data}}, function(err, res, msg){
-      SendMessage("AccountWasCreated", msg);
-    });
-  });
-}
-
-function Login(data){
-  EncryptData(data)
-  .then((data) => {
-    request.post({url:"https://fizz.gg/login", form: {"data":data}}, function(err, res, msg){
-      SendMessage("LoginPageToMainApp", msg);
-    });
   });
 }
