@@ -248,8 +248,22 @@ function TakeScreenshot(){
     };
 
     request.post({url:"https://fizz.gg/send-screenshot", formData: formData, json: true}, function(err, res, body){
-      if(err)
-        return console.log("FAILED:", err);
+
+      if(err){
+        if(err["code"] == "ENOTFOUND"){
+          console.log("Client was unable to communicate with the server");
+        }else{
+          console.log("An unknown error occurred when trying to communicate with the server");
+          console.log("Error code:", err["code"]);
+        }
+        return;
+      }
+
+      if(res["statusCode"] != 200){
+        console.log("Invalid response from the server");
+        console.log("Error code:", res["statusCode"]);
+        return;
+      }
 
       lastUploadedScreenshotUrl = body["url"];
       clipboard.write({"text": body["url"]});
