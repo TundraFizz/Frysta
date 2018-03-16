@@ -1,6 +1,8 @@
 const ipc         = require("electron").ipcRenderer;
 const EmitMessage = require("electron").remote.app.emit;
 
+var options = {};
+
 function SendMessage(func, data=null){
   EmitMessage("message", {
     "function": func,
@@ -157,6 +159,7 @@ function AnimateLoadingToOkIcon(app){
   $(".loading-spinner", app).css("background-size",  "cover");
 }
 
+// App 1
 function MenuButtonLogin(){
   $("[input-field='email']").animate({
     "opacity": "0"
@@ -188,6 +191,27 @@ function MenuButtonCreateAccount(){
   $("[input-field='password']").animate({
     "top": "56px"
   }, {duration: 250, queue: false});
+}
+
+// App 2
+function MenuButtonGeneral(){
+  $(".container[data]", "#app-2").css("display", "none");
+  $(".container[data='general']").css("display", "block");
+}
+
+function MenuButtonShortcuts(){
+  $(".container[data]", "#app-2").css("display", "none");
+  $(".container[data='shortcuts']").css("display", "block");
+}
+
+function MenuButtonAccount(){
+  $(".container[data]", "#app-2").css("display", "none");
+  $(".container[data='account']").css("display", "block");
+}
+
+function MenuButtonMisc(){
+  $(".container[data]", "#app-2").css("display", "none");
+  $(".container[data='misc']").css("display", "block");
 }
 
 // Submit button functions (1/2)
@@ -296,15 +320,31 @@ function TransitionToMain(){
 // Receiving a message from main.js
 ipc.on("message", (event, msg) => {
   var func = msg["function"];
-  var data = JSON.parse(msg["data"]);
+  var data = msg["data"];
+
+  // Sometimes we may receive a JSON object in string form,
+  // and sometimes we may receive a regular JSON object.
+  // Convert it to an object if it's in string form.
+  if(typeof data != "object")
+    data = JSON.parse(data);
 
   if(func == "AccountWasCreated")   AccountWasCreated(data);
   if(func == "LoginPageToMainApp")  LoginPageToMainApp(data);
   if(func == "PlaySfxNotification") PlaySfxNotification(data);
+  if(func == "GetOptions")          GetOptions(data);
 });
 
 function PlaySfxNotification(){
   $("#sfx-notification")[0].play();
+}
+
+function GetOptions(data){
+  options = data;
+  $("[option='LaunchOnStartup']" ).attr("active", options["LaunchOnStartup"] );
+  $("[option='CopyUrlOnSuccess']").attr("active", options["CopyUrlOnSuccess"]);
+  $("[option='SfxOnSuccess']"    ).attr("active", options["SfxOnSuccess"]    );
+  $("[option='SfxOnFailure']"    ).attr("active", options["SfxOnFailure"]    );
+  $("[option='LocalCopy']"       ).attr("active", options["LocalCopy"]       );
 }
 
 // Determine the width and starting position of the menu line forground
@@ -361,3 +401,4 @@ $("#test-load").click(function(){
 // $("#app-2").css("display", "block"); //
 //////////////////////////////////////////
 $(".submit-button").attr("ready", "true");
+MenuButtonGeneral();

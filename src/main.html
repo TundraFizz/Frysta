@@ -55,25 +55,59 @@
     <div id="app-2">
       <div class="container">
         <div class="menu-buttons">
-          <div class="menu-button" data="sample-1" active="false">Sample 1</div>
-          <div class="menu-button" data="sample-2" active="true">Sample 2</div>
-          <div class="menu-button" data="sample-3" active="false">Sample 3</div>
+          <div class="menu-button" function="MenuButtonGeneral"   active="true">General</div>
+          <div class="menu-button" function="MenuButtonShortcuts" active="false">Shortcuts</div>
+          <div class="menu-button" function="MenuButtonAccount"   active="false">Account</div>
+          <div class="menu-button" function="MenuButtonMisc"      active="false">Misc</div>
         </div>
         <div class="menu-line-bg">
           <div class="menu-line-fg"></div>
         </div>
       </div>
 
-      <div class="spacer"></div>
-
-      <div class="container">
-        <div class="submit-button" function="TakeScreenshotButton">Screenshot</div>
+      <div class="container" data="general">
+        <div class="option-container">
+          <div class="option-toggle" option="LaunchOnStartup" active=""></div>
+          <div class="option-text">Launch Frysta on startup</div>
+        </div>
+        <div class="option-container">
+          <div class="option-toggle" option="CopyUrlOnSuccess" active=""></div>
+          <div class="option-text">Copy URL to clipboard on successful upload</div>
+        </div>
+        <div class="option-container">
+          <div class="option-toggle" option="SfxOnSuccess" active="">
+            <div class="test-object">⦿</div>
+          </div>
+          <div class="option-text">Play sound effect on successful upload</div>
+        </div>
+        <div class="option-container">
+          <div class="option-toggle" option="SfxOnFailure" active=""></div>
+          <div class="option-text">Play sound effect on failed upload</div>
+        </div>
+        <div class="option-container">
+          <div class="option-toggle" option="LocalCopy" active=""></div>
+          <div class="option-text">Save a local copy</div>
+          <div id="local-copy-dir"></div>
+        </div>
       </div>
 
-      <div class="spacer"></div>
+      <div class="container" data="shortcuts">
+        <div>
+          <div class="submit-button" function="TakeScreenshotButton">Screenshot</div>
+          <div>Shortcut: Ctrl+Shift+1</div>
+        </div>
+      </div>
 
-      <div class="text-container">
-        <div>Shortcut: Ctrl+Shift+1</div>
+      <div class="container" data="account">
+        <div>
+          <div class="text">Account</div>
+        </div>
+      </div>
+
+      <div class="container" data="misc">
+        <div>
+          <div class="text">Misc</div>
+        </div>
       </div>
     </div>
   </body>

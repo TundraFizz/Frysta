@@ -17,8 +17,18 @@ var quit = false;
 var clickedOnButton = null;
 var lastUploadedScreenshotUrl = null;
 
+// Default options
+var options = {
+  "LaunchOnStartup" : true,
+  "CopyUrlOnSuccess": true,
+  "SfxOnSuccess"    : true,
+  "SfxOnFailure"    : true,
+  "LocalCopy"       : false
+};
+
 storage.setDataPath(__dirname);
 
+// Get options. If there are no options, create a file with default options
 // storage.set("foobar", {"foo": "bar"}, function(error){
 //   storage.get("foobar", function(error, data){
 //     if(error)
@@ -105,6 +115,18 @@ function createWindow(){
   });
 
   win.once("ready-to-show", function(){
+
+    storage.get("config", function(error, data){
+      if("LaunchOnStartup"  in data) options["LaunchOnStartup"]  = data["LaunchOnStartup"];
+      if("CopyUrlOnSuccess" in data) options["CopyUrlOnSuccess"] = data["CopyUrlOnSuccess"];
+      if("SfxOnSuccess"     in data) options["SfxOnSuccess"]     = data["SfxOnSuccess"];
+      if("SfxOnFailure"     in data) options["SfxOnFailure"]     = data["SfxOnFailure"];
+      if("LocalCopy"        in data) options["LocalCopy"]        = data["LocalCopy"];
+
+      SendMessage("GetOptions", options);
+      storage.set("config", options, function(error){});
+    });
+
     var loggedIn = false; // DEBUG VARIABLE
 
     if(loggedIn)
