@@ -335,7 +335,24 @@ ipc.on("message", (event, msg) => {
 });
 
 function PlaySfxNotification(){
-  $("#sfx-notification")[0].play();
+  var done = false;
+
+  $(".sfx-notification").each(function(){
+    var playing = $(this).attr("playing");
+
+    if(playing == "false"){
+      $(this).attr("playing", "true");
+      $(this)[0].play();
+      done = true;
+      return false;
+    }
+  });
+
+  if(done == false){
+    var audioObject = `<audio class="sfx-notification" src="sfx/notification.ogg" preload="auto" playing="false" onended="$(this).attr('playing', 'false')"></audio>`;
+    $("body").append(audioObject);
+    PlaySfxNotification();
+  }
 }
 
 function GetOptions(data){
