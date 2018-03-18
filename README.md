@@ -14,10 +14,14 @@ Frysta is an application that allows you to select regions of your computer scre
 Make sure you install the Windows build tools first, or else `npm run compile` will not work
 Installing the build tools must be done in a command prompt with administrative privileges
 
+```
 npm i -g --production windows-build-tools
 npm i -g node-gyp
+```
 
 Generating public and private keys
 
+```
 openssl rsa -in priv.key -pubout -out public.key
 openssl genrsa -out private.key 2048
+```
