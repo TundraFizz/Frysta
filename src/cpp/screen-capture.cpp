@@ -1,15 +1,4 @@
-#include <nan.h>
-#include <cmath>
-#include <windows.h>
-#include <windowsx.h>
-#include <iostream>
-#include <ole2.h>
-#include <olectl.h>
-#include <gdiplus.h>
-#include <time.h>
-#include <locale> // Convert string to wstring
 #include "screen-capture.h"
-#pragma comment (lib,"Gdiplus.lib")
 
 std::string directoryToSaveCopy = "FEATURE_TO_DO";
 
@@ -473,25 +462,9 @@ void Reeeeeeeee(){
   }
 }
 
-NAN_MODULE_INIT(ScreenCapture::Init) {
-  Nan::SetMethod(target, "doSyncStuff", DoSyncStuff);
+NAN_MODULE_INIT(ScreenCapture::Init){
+  // All C++ methods are set in this module initialization method
   Nan::SetMethod(target, "doAsyncStuff", DoAsyncStuff);
-}
-
-NAN_METHOD(ScreenCapture::DoSyncStuff) {
-  if(!info[0]->IsString()) {
-    return Nan::ThrowError(Nan::New("expected arg 0: string workerId").ToLocalChecked());
-  }
-  if(!info[1]->IsInt32()) {
-    return Nan::ThrowError(Nan::New("expected arg 1: int iterations").ToLocalChecked());
-  }
-
-  std::string workerId = std::string(*Nan::Utf8String(info[0]->ToString()));
-  int iterations = info[1]->Int32Value();
-
-  // Sleep here
-
-  info.GetReturnValue().Set(Nan::New(workerId).ToLocalChecked());
 }
 
 void TestingWindow(){
@@ -579,9 +552,12 @@ class MyAsyncWorker : public Nan::AsyncWorker {
 
 NAN_METHOD(ScreenCapture::DoAsyncStuff){
   Nan::AsyncQueueWorker(new MyAsyncWorker(
+    // All parameters (except the final one) are variables passed from Node.JS
     std::string(*Nan::Utf8String(info[0]->ToString())),
     info[1]->Int32Value(),
     info[2]->BooleanValue(),
+
+    // The final parameter in MyAsyncWorker will always be the callback function
     new Nan::Callback(info[3].As<v8::Function>())
   ));
 }
