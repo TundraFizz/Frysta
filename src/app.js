@@ -6,7 +6,8 @@ var bcrypt        = require("bcrypt");  // -
 var $             = require("jquery");  // jQuery
 var request       = require("request"); // POST request to the server
 var storage       = require("electron-json-storage");
-var screenCapture = require("./cpp/binding.js"); // C++ module for screen capturing
+var screenCapture = require("../build/Release/screen-capture.node"); // C++ module for screen capturing
+
 var {app, BrowserWindow, Tray, Menu, globalShortcut, ipcMain, clipboard, shell} = require("electron");
 
 // Keep a global reference of the window object, if you don't, the window will
@@ -42,10 +43,8 @@ const dataPath = storage.getDataPath();
 function createWindow(){
   // Create the browser window
   win = new BrowserWindow({
-    // width: 400,
-    // height: 300,
-    width: 800,
-    height: 600,
+    width: 400,
+    height: 300,
     show: false,
     frame: false,
     backgroundColor: "#33363f",
