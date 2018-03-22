@@ -12,7 +12,8 @@
 #pragma comment (lib,"Gdiplus.lib")
 
 class ScreenCapture {
-public:
+  public:
+
   static NAN_MODULE_INIT(Init);
-  static NAN_METHOD(DoAsyncStuff);
+  static NAN_METHOD(TakeScreenshot);
 };

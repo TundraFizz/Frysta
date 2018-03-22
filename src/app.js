@@ -256,7 +256,7 @@ function TakeScreenshot(){
   win.hide();
   // win.minimize();
 
-  screenCapture.doAsyncStuff(123, 5, true, function(result, error){
+  screenCapture.TakeScreenshot(123, 5, true, function(result, error){
 
     // If the user clicked on the "Screenshot" button, then we'll display the window again
     if(clickedOnButton)
