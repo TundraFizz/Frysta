@@ -36,7 +36,7 @@ int programState = 0;
 // 6 = Upload failed, server responded with error
 // 7 = Upload successful, copy URL to clipboard
 
-int GetEncoderClsid(const WCHAR* format, CLSID* pClsid){
+int GetEncoderClsid(const WCHAR *format, CLSID *pClsid){
   UINT num  = 0; // number of image encoders
   UINT size = 0; // size of the image encoder array in bytes
 
@@ -359,7 +359,19 @@ BOOL CALLBACK MonitorEnumProc(HMONITOR hMonitor, HDC hdcMonitor, LPRECT lprcMoni
   return true;
 }
 
-void MyAsyncWorker::Reeeeeeeee(){
+MyAsyncWorker::MyAsyncWorker(std::string myString, int myInt, bool myBool, Nan::Callback *callback) : Nan::AsyncWorker(callback){
+  this->myString = myString;
+  this->myInt    = myInt;
+  this->myBool   = myBool;
+  // These variables are now accessible: myString, myInt, myBool
+}
+
+void MyAsyncWorker::Execute(){
+  std::cout << "===== Execute variables =====\n";
+  std::cout << "String: " << myString << "\n";
+  std::cout << "Int   : " << myInt    << "\n";
+  std::cout << "Bool  : " << myBool   << "\n";
+  std::cout << "=============================\n";
   HINSTANCE hInstance = GetModuleHandle(NULL);
 
   EnumDisplayMonitors(NULL, NULL, MonitorEnumProc, 0);
@@ -460,22 +472,6 @@ void MyAsyncWorker::Reeeeeeeee(){
     TranslateMessage(&message);
     DispatchMessage(&message);
   }
-}
-
-MyAsyncWorker::MyAsyncWorker(std::string myString, int myInt, bool myBool, Nan::Callback *callback) : Nan::AsyncWorker(callback){
-  this->myString = myString;
-  this->myInt    = myInt;
-  this->myBool   = myBool;
-  // These variables are now accessible: myString, myInt, myBool
-}
-
-void MyAsyncWorker::Execute(){
-  std::cout << "===== Execute variables =====\n";
-  std::cout << "String: " << myString << "\n";
-  std::cout << "Int   : " << myInt    << "\n";
-  std::cout << "Bool  : " << myBool   << "\n";
-  std::cout << "=============================\n";
-  Reeeeeeeee();
 }
 
 void MyAsyncWorker::HandleOKCallback(){

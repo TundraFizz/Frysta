@@ -25,14 +25,28 @@ class MyAsyncWorker: public Nan::AsyncWorker{
   MyAsyncWorker(std::string myString, int myInt, bool myBool, Nan::Callback *callback);
 
   // Mandatory special functions
-  void Execute();
-  void HandleOKCallback();
+  void Execute();          // Automatically called right after the Initializer
+  void HandleOKCallback(); // Called once the program is completed
 
   // Custom functions
-  void Reeeeeeeee();
+  // TBD
+
+  // int  GetEncoderClsid(const WCHAR *format, CLSID *pClsid);
+  // bool saveBitmap(HBITMAP bmp, HPALETTE pal);
+  // bool screenCapturePart(int x, int y, int w, int h);
+  // void ConvertBmpToPng();
 
   // Variables
   std::string myString;
   int myInt;
   bool myBool;
 };
+
+int  GetEncoderClsid(const WCHAR *format, CLSID *pClsid);
+bool saveBitmap(HBITMAP bmp, HPALETTE pal);
+bool screenCapturePart(int x, int y, int w, int h);
+void ConvertBmpToPng();
+
+LRESULT CALLBACK WindowProcTop(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+LRESULT CALLBACK WindowProcBot(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+BOOL    CALLBACK MonitorEnumProc(HMONITOR hMonitor, HDC hdcMonitor, LPRECT lprcMonitor, LPARAM dwData);
