@@ -359,7 +359,7 @@ BOOL CALLBACK MonitorEnumProc(HMONITOR hMonitor, HDC hdcMonitor, LPRECT lprcMoni
   return true;
 }
 
-void Reeeeeeeee(){
+void MyAsyncWorker::Reeeeeeeee(){
   HINSTANCE hInstance = GetModuleHandle(NULL);
 
   EnumDisplayMonitors(NULL, NULL, MonitorEnumProc, 0);
@@ -462,40 +462,32 @@ void Reeeeeeeee(){
   }
 }
 
-class MyAsyncWorker: public Nan::AsyncWorker{
-  public:
+MyAsyncWorker::MyAsyncWorker(std::string myString, int myInt, bool myBool, Nan::Callback *callback) : Nan::AsyncWorker(callback){
+  this->myString = myString;
+  this->myInt    = myInt;
+  this->myBool   = myBool;
+  // These variables are now accessible: myString, myInt, myBool
+}
 
-  std::string myString;
-  int myInt;
-  bool myBool;
+void MyAsyncWorker::Execute(){
+  std::cout << "===== Execute variables =====\n";
+  std::cout << "String: " << myString << "\n";
+  std::cout << "Int   : " << myInt    << "\n";
+  std::cout << "Bool  : " << myBool   << "\n";
+  std::cout << "=============================\n";
+  Reeeeeeeee();
+}
 
-  MyAsyncWorker(std::string myString, int myInt, bool myBool, Nan::Callback *callback)
-  : Nan::AsyncWorker(callback){
-    this->myString = myString;
-    this->myInt    = myInt;
-    this->myBool   = myBool;
-  }
+void MyAsyncWorker::HandleOKCallback(){
+  std::string sendToNode = "Data to be sent to Node from C++";
 
-  void Execute(){
-    // std::cout << "===== Execute variables =====\n";
-    // std::cout << "String: " << myString << "\n";
-    // std::cout << "Int   : " << myInt    << "\n";
-    // std::cout << "Bool  : " << myBool   << "\n";
-    // std::cout << "=============================\n";
-    Reeeeeeeee();
-  }
+  v8::Local<v8::Value> argv[] = {
+    Nan::New(fileNamePng).ToLocalChecked(),
+    Nan::Null()
+  };
 
-  void HandleOKCallback(){
-    std::string sendToNode = "Data to be sent to Node from C++";
-
-    v8::Local<v8::Value> argv[] = {
-      Nan::New(fileNamePng).ToLocalChecked(),
-      Nan::Null()
-    };
-
-    callback->Call(2, argv);
-  }
-};
+  callback->Call(2, argv);
+}
 
 NAN_METHOD(ScreenCapture::TakeScreenshot){
   Nan::AsyncQueueWorker(new MyAsyncWorker(

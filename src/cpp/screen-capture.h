@@ -17,3 +17,22 @@ class ScreenCapture {
   static NAN_MODULE_INIT(Init);
   static NAN_METHOD(TakeScreenshot);
 };
+
+class MyAsyncWorker: public Nan::AsyncWorker{
+  public:
+
+  // Initializer
+  MyAsyncWorker(std::string myString, int myInt, bool myBool, Nan::Callback *callback);
+
+  // Mandatory special functions
+  void Execute();
+  void HandleOKCallback();
+
+  // Custom functions
+  void Reeeeeeeee();
+
+  // Variables
+  std::string myString;
+  int myInt;
+  bool myBool;
+};
