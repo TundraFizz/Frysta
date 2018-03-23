@@ -4,7 +4,7 @@ std::string directoryToSaveCopy = "FEATURE_TO_DO";
 
 bool itIsTime = false;
 
-HWND hwndTop;
+// HWND hwndTop;
 HWND hwndBot;
 
 int selectX1   = 0;
@@ -190,7 +190,18 @@ void ConvertBmpToPng(){
   Gdiplus::GdiplusShutdown(gdiplusToken);
 }
 
-LRESULT CALLBACK WindowProcTop(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
+LRESULT CALLBACK MyAsyncWorker::WindowProcTopStatic(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
+  MyAsyncWorker* app;
+  if(msg == WM_CREATE){
+    app = (MyAsyncWorker*)(((LPCREATESTRUCT)lParam)->lpCreateParams);
+    SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR)app);
+  }else{
+    app = (MyAsyncWorker*)GetWindowLongPtr(hwnd, GWLP_USERDATA);
+  }
+  return app->WindowProcTop(hwnd, msg, wParam, lParam);
+}
+
+LRESULT MyAsyncWorker::WindowProcTop(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
   switch(msg){
     case WM_CLOSE:{
       itIsTime = true;
@@ -257,6 +268,12 @@ LRESULT CALLBACK WindowProcTop(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
       screenCapturePart(smallestX, smallestY, width, height);
       ConvertBmpToPng();
 
+      std::cout << "===== TESTING TEST TEST =====\n";
+      std::cout << "String: " << myString << "\n";
+      std::cout << "Int   : " << myInt    << "\n";
+      std::cout << "Bool  : " << myBool   << "\n";
+      Sample();
+
       break;
     }
 
@@ -316,6 +333,12 @@ LRESULT CALLBACK WindowProcTop(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
       return DefWindowProc(hwnd, msg, wParam, lParam);
   }
   return 0;
+}
+
+void MyAsyncWorker::Sample(){
+  std::cout << "===== Sample =====\n";
+  std::cout << myString << "\n";
+  std::cout << "==================\n";
 }
 
 LRESULT CALLBACK WindowProcBot(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
@@ -387,7 +410,8 @@ void MyAsyncWorker::Execute(){
 
   WNDCLASS winClassTop;
   winClassTop.style = CS_DBLCLKS | CS_OWNDC | CS_HREDRAW | CS_VREDRAW;
-  winClassTop.lpfnWndProc = WindowProcTop;
+  // winClassTop.lpfnWndProc = WindowProcTop;
+  winClassTop.lpfnWndProc = WindowProcTopStatic;
   winClassTop.cbClsExtra = 0;
   winClassTop.cbWndExtra = 0;
   winClassTop.hInstance = hInstance;
@@ -452,7 +476,7 @@ void MyAsyncWorker::Execute(){
     NULL,
     NULL,
     hInstance,
-    NULL);
+    this);
 
   SetLayeredWindowAttributes(hwndTop, NULL, 1,   LWA_ALPHA);
   SetLayeredWindowAttributes(hwndBot, NULL, 120, LWA_ALPHA);

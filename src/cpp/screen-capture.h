@@ -19,6 +19,8 @@ class ScreenCapture {
 };
 
 class MyAsyncWorker: public Nan::AsyncWorker{
+  private:
+
   public:
 
   // Initializer
@@ -30,6 +32,7 @@ class MyAsyncWorker: public Nan::AsyncWorker{
 
   // Custom functions
   // TBD
+  void Sample();
 
   // int  GetEncoderClsid(const WCHAR *format, CLSID *pClsid);
   // bool saveBitmap(HBITMAP bmp, HPALETTE pal);
@@ -37,9 +40,16 @@ class MyAsyncWorker: public Nan::AsyncWorker{
   // void ConvertBmpToPng();
 
   // Variables
-  std::string myString;
+
   int myInt;
   bool myBool;
+
+  private:
+  static LRESULT CALLBACK WindowProcTopStatic(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+  LRESULT CALLBACK WindowProcTop(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+  HWND hwndTop;
+
+  std::string myString;
 };
 
 int  GetEncoderClsid(const WCHAR *format, CLSID *pClsid);
@@ -47,7 +57,7 @@ bool saveBitmap(HBITMAP bmp, HPALETTE pal);
 bool screenCapturePart(int x, int y, int w, int h);
 void ConvertBmpToPng();
 
-LRESULT CALLBACK WindowProcTop(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+// LRESULT CALLBACK WindowProcTop(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 LRESULT CALLBACK WindowProcBot(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 BOOL    CALLBACK MonitorEnumProc(HMONITOR hMonitor, HDC hdcMonitor, LPRECT lprcMonitor, LPARAM dwData);
 
