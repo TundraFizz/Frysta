@@ -1,42 +1,6 @@
 #include "screen-capture.h"
 
-std::string directoryToSaveCopy = "FEATURE_TO_DO";
-
-bool itIsTime = false;
-
-// HWND hwndTop;
-HWND hwndBot;
-
-int selectX1   = 0;
-int selectY1   = 0;
-int selectX2   = 0;
-int selectY2   = 0;
-int mouseStep  = 0;
-bool mouseDown = false;
-
-int smallestLeft  = 0;
-int smallestTop   = 0;
-int largestRight  = 0;
-int largestBottom = 0;
-bool firstRun     = true;
-
-int maskWidth  = 0;
-int maskHeight = 0;
-
-std::string fileName    = "";
-std::string fileNameBmp = "";
-std::string fileNamePng = "";
-int programState = 0;
-// 0 = Idle
-// 1 = Mask active, waiting for user to select screen region
-// 2 = Generating file
-// 3 = Uploading to server
-// 4 = Waiting for server response
-// 5 = Upload failed, no response from server
-// 6 = Upload failed, server responded with error
-// 7 = Upload successful, copy URL to clipboard
-
-int GetEncoderClsid(const WCHAR *format, CLSID *pClsid){
+int MyAsyncWorker::GetEncoderClsid(const WCHAR *format, CLSID *pClsid){
   UINT num  = 0; // number of image encoders
   UINT size = 0; // size of the image encoder array in bytes
 
@@ -66,7 +30,7 @@ int GetEncoderClsid(const WCHAR *format, CLSID *pClsid){
   return -1; // Failure
 }
 
-bool saveBitmap(HBITMAP bmp, HPALETTE pal){
+bool MyAsyncWorker::saveBitmap(HBITMAP bmp, HPALETTE pal){
   bool result = false;
   PICTDESC pd;
 
@@ -130,7 +94,7 @@ bool saveBitmap(HBITMAP bmp, HPALETTE pal){
   return result;
 }
 
-bool screenCapturePart(int x, int y, int w, int h){
+bool MyAsyncWorker::screenCapturePart(int x, int y, int w, int h){
   HDC hdcSource = GetDC(NULL);
   HDC hdcMemory = CreateCompatibleDC(hdcSource);
 
@@ -153,7 +117,7 @@ bool screenCapturePart(int x, int y, int w, int h){
   return false;
 }
 
-void ConvertBmpToPng(){
+void MyAsyncWorker::ConvertBmpToPng(){
   ULONG_PTR                    gdiplusToken;
   Gdiplus::GdiplusStartupInput gdiplusStartupInput;
 
@@ -191,6 +155,17 @@ void ConvertBmpToPng(){
 }
 
 LRESULT CALLBACK MyAsyncWorker::WindowProcTopStatic(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
+  MyAsyncWorker* app;
+  if(msg == WM_CREATE){
+    app = (MyAsyncWorker*)(((LPCREATESTRUCT)lParam)->lpCreateParams);
+    SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR)app);
+  }else{
+    app = (MyAsyncWorker*)GetWindowLongPtr(hwnd, GWLP_USERDATA);
+  }
+  return app->WindowProcTop(hwnd, msg, wParam, lParam);
+}
+
+LRESULT CALLBACK MyAsyncWorker::WindowProcBotStatic(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
   MyAsyncWorker* app;
   if(msg == WM_CREATE){
     app = (MyAsyncWorker*)(((LPCREATESTRUCT)lParam)->lpCreateParams);
@@ -242,37 +217,46 @@ LRESULT MyAsyncWorker::WindowProcTop(HWND hwnd, UINT msg, WPARAM wParam, LPARAM 
       selectY2 = GET_Y_LPARAM(lParam);
       mouseStep = 0;
 
+      std::cout << "11111111111111111111\n";
       SendMessage(hwndBot, WM_CLOSE, 0, NULL);
+      std::cout << "22222222222222222222\n";
       SendMessage(hwndTop, WM_CLOSE, 0, NULL);
+      std::cout << "3\n";
 
       // CloseWindow(hwndBot);
       // CloseWindow(hwndTop);
 
       int width  = abs(selectX1 - selectX2);
+      std::cout << "4\n";
       int height = abs(selectY1 - selectY2);
+      std::cout << "5\n";
 
       int smallestX;
       int smallestY;
 
       if  (selectX1 < selectX2) smallestX = selectX1;
       else                      smallestX = selectX2;
+      std::cout << "6\n";
 
       if  (selectY1 < selectY2) smallestY = selectY1;
       else                      smallestY = selectY2;
+      std::cout << "7\n";
 
       smallestX += smallestLeft;
       smallestY += smallestTop;
+      std::cout << "8\n";
 
       // std::cout << "(" << selectX1 << ", " << selectY1 << "), (" << selectX2 << ", " << selectY2 << ")\n";
       // std::cout << "W: " << width << "   H: " << height << "\n";
       screenCapturePart(smallestX, smallestY, width, height);
+      std::cout << "9\n";
       ConvertBmpToPng();
+      std::cout << "10\n";
 
       std::cout << "===== TESTING TEST TEST =====\n";
       std::cout << "String: " << myString << "\n";
       std::cout << "Int   : " << myInt    << "\n";
       std::cout << "Bool  : " << myBool   << "\n";
-      Sample();
 
       break;
     }
@@ -335,13 +319,7 @@ LRESULT MyAsyncWorker::WindowProcTop(HWND hwnd, UINT msg, WPARAM wParam, LPARAM 
   return 0;
 }
 
-void MyAsyncWorker::Sample(){
-  std::cout << "===== Sample =====\n";
-  std::cout << myString << "\n";
-  std::cout << "==================\n";
-}
-
-LRESULT CALLBACK WindowProcBot(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
+LRESULT MyAsyncWorker::WindowProcBot(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
   switch(msg){
     case WM_CLOSE:{
       DestroyWindow(hwnd);
@@ -361,6 +339,11 @@ LRESULT CALLBACK WindowProcBot(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
 }
 
 BOOL CALLBACK MonitorEnumProc(HMONITOR hMonitor, HDC hdcMonitor, LPRECT lprcMonitor, LPARAM dwData){
+  reinterpret_cast<MyAsyncWorker*>(dwData)->YoloSwag(hMonitor, hdcMonitor, lprcMonitor);
+  return true;
+}
+
+bool MyAsyncWorker::YoloSwag(HMONITOR hMonitor, HDC hdcMonitor, LPRECT lprcMonitor){
   MONITORINFO mi;
   mi.cbSize = sizeof(mi);
   GetMonitorInfo(hMonitor, &mi);
@@ -397,7 +380,17 @@ void MyAsyncWorker::Execute(){
   std::cout << "=============================\n";
   HINSTANCE hInstance = GetModuleHandle(NULL);
 
-  EnumDisplayMonitors(NULL, NULL, MonitorEnumProc, 0);
+  std::cout << "FirstRun     : " << firstRun << "\n";
+
+  // EnumDisplayMonitors(NULL, NULL, MonitorEnumProc, 0);
+  EnumDisplayMonitors(NULL, NULL, MonitorEnumProc, reinterpret_cast<LPARAM>(this));
+
+  std::cout << "FirstRun     : " << firstRun      << "\n";
+  std::cout << "smallestLeft : " << smallestLeft  << "\n";
+  std::cout << "smallestTop  : " << smallestTop   << "\n";
+  std::cout << "largestRight : " << largestRight  << "\n";
+  std::cout << "largestBottom: " << largestBottom << "\n";
+
   maskWidth  = largestRight  - smallestLeft;
   maskHeight = largestBottom - smallestTop;
   // std::cout << "========== Monitor Information ==========\n";
@@ -410,7 +403,6 @@ void MyAsyncWorker::Execute(){
 
   WNDCLASS winClassTop;
   winClassTop.style = CS_DBLCLKS | CS_OWNDC | CS_HREDRAW | CS_VREDRAW;
-  // winClassTop.lpfnWndProc = WindowProcTop;
   winClassTop.lpfnWndProc = WindowProcTopStatic;
   winClassTop.cbClsExtra = 0;
   winClassTop.cbWndExtra = 0;
@@ -423,7 +415,7 @@ void MyAsyncWorker::Execute(){
 
   WNDCLASS winClassBot;
   winClassBot.style = CS_DBLCLKS | CS_OWNDC | CS_HREDRAW | CS_VREDRAW;
-  winClassBot.lpfnWndProc = WindowProcBot;
+  winClassBot.lpfnWndProc = WindowProcBotStatic;
   winClassBot.cbClsExtra = 0;
   winClassBot.cbWndExtra = 0;
   winClassBot.hInstance = hInstance;
