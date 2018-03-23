@@ -50,3 +50,10 @@ void ConvertBmpToPng();
 LRESULT CALLBACK WindowProcTop(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 LRESULT CALLBACK WindowProcBot(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 BOOL    CALLBACK MonitorEnumProc(HMONITOR hMonitor, HDC hdcMonitor, LPRECT lprcMonitor, LPARAM dwData);
+
+// Self-register the module
+NAN_MODULE_INIT(InitModule){
+  ScreenCapture::Init(target);
+}
+
+NODE_MODULE(myModule, InitModule);

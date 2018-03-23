@@ -6,7 +6,6 @@
       "<!(node -e \"require('nan')\")"
     ],
     "sources": [
-      "src/cpp/index.cpp",
       "src/cpp/screen-capture.cpp"
     ]
   }]
