@@ -1,5 +1,21 @@
 #include "screen-capture.h"
 
+NAN_MODULE_INIT(ScreenCapture::Init){
+  Nan::SetMethod(target, "TakeScreenshot", TakeScreenshot);
+}
+
+NAN_METHOD(ScreenCapture::TakeScreenshot){
+  Nan::AsyncQueueWorker(new MyAsyncWorker(
+    // All parameters (except the final one) are variables passed from Node.JS
+    std::string(*Nan::Utf8String(info[0]->ToString())),
+    info[1]->Int32Value(),
+    info[2]->BooleanValue(),
+
+    // The final parameter in MyAsyncWorker will always be the callback function
+    new Nan::Callback(info[3].As<v8::Function>())
+  ));
+}
+
 int MyAsyncWorker::GetEncoderClsid(const WCHAR *format, CLSID *pClsid){
   UINT num  = 0; // number of image encoders
   UINT size = 0; // size of the image encoder array in bytes
@@ -217,46 +233,29 @@ LRESULT MyAsyncWorker::WindowProcTop(HWND hwnd, UINT msg, WPARAM wParam, LPARAM 
       selectY2 = GET_Y_LPARAM(lParam);
       mouseStep = 0;
 
-      std::cout << "11111111111111111111\n";
       SendMessage(hwndBot, WM_CLOSE, 0, NULL);
-      std::cout << "22222222222222222222\n";
       SendMessage(hwndTop, WM_CLOSE, 0, NULL);
-      std::cout << "3\n";
 
       // CloseWindow(hwndBot);
       // CloseWindow(hwndTop);
 
       int width  = abs(selectX1 - selectX2);
-      std::cout << "4\n";
       int height = abs(selectY1 - selectY2);
-      std::cout << "5\n";
 
       int smallestX;
       int smallestY;
 
       if  (selectX1 < selectX2) smallestX = selectX1;
       else                      smallestX = selectX2;
-      std::cout << "6\n";
 
       if  (selectY1 < selectY2) smallestY = selectY1;
       else                      smallestY = selectY2;
-      std::cout << "7\n";
 
       smallestX += smallestLeft;
       smallestY += smallestTop;
-      std::cout << "8\n";
 
-      // std::cout << "(" << selectX1 << ", " << selectY1 << "), (" << selectX2 << ", " << selectY2 << ")\n";
-      // std::cout << "W: " << width << "   H: " << height << "\n";
       screenCapturePart(smallestX, smallestY, width, height);
-      std::cout << "9\n";
       ConvertBmpToPng();
-      std::cout << "10\n";
-
-      std::cout << "===== TESTING TEST TEST =====\n";
-      std::cout << "String: " << myString << "\n";
-      std::cout << "Int   : " << myInt    << "\n";
-      std::cout << "Bool  : " << myBool   << "\n";
 
       break;
     }
@@ -283,16 +282,6 @@ LRESULT MyAsyncWorker::WindowProcTop(HWND hwnd, UINT msg, WPARAM wParam, LPARAM 
 
         if(selectY1 > selectY2) lowerRightY = selectY1;
         else                    lowerRightY = selectY2;
-
-        // std::cout << "===========================\n";
-        // std::cout << "upperLeftX:   " << upperLeftX   << "\n";
-        // std::cout << "upperLeftY:   " << upperLeftY   << "\n";
-        // std::cout << "lowerRightX:  " << lowerRightX  << "\n";
-        // std::cout << "lowerRightY:  " << lowerRightY  << "\n";
-        // std::cout << "smallestLeft: " << smallestLeft << "\n";
-        // std::cout << "smallestTop:  " << smallestTop  << "\n";
-        // std::cout << "maskWidth:    " << maskWidth    << "\n";
-        // std::cout << "maskHeight:   " << maskHeight   << "\n";
 
         HRGN WinRgn1;
         HRGN WinRgn2;
@@ -339,11 +328,11 @@ LRESULT MyAsyncWorker::WindowProcBot(HWND hwnd, UINT msg, WPARAM wParam, LPARAM 
 }
 
 BOOL CALLBACK MonitorEnumProc(HMONITOR hMonitor, HDC hdcMonitor, LPRECT lprcMonitor, LPARAM dwData){
-  reinterpret_cast<MyAsyncWorker*>(dwData)->YoloSwag(hMonitor, hdcMonitor, lprcMonitor);
+  reinterpret_cast<MyAsyncWorker*>(dwData)->GetMonitorStats(hMonitor, hdcMonitor, lprcMonitor);
   return true;
 }
 
-bool MyAsyncWorker::YoloSwag(HMONITOR hMonitor, HDC hdcMonitor, LPRECT lprcMonitor){
+bool MyAsyncWorker::GetMonitorStats(HMONITOR hMonitor, HDC hdcMonitor, LPRECT lprcMonitor){
   MONITORINFO mi;
   mi.cbSize = sizeof(mi);
   GetMonitorInfo(hMonitor, &mi);
@@ -373,33 +362,12 @@ MyAsyncWorker::MyAsyncWorker(std::string myString, int myInt, bool myBool, Nan::
 }
 
 void MyAsyncWorker::Execute(){
-  std::cout << "===== Execute variables =====\n";
-  std::cout << "String: " << myString << "\n";
-  std::cout << "Int   : " << myInt    << "\n";
-  std::cout << "Bool  : " << myBool   << "\n";
-  std::cout << "=============================\n";
   HINSTANCE hInstance = GetModuleHandle(NULL);
 
-  std::cout << "FirstRun     : " << firstRun << "\n";
-
-  // EnumDisplayMonitors(NULL, NULL, MonitorEnumProc, 0);
   EnumDisplayMonitors(NULL, NULL, MonitorEnumProc, reinterpret_cast<LPARAM>(this));
-
-  std::cout << "FirstRun     : " << firstRun      << "\n";
-  std::cout << "smallestLeft : " << smallestLeft  << "\n";
-  std::cout << "smallestTop  : " << smallestTop   << "\n";
-  std::cout << "largestRight : " << largestRight  << "\n";
-  std::cout << "largestBottom: " << largestBottom << "\n";
 
   maskWidth  = largestRight  - smallestLeft;
   maskHeight = largestBottom - smallestTop;
-  // std::cout << "========== Monitor Information ==========\n";
-  // std::cout << "smallestLeft : " << smallestLeft  << "\n";
-  // std::cout << "smallestTop  : " << smallestTop   << "\n";
-  // std::cout << "largestRight : " << largestRight  << "\n";
-  // std::cout << "largestBottom: " << largestBottom << "\n";
-  // std::cout << "maskWidth    : " << maskWidth     << "\n";
-  // std::cout << "maskHeight   : " << maskHeight    << "\n";
 
   WNDCLASS winClassTop;
   winClassTop.style = CS_DBLCLKS | CS_OWNDC | CS_HREDRAW | CS_VREDRAW;
@@ -449,7 +417,7 @@ void MyAsyncWorker::Execute(){
     NULL,
     NULL,
     hInstance,
-    NULL);
+    this);
 
   hwndTop = CreateWindowEx(
     // 1. Allows better window functionality
@@ -499,21 +467,4 @@ void MyAsyncWorker::HandleOKCallback(){
   };
 
   callback->Call(2, argv);
-}
-
-NAN_METHOD(ScreenCapture::TakeScreenshot){
-  Nan::AsyncQueueWorker(new MyAsyncWorker(
-    // All parameters (except the final one) are variables passed from Node.JS
-    std::string(*Nan::Utf8String(info[0]->ToString())),
-    info[1]->Int32Value(),
-    info[2]->BooleanValue(),
-
-    // The final parameter in MyAsyncWorker will always be the callback function
-    new Nan::Callback(info[3].As<v8::Function>())
-  ));
-}
-
-NAN_MODULE_INIT(ScreenCapture::Init){
-  // All C++ methods are set in this module initialization method
-  Nan::SetMethod(target, "TakeScreenshot", TakeScreenshot);
 }

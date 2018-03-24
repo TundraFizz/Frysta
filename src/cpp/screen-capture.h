@@ -11,19 +11,15 @@
 
 #pragma comment (lib,"Gdiplus.lib")
 
-class ScreenCapture {
-  public:
-
+struct ScreenCapture {
   static NAN_MODULE_INIT(Init);
   static NAN_METHOD(TakeScreenshot);
 };
 
 class MyAsyncWorker: public Nan::AsyncWorker{
-  private:
-
   public:
 
-  // Initializer
+  // Constructor
   MyAsyncWorker(std::string myString, int myInt, bool myBool, Nan::Callback *callback);
 
   // Mandatory special functions
@@ -31,16 +27,13 @@ class MyAsyncWorker: public Nan::AsyncWorker{
   void HandleOKCallback(); // Called once the program is completed
 
   // Custom functions
-  // TBD
-  void Sample();
-
-  // int  GetEncoderClsid(const WCHAR *format, CLSID *pClsid);
-  // bool saveBitmap(HBITMAP bmp, HPALETTE pal);
-  // bool screenCapturePart(int x, int y, int w, int h);
-  // void ConvertBmpToPng();
+  int  GetEncoderClsid(const WCHAR *format, CLSID *pClsid);
+  bool saveBitmap(HBITMAP bmp, HPALETTE pal);
+  bool screenCapturePart(int x, int y, int w, int h);
+  void ConvertBmpToPng();
+  bool GetMonitorStats(HMONITOR hMonitor, HDC hdcMonitor, LPRECT lprcMonitor);
 
   // Variables
-
   int myInt;
   bool myBool;
 
@@ -88,14 +81,6 @@ class MyAsyncWorker: public Nan::AsyncWorker{
   // 5 = Upload failed, no response from server
   // 6 = Upload failed, server responded with error
   // 7 = Upload successful, copy URL to clipboard
-
-  int  GetEncoderClsid(const WCHAR *format, CLSID *pClsid);
-  bool saveBitmap(HBITMAP bmp, HPALETTE pal);
-  bool screenCapturePart(int x, int y, int w, int h);
-  void ConvertBmpToPng();
-
-  public:
-  bool YoloSwag(HMONITOR hMonitor, HDC hdcMonitor, LPRECT lprcMonitor);
 };
 
 // Self-register the module
