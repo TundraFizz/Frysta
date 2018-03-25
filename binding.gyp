@@ -8,9 +8,9 @@
     "sources": [
       "src/cpp/screen-capture.cpp"
     ],
-    'msvs_settings': {
-      'VCCLCompilerTool': {
-        'WarnAsError': 'true'
+    "msvs_settings": {
+      "VCCLCompilerTool": {
+        "WarnAsError": "true"
       }
     }
   }]

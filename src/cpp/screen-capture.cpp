@@ -106,8 +106,8 @@ void MyAsyncWorker::Execute(){
   // Change background colors of the windows
   HBRUSH brushTop = CreateSolidBrush(RGB(255, 255, 255));
   HBRUSH brushBot = CreateSolidBrush(RGB(0, 0, 0));
-  SetClassLongPtr(hwndTop, GCLP_HBRBACKGROUND, (LONG)brushTop);
-  SetClassLongPtr(hwndBot, GCLP_HBRBACKGROUND, (LONG)brushBot);
+  SetClassLongPtr(hwndTop, GCLP_HBRBACKGROUND, (LONG_PTR)brushTop);
+  SetClassLongPtr(hwndBot, GCLP_HBRBACKGROUND, (LONG_PTR)brushBot);
 
   ShowWindow(hwndTop, SW_SHOW);
   ShowWindow(hwndBot, SW_SHOW);
@@ -121,14 +121,16 @@ void MyAsyncWorker::Execute(){
 }
 
 void MyAsyncWorker::HandleOKCallback(){
-  std::string sendToNode = "Data to be sent to Node from C++";
-
-  v8::Local<v8::Value> argv[] = {
+  v8::Local<v8::Value> arguments[] = {
     Nan::New(fileNamePng).ToLocalChecked(),
-    Nan::Null()
+    Nan::New(fileNamePng).ToLocalChecked(),
+    Nan::New(fileNamePng).ToLocalChecked()
   };
 
-  callback->Call(2, argv);
+  size_t argumentCount = sizeof(arguments)/sizeof(*arguments);
+  Nan::AsyncResource *dummy = new Nan::AsyncResource(Nan::New("").ToLocalChecked());
+
+  callback->Call(argumentCount, argv, dummy);
 }
 
 int MyAsyncWorker::GetEncoderClsid(const WCHAR *format, CLSID *pClsid){
@@ -191,7 +193,7 @@ bool MyAsyncWorker::SaveBitmap(HBITMAP bmp, HPALETTE pal){
 
   fileName = "tmp-";
 
-  srand(time(NULL));
+  srand((unsigned int)time(NULL));
 
   for(size_t i = 0; i < 6; i++)
     fileName += characters[rand() % 62];
