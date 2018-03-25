@@ -16,344 +16,6 @@ NAN_METHOD(ScreenCapture::TakeScreenshot){
   ));
 }
 
-int MyAsyncWorker::GetEncoderClsid(const WCHAR *format, CLSID *pClsid){
-  UINT num  = 0; // number of image encoders
-  UINT size = 0; // size of the image encoder array in bytes
-
-  Gdiplus::ImageCodecInfo* pImageCodecInfo = NULL;
-
-  Gdiplus::GetImageEncodersSize(&num, &size);
-
-  if(size == 0)
-    return -1; // Failure
-
-  pImageCodecInfo = (Gdiplus::ImageCodecInfo*)(malloc(size));
-
-  if(pImageCodecInfo == NULL)
-    return -1; // Failure
-
-  GetImageEncoders(num, size, pImageCodecInfo);
-
-  for(UINT j = 0; j < num; ++j){
-    if(wcscmp(pImageCodecInfo[j].MimeType, format) == 0){
-      *pClsid = pImageCodecInfo[j].Clsid;
-      free(pImageCodecInfo);
-      return j; // Success
-    }
-  }
-
-  free(pImageCodecInfo);
-  return -1; // Failure
-}
-
-bool MyAsyncWorker::saveBitmap(HBITMAP bmp, HPALETTE pal){
-  bool result = false;
-  PICTDESC pd;
-
-  pd.cbSizeofstruct = sizeof(PICTDESC);
-  pd.picType        = PICTYPE_BITMAP;
-  pd.bmp.hbitmap    = bmp;
-  pd.bmp.hpal       = pal;
-
-  LPPICTURE picture;
-  HRESULT res = OleCreatePictureIndirect(&pd, IID_IPicture, false, reinterpret_cast<void**>(&picture));
-
-  if(!SUCCEEDED(res))
-    return false;
-
-  LPSTREAM stream;
-  res = CreateStreamOnHGlobal(0, true, &stream);
-
-  if(!SUCCEEDED(res)){
-    picture->Release();
-    return false;
-  }
-
-  LONG bytes_streamed;
-  res = picture->SaveAsFile(stream, true, &bytes_streamed);
-
-  char characters[] = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-
-  fileName = "tmp-";
-
-  srand(time(NULL));
-
-  for(size_t i = 0; i < 6; i++)
-    fileName += characters[rand() % 62];
-
-  fileNameBmp = fileName + ".bmp";
-  fileNamePng = fileName + ".png";
-
-  HANDLE file = CreateFile(fileNameBmp.c_str(), GENERIC_WRITE, FILE_SHARE_READ, 0, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0);
-
-  if(!SUCCEEDED(res) || !file){
-    stream->Release();
-    picture->Release();
-    return false;
-  }
-
-  HGLOBAL mem = 0;
-  GetHGlobalFromStream(stream, &mem);
-  LPVOID data = GlobalLock(mem);
-
-  DWORD bytes_written;
-
-  result   = !!WriteFile(file, data, bytes_streamed, &bytes_written, 0);
-  result  &= (bytes_written == static_cast<DWORD>(bytes_streamed));
-
-  GlobalUnlock(mem);
-  CloseHandle(file);
-
-  stream->Release();
-  picture->Release();
-
-  return result;
-}
-
-bool MyAsyncWorker::screenCapturePart(int x, int y, int w, int h){
-  HDC hdcSource = GetDC(NULL);
-  HDC hdcMemory = CreateCompatibleDC(hdcSource);
-
-  int capX = GetDeviceCaps(hdcSource, HORZRES);
-  int capY = GetDeviceCaps(hdcSource, VERTRES);
-
-  HBITMAP hBitmap    = CreateCompatibleBitmap(hdcSource, w, h);
-  HBITMAP hBitmapOld = (HBITMAP)SelectObject(hdcMemory, hBitmap);
-
-  BitBlt(hdcMemory, 0, 0, w, h, hdcSource, x, y, SRCCOPY);
-  hBitmap = (HBITMAP)SelectObject(hdcMemory, hBitmapOld);
-
-  DeleteDC(hdcSource);
-  DeleteDC(hdcMemory);
-
-  HPALETTE hpal = NULL;
-
-  if(saveBitmap(hBitmap, hpal))
-    return true;
-  return false;
-}
-
-void MyAsyncWorker::ConvertBmpToPng(){
-  ULONG_PTR                    gdiplusToken;
-  Gdiplus::GdiplusStartupInput gdiplusStartupInput;
-
-  // Initializes Windows GDI+, make sure you call GdiplusShutdown when you're done using GDI+
-  GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
-
-  std::wstring_convert< std::codecvt<wchar_t,char,std::mbstate_t> > conv1;
-  std::wstring_convert< std::codecvt<wchar_t,char,std::mbstate_t> > conv2;
-  std::wstring wcstring1 = conv1.from_bytes(fileNameBmp);
-  std::wstring wcstring2 = conv1.from_bytes(fileNamePng);
-
-  const WCHAR * testing1 = wcstring1.c_str();
-  const WCHAR * testing2 = wcstring2.c_str();
-
-  Gdiplus::Image  *image = new Gdiplus::Image(testing1);
-  Gdiplus::Status stat;
-  CLSID           encoderClsid;
-
-  // Get the CLSID of the PNG encoder
-  GetEncoderClsid(L"image/png", &encoderClsid);
-
-  // Convert the .bmp file into a .png file
-  stat = image->Save(testing2, &encoderClsid, NULL);
-
-  if(stat != Gdiplus::Ok){
-    std::cout << "Error converting .bmp to .png\n";
-    std::cout << "Code: " << stat << "\n";
-  }
-
-  // Delete the lock that the program has on the .bmp file (it does NOT delete the file itself)
-  delete image;
-
-  // Clean up resources used by Windows GDI+
-  Gdiplus::GdiplusShutdown(gdiplusToken);
-}
-
-LRESULT CALLBACK MyAsyncWorker::WindowProcTopStatic(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
-  MyAsyncWorker* app;
-  if(msg == WM_CREATE){
-    app = (MyAsyncWorker*)(((LPCREATESTRUCT)lParam)->lpCreateParams);
-    SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR)app);
-  }else{
-    app = (MyAsyncWorker*)GetWindowLongPtr(hwnd, GWLP_USERDATA);
-  }
-  return app->WindowProcTop(hwnd, msg, wParam, lParam);
-}
-
-LRESULT CALLBACK MyAsyncWorker::WindowProcBotStatic(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
-  MyAsyncWorker* app;
-  if(msg == WM_CREATE){
-    app = (MyAsyncWorker*)(((LPCREATESTRUCT)lParam)->lpCreateParams);
-    SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR)app);
-  }else{
-    app = (MyAsyncWorker*)GetWindowLongPtr(hwnd, GWLP_USERDATA);
-  }
-  return app->WindowProcTop(hwnd, msg, wParam, lParam);
-}
-
-LRESULT MyAsyncWorker::WindowProcTop(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
-  switch(msg){
-    case WM_CLOSE:{
-      itIsTime = true;
-      DestroyWindow(hwnd);
-      break;
-    }
-
-    case WM_DESTROY:{
-      itIsTime = true;
-      PostQuitMessage(0);
-      break;
-    }
-
-    case WM_SETCURSOR:{
-      if(LOWORD(lParam) == HTCLIENT){
-        HINSTANCE instance;
-        LPCTSTR   cursor;
-
-        instance = NULL;
-        cursor   = IDC_CROSS;
-
-        SetCursor(LoadCursor(instance, cursor));
-
-        return true;
-      }
-      break;
-    }
-
-    case WM_LBUTTONDOWN:{
-      selectX1 = GET_X_LPARAM(lParam);
-      selectY1 = GET_Y_LPARAM(lParam);
-      mouseStep = 1;
-      break;
-    }
-
-    case WM_LBUTTONUP:{
-      selectX2 = GET_X_LPARAM(lParam);
-      selectY2 = GET_Y_LPARAM(lParam);
-      mouseStep = 0;
-
-      SendMessage(hwndBot, WM_CLOSE, 0, NULL);
-      SendMessage(hwndTop, WM_CLOSE, 0, NULL);
-
-      // CloseWindow(hwndBot);
-      // CloseWindow(hwndTop);
-
-      int width  = abs(selectX1 - selectX2);
-      int height = abs(selectY1 - selectY2);
-
-      int smallestX;
-      int smallestY;
-
-      if  (selectX1 < selectX2) smallestX = selectX1;
-      else                      smallestX = selectX2;
-
-      if  (selectY1 < selectY2) smallestY = selectY1;
-      else                      smallestY = selectY2;
-
-      smallestX += smallestLeft;
-      smallestY += smallestTop;
-
-      screenCapturePart(smallestX, smallestY, width, height);
-      ConvertBmpToPng();
-
-      break;
-    }
-
-    case WM_MOUSEMOVE:{
-      if(mouseStep == 1 || mouseStep == 2){
-        selectX2 = GET_X_LPARAM(lParam);
-        selectY2 = GET_Y_LPARAM(lParam);
-        mouseStep = 2;
-
-        int upperLeftX  = 0;
-        int upperLeftY  = 0;
-        int lowerRightX = 0;
-        int lowerRightY = 0;
-
-        if(selectX1 < selectX2) upperLeftX = selectX1;
-        else                    upperLeftX = selectX2;
-
-        if(selectY1 < selectY2) upperLeftY = selectY1;
-        else                    upperLeftY = selectY2;
-
-        if(selectX1 > selectX2) lowerRightX = selectX1;
-        else                    lowerRightX = selectX2;
-
-        if(selectY1 > selectY2) lowerRightY = selectY1;
-        else                    lowerRightY = selectY2;
-
-        HRGN WinRgn1;
-        HRGN WinRgn2;
-        WinRgn1 = CreateRectRgn(upperLeftX, upperLeftY, lowerRightX, lowerRightY);
-        WinRgn2 = CreateRectRgn(smallestLeft, smallestTop, maskWidth, maskHeight);
-
-        CombineRgn(WinRgn1, WinRgn1, WinRgn2, RGN_XOR);
-        SetWindowRgn(hwndBot, WinRgn1, true);
-        UpdateWindow(hwndBot);
-      }
-      break;
-    }
-
-    case WM_PAINT:{
-      PAINTSTRUCT ps;
-      BeginPaint(hwnd, &ps);
-      EndPaint(hwnd, &ps);
-      return 0;
-    }
-
-    default:
-      return DefWindowProc(hwnd, msg, wParam, lParam);
-  }
-  return 0;
-}
-
-LRESULT MyAsyncWorker::WindowProcBot(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
-  switch(msg){
-    case WM_CLOSE:{
-      DestroyWindow(hwnd);
-      break;
-    }
-
-    case WM_DESTROY:{
-      PostQuitMessage(0);
-      break;
-    }
-
-    default:{
-      return DefWindowProc(hwnd, msg, wParam, lParam);
-    }
-  }
-  return 0;
-}
-
-BOOL CALLBACK MonitorEnumProc(HMONITOR hMonitor, HDC hdcMonitor, LPRECT lprcMonitor, LPARAM dwData){
-  reinterpret_cast<MyAsyncWorker*>(dwData)->GetMonitorStats(hMonitor, hdcMonitor, lprcMonitor);
-  return true;
-}
-
-bool MyAsyncWorker::GetMonitorStats(HMONITOR hMonitor, HDC hdcMonitor, LPRECT lprcMonitor){
-  MONITORINFO mi;
-  mi.cbSize = sizeof(mi);
-  GetMonitorInfo(hMonitor, &mi);
-  RECT r = mi.rcMonitor;
-
-  if(firstRun){
-    firstRun      = false;
-    smallestLeft  = r.left;
-    smallestTop   = r.top;
-    largestRight  = r.right;
-    largestBottom = r.bottom;
-  }else{
-    if(r.left   < smallestLeft)  smallestLeft  = r.left;
-    if(r.top    < smallestTop)   smallestTop   = r.top;
-    if(r.right  > largestRight)  largestRight  = r.right;
-    if(r.bottom > largestBottom) largestBottom = r.bottom;
-  }
-
-  return true;
-}
-
 MyAsyncWorker::MyAsyncWorker(std::string myString, int myInt, bool myBool, Nan::Callback *callback) : Nan::AsyncWorker(callback){
   this->myString = myString;
   this->myInt    = myInt;
@@ -364,7 +26,7 @@ MyAsyncWorker::MyAsyncWorker(std::string myString, int myInt, bool myBool, Nan::
 void MyAsyncWorker::Execute(){
   HINSTANCE hInstance = GetModuleHandle(NULL);
 
-  EnumDisplayMonitors(NULL, NULL, MonitorEnumProc, reinterpret_cast<LPARAM>(this));
+  EnumDisplayMonitors(NULL, NULL, MonitorEnumProcStatic, reinterpret_cast<LPARAM>(this));
 
   maskWidth  = largestRight  - smallestLeft;
   maskHeight = largestBottom - smallestTop;
@@ -467,4 +129,342 @@ void MyAsyncWorker::HandleOKCallback(){
   };
 
   callback->Call(2, argv);
+}
+
+int MyAsyncWorker::GetEncoderClsid(const WCHAR *format, CLSID *pClsid){
+  UINT num  = 0; // number of image encoders
+  UINT size = 0; // size of the image encoder array in bytes
+
+  Gdiplus::ImageCodecInfo* pImageCodecInfo = NULL;
+
+  Gdiplus::GetImageEncodersSize(&num, &size);
+
+  if(size == 0)
+    return -1; // Failure
+
+  pImageCodecInfo = (Gdiplus::ImageCodecInfo*)(malloc(size));
+
+  if(pImageCodecInfo == NULL)
+    return -1; // Failure
+
+  GetImageEncoders(num, size, pImageCodecInfo);
+
+  for(UINT j = 0; j < num; ++j){
+    if(wcscmp(pImageCodecInfo[j].MimeType, format) == 0){
+      *pClsid = pImageCodecInfo[j].Clsid;
+      free(pImageCodecInfo);
+      return j; // Success
+    }
+  }
+
+  free(pImageCodecInfo);
+  return -1; // Failure
+}
+
+bool MyAsyncWorker::SaveBitmap(HBITMAP bmp, HPALETTE pal){
+  bool result = false;
+  PICTDESC pd;
+
+  pd.cbSizeofstruct = sizeof(PICTDESC);
+  pd.picType        = PICTYPE_BITMAP;
+  pd.bmp.hbitmap    = bmp;
+  pd.bmp.hpal       = pal;
+
+  LPPICTURE picture;
+  HRESULT res = OleCreatePictureIndirect(&pd, IID_IPicture, false, reinterpret_cast<void**>(&picture));
+
+  if(!SUCCEEDED(res))
+    return false;
+
+  LPSTREAM stream;
+  res = CreateStreamOnHGlobal(0, true, &stream);
+
+  if(!SUCCEEDED(res)){
+    picture->Release();
+    return false;
+  }
+
+  LONG bytes_streamed;
+  res = picture->SaveAsFile(stream, true, &bytes_streamed);
+
+  char characters[] = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+  fileName = "tmp-";
+
+  srand(time(NULL));
+
+  for(size_t i = 0; i < 6; i++)
+    fileName += characters[rand() % 62];
+
+  fileNameBmp = fileName + ".bmp";
+  fileNamePng = fileName + ".png";
+
+  HANDLE file = CreateFile(fileNameBmp.c_str(), GENERIC_WRITE, FILE_SHARE_READ, 0, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0);
+
+  if(!SUCCEEDED(res) || !file){
+    stream->Release();
+    picture->Release();
+    return false;
+  }
+
+  HGLOBAL mem = 0;
+  GetHGlobalFromStream(stream, &mem);
+  LPVOID data = GlobalLock(mem);
+
+  DWORD bytes_written;
+
+  result   = !!WriteFile(file, data, bytes_streamed, &bytes_written, 0);
+  result  &= (bytes_written == static_cast<DWORD>(bytes_streamed));
+
+  GlobalUnlock(mem);
+  CloseHandle(file);
+
+  stream->Release();
+  picture->Release();
+
+  return result;
+}
+
+bool MyAsyncWorker::ScreenCapturePart(int x, int y, int w, int h){
+  HDC hdcSource = GetDC(NULL);
+  HDC hdcMemory = CreateCompatibleDC(hdcSource);
+
+  int capX = GetDeviceCaps(hdcSource, HORZRES);
+  int capY = GetDeviceCaps(hdcSource, VERTRES);
+
+  HBITMAP hBitmap    = CreateCompatibleBitmap(hdcSource, w, h);
+  HBITMAP hBitmapOld = (HBITMAP)SelectObject(hdcMemory, hBitmap);
+
+  BitBlt(hdcMemory, 0, 0, w, h, hdcSource, x, y, SRCCOPY);
+  hBitmap = (HBITMAP)SelectObject(hdcMemory, hBitmapOld);
+
+  DeleteDC(hdcSource);
+  DeleteDC(hdcMemory);
+
+  HPALETTE hpal = NULL;
+
+  if(SaveBitmap(hBitmap, hpal))
+    return true;
+  return false;
+}
+
+void MyAsyncWorker::ConvertBmpToPng(){
+  ULONG_PTR                    gdiplusToken;
+  Gdiplus::GdiplusStartupInput gdiplusStartupInput;
+
+  // Initializes Windows GDI+, make sure you call GdiplusShutdown when you're done using GDI+
+  GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
+
+  std::wstring_convert< std::codecvt<wchar_t,char,std::mbstate_t> > conv1;
+  std::wstring_convert< std::codecvt<wchar_t,char,std::mbstate_t> > conv2;
+  std::wstring wcstring1 = conv1.from_bytes(fileNameBmp);
+  std::wstring wcstring2 = conv1.from_bytes(fileNamePng);
+
+  const WCHAR * testing1 = wcstring1.c_str();
+  const WCHAR * testing2 = wcstring2.c_str();
+
+  Gdiplus::Image  *image = new Gdiplus::Image(testing1);
+  Gdiplus::Status stat;
+  CLSID           encoderClsid;
+
+  // Get the CLSID of the PNG encoder
+  GetEncoderClsid(L"image/png", &encoderClsid);
+
+  // Convert the .bmp file into a .png file
+  stat = image->Save(testing2, &encoderClsid, NULL);
+
+  if(stat != Gdiplus::Ok){
+    std::cout << "Error converting .bmp to .png\n";
+    std::cout << "Code: " << stat << "\n";
+  }
+
+  // Delete the lock that the program has on the .bmp file (it does NOT delete the file itself)
+  delete image;
+
+  // Clean up resources used by Windows GDI+
+  Gdiplus::GdiplusShutdown(gdiplusToken);
+}
+
+bool MyAsyncWorker::GetMonitorStats(HMONITOR hMonitor, HDC hdcMonitor, LPRECT lprcMonitor){
+  MONITORINFO mi;
+  mi.cbSize = sizeof(mi);
+  GetMonitorInfo(hMonitor, &mi);
+  RECT r = mi.rcMonitor;
+
+  if(firstRun){
+    firstRun      = false;
+    smallestLeft  = r.left;
+    smallestTop   = r.top;
+    largestRight  = r.right;
+    largestBottom = r.bottom;
+  }else{
+    if(r.left   < smallestLeft)  smallestLeft  = r.left;
+    if(r.top    < smallestTop)   smallestTop   = r.top;
+    if(r.right  > largestRight)  largestRight  = r.right;
+    if(r.bottom > largestBottom) largestBottom = r.bottom;
+  }
+
+  return true;
+}
+
+BOOL CALLBACK MyAsyncWorker::MonitorEnumProcStatic(HMONITOR hMonitor, HDC hdcMonitor, LPRECT lprcMonitor, LPARAM dwData){
+  reinterpret_cast<MyAsyncWorker*>(dwData)->GetMonitorStats(hMonitor, hdcMonitor, lprcMonitor);
+  return true;
+}
+
+LRESULT CALLBACK MyAsyncWorker::WindowProcTopStatic(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
+  MyAsyncWorker* app;
+  if(msg == WM_CREATE){
+    app = (MyAsyncWorker*)(((LPCREATESTRUCT)lParam)->lpCreateParams);
+    SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR)app);
+  }else{
+    app = (MyAsyncWorker*)GetWindowLongPtr(hwnd, GWLP_USERDATA);
+  }
+  return app->WindowProcTop(hwnd, msg, wParam, lParam);
+}
+
+LRESULT CALLBACK MyAsyncWorker::WindowProcBotStatic(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
+  MyAsyncWorker* app;
+  if(msg == WM_CREATE){
+    app = (MyAsyncWorker*)(((LPCREATESTRUCT)lParam)->lpCreateParams);
+    SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR)app);
+  }else{
+    app = (MyAsyncWorker*)GetWindowLongPtr(hwnd, GWLP_USERDATA);
+  }
+  return app->WindowProcTop(hwnd, msg, wParam, lParam);
+}
+
+LRESULT MyAsyncWorker::WindowProcTop(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
+  switch(msg){
+    case WM_CLOSE:{
+      itIsTime = true;
+      DestroyWindow(hwnd);
+      break;
+    }
+
+    case WM_DESTROY:{
+      itIsTime = true;
+      PostQuitMessage(0);
+      break;
+    }
+
+    case WM_SETCURSOR:{
+      if(LOWORD(lParam) == HTCLIENT){
+        HINSTANCE instance;
+        LPCTSTR   cursor;
+
+        instance = NULL;
+        cursor   = IDC_CROSS;
+
+        SetCursor(LoadCursor(instance, cursor));
+
+        return true;
+      }
+      break;
+    }
+
+    case WM_LBUTTONDOWN:{
+      selectX1 = GET_X_LPARAM(lParam);
+      selectY1 = GET_Y_LPARAM(lParam);
+      mouseStep = 1;
+      break;
+    }
+
+    case WM_LBUTTONUP:{
+      selectX2 = GET_X_LPARAM(lParam);
+      selectY2 = GET_Y_LPARAM(lParam);
+      mouseStep = 0;
+
+      SendMessage(hwndBot, WM_CLOSE, 0, NULL);
+      SendMessage(hwndTop, WM_CLOSE, 0, NULL);
+
+      // CloseWindow(hwndBot);
+      // CloseWindow(hwndTop);
+
+      int width  = abs(selectX1 - selectX2);
+      int height = abs(selectY1 - selectY2);
+
+      int smallestX;
+      int smallestY;
+
+      if  (selectX1 < selectX2) smallestX = selectX1;
+      else                      smallestX = selectX2;
+
+      if  (selectY1 < selectY2) smallestY = selectY1;
+      else                      smallestY = selectY2;
+
+      smallestX += smallestLeft;
+      smallestY += smallestTop;
+
+      ScreenCapturePart(smallestX, smallestY, width, height);
+      ConvertBmpToPng();
+
+      break;
+    }
+
+    case WM_MOUSEMOVE:{
+      if(mouseStep == 1 || mouseStep == 2){
+        selectX2 = GET_X_LPARAM(lParam);
+        selectY2 = GET_Y_LPARAM(lParam);
+        mouseStep = 2;
+
+        int upperLeftX  = 0;
+        int upperLeftY  = 0;
+        int lowerRightX = 0;
+        int lowerRightY = 0;
+
+        if(selectX1 < selectX2) upperLeftX = selectX1;
+        else                    upperLeftX = selectX2;
+
+        if(selectY1 < selectY2) upperLeftY = selectY1;
+        else                    upperLeftY = selectY2;
+
+        if(selectX1 > selectX2) lowerRightX = selectX1;
+        else                    lowerRightX = selectX2;
+
+        if(selectY1 > selectY2) lowerRightY = selectY1;
+        else                    lowerRightY = selectY2;
+
+        HRGN WinRgn1;
+        HRGN WinRgn2;
+        WinRgn1 = CreateRectRgn(upperLeftX, upperLeftY, lowerRightX, lowerRightY);
+        WinRgn2 = CreateRectRgn(smallestLeft, smallestTop, maskWidth, maskHeight);
+
+        CombineRgn(WinRgn1, WinRgn1, WinRgn2, RGN_XOR);
+        SetWindowRgn(hwndBot, WinRgn1, true);
+        UpdateWindow(hwndBot);
+      }
+      break;
+    }
+
+    case WM_PAINT:{
+      PAINTSTRUCT ps;
+      BeginPaint(hwnd, &ps);
+      EndPaint(hwnd, &ps);
+      return 0;
+    }
+
+    default:
+      return DefWindowProc(hwnd, msg, wParam, lParam);
+  }
+  return 0;
+}
+
+LRESULT MyAsyncWorker::WindowProcBot(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
+  switch(msg){
+    case WM_CLOSE:{
+      DestroyWindow(hwnd);
+      break;
+    }
+
+    case WM_DESTROY:{
+      PostQuitMessage(0);
+      break;
+    }
+
+    default:{
+      return DefWindowProc(hwnd, msg, wParam, lParam);
+    }
+  }
+  return 0;
 }

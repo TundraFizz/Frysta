@@ -28,26 +28,21 @@ class MyAsyncWorker: public Nan::AsyncWorker{
 
   // Custom functions
   int  GetEncoderClsid(const WCHAR *format, CLSID *pClsid);
-  bool saveBitmap(HBITMAP bmp, HPALETTE pal);
-  bool screenCapturePart(int x, int y, int w, int h);
+  bool SaveBitmap(HBITMAP bmp, HPALETTE pal);
+  bool ScreenCapturePart(int x, int y, int w, int h);
   void ConvertBmpToPng();
   bool GetMonitorStats(HMONITOR hMonitor, HDC hdcMonitor, LPRECT lprcMonitor);
 
-  // Variables
-  int myInt;
-  bool myBool;
+  static BOOL    CALLBACK MonitorEnumProcStatic(HMONITOR hMonitor, HDC hdcMonitor, LPRECT lprcMonitor, LPARAM dwData);
+  static LRESULT CALLBACK WindowProcTopStatic(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+  static LRESULT CALLBACK WindowProcBotStatic(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+         LRESULT CALLBACK WindowProcTop      (HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+         LRESULT CALLBACK WindowProcBot      (HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
   private:
 
-  static LRESULT CALLBACK WindowProcTopStatic(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
-  LRESULT CALLBACK WindowProcTop(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
   HWND hwndTop;
-
-  static LRESULT CALLBACK WindowProcBotStatic(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
-  LRESULT CALLBACK WindowProcBot(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
   HWND hwndBot;
-
-  std::string myString;
 
   std::string directoryToSaveCopy = "FEATURE_TO_DO";
 
@@ -81,6 +76,11 @@ class MyAsyncWorker: public Nan::AsyncWorker{
   // 5 = Upload failed, no response from server
   // 6 = Upload failed, server responded with error
   // 7 = Upload successful, copy URL to clipboard
+
+  // Testing variables, remove later
+  std::string myString;
+  int myInt;
+  bool myBool;
 };
 
 // Self-register the module
