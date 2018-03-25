@@ -19,7 +19,7 @@
   "scripts": {
     "all": "cls && npm run clean && npm run compile && npm start",
     "clean": "node-gyp clean",
-    "compile": "./node_modules/.bin/electron-rebuild",
+    "compile": "electron-rebuild",
     "start": "electron ./src/app.js"
   },
   "repository": {
