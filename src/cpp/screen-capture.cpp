@@ -121,16 +121,25 @@ void MyAsyncWorker::Execute(){
 }
 
 void MyAsyncWorker::HandleOKCallback(){
+  std::string yoloSwag = "Yolo Swag";
+  v8::Local<v8::String> testing = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), yoloSwag.c_str());
+  std::cout << "======================\n";
+  std::cout << fileNamePng <<        "\n";
+  std::cout << "======================\n";
+  // v8::Local<v8::Value> reeee = ;
+
   v8::Local<v8::Value> arguments[] = {
-    Nan::New(fileNamePng).ToLocalChecked(),
-    Nan::New(fileNamePng).ToLocalChecked(),
-    Nan::New(fileNamePng).ToLocalChecked()
+    // reeee
+    testing
+    // Nan::New(fileNamePng)
   };
 
   size_t argumentCount = sizeof(arguments)/sizeof(*arguments);
+
+  // A dummy AsyncResource object needs to be created as a placeholder
   Nan::AsyncResource *dummy = new Nan::AsyncResource(Nan::New("").ToLocalChecked());
 
-  callback->Call(argumentCount, argv, dummy);
+  callback->Call(argumentCount, arguments, dummy);
 }
 
 int MyAsyncWorker::GetEncoderClsid(const WCHAR *format, CLSID *pClsid){
