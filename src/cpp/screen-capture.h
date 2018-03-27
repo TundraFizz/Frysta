@@ -20,7 +20,8 @@ class MyAsyncWorker: public Nan::AsyncWorker{
   public:
 
   // Constructor
-  MyAsyncWorker(std::string myString, int myInt, bool myBool, Nan::Callback *callback);
+  MyAsyncWorker(Nan::Callback *callback);
+  // MyAsyncWorker(std::string directory, Nan::Callback *callback);
 
   // Mandatory special functions
   void Execute();          // Automatically called right after the Initializer
@@ -44,30 +45,31 @@ class MyAsyncWorker: public Nan::AsyncWorker{
   HWND hwndTop;
   HWND hwndBot;
 
-  std::string directoryToSaveCopy = "FEATURE_TO_DO";
+  // std::string imageDirectory;
 
-  bool itIsTime = false;
+  int selectX1;
+  int selectY1;
+  int selectX2;
+  int selectY2;
+  int mouseStep;
+  bool mouseDown;
 
-  int selectX1   = 0;
-  int selectY1   = 0;
-  int selectX2   = 0;
-  int selectY2   = 0;
-  int mouseStep  = 0;
-  bool mouseDown = false;
+  int smallestLeft;
+  int smallestTop;
+  int largestRight;
+  int largestBottom;
+  bool firstRun;
 
-  int smallestLeft  = 0;
-  int smallestTop   = 0;
-  int largestRight  = 0;
-  int largestBottom = 0;
-  bool firstRun     = true;
+  int maskWidth;
+  int maskHeight;
 
-  int maskWidth  = 0;
-  int maskHeight = 0;
+  std::string fileNameBmp;
+  std::string fileNamePng;
+  v8::Local<v8::String> fileNamePngV8;
 
-  std::string fileName    = "";
-  std::string fileNameBmp = "";
-  std::string fileNamePng = "";
-  int programState = 0;
+  bool itIsTime;
+
+  int programState;
   // 0 = Idle
   // 1 = Mask active, waiting for user to select screen region
   // 2 = Generating file
@@ -76,11 +78,6 @@ class MyAsyncWorker: public Nan::AsyncWorker{
   // 5 = Upload failed, no response from server
   // 6 = Upload failed, server responded with error
   // 7 = Upload successful, copy URL to clipboard
-
-  // Testing variables, remove later
-  std::string myString;
-  int myInt;
-  bool myBool;
 };
 
 // Self-register the module

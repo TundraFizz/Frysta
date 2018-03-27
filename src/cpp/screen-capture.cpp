@@ -6,21 +6,52 @@ NAN_MODULE_INIT(ScreenCapture::Init){
 
 NAN_METHOD(ScreenCapture::TakeScreenshot){
   Nan::AsyncQueueWorker(new MyAsyncWorker(
+    new Nan::Callback(info[0].As<v8::Function>())
+  ));
+
+  /*
+  Nan::AsyncQueueWorker(new MyAsyncWorker(
     // All parameters (except the final one) are variables passed from Node.JS
     std::string(*Nan::Utf8String(info[0]->ToString())),
-    info[1]->Int32Value(),
-    info[2]->BooleanValue(),
 
     // The final parameter in MyAsyncWorker will always be the callback function
-    new Nan::Callback(info[3].As<v8::Function>())
+    new Nan::Callback(info[1].As<v8::Function>())
   ));
+  */
 }
 
-MyAsyncWorker::MyAsyncWorker(std::string myString, int myInt, bool myBool, Nan::Callback *callback) : Nan::AsyncWorker(callback){
-  this->myString = myString;
-  this->myInt    = myInt;
-  this->myBool   = myBool;
-  // These variables are now accessible: myString, myInt, myBool
+// MyAsyncWorker::MyAsyncWorker(std::string directory, Nan::Callback *callback) : Nan::AsyncWorker(callback){
+MyAsyncWorker::MyAsyncWorker(Nan::Callback *callback) : Nan::AsyncWorker(callback){
+  // Set all private variables to a default value
+  std::string imageDirectory = "";
+
+  selectX1  = 0;
+  selectY1  = 0;
+  selectX2  = 0;
+  selectY2  = 0;
+  mouseStep = 0;
+  mouseDown = false;
+
+  smallestLeft  = 0;
+  smallestTop   = 0;
+  largestRight  = 0;
+  largestBottom = 0;
+  firstRun      = true;
+
+  maskWidth  = 0;
+  maskHeight = 0;
+
+  fileNameBmp = "temp.bmp";
+  fileNamePng = "temp.png";
+
+  itIsTime = false;
+
+  programState = 0;
+
+  // Set incoming variables
+  // imageDirectory = directory;
+  std::cout << "=== C++ ==================================\n";
+  std::cout << imageDirectory << "\n";
 }
 
 void MyAsyncWorker::Execute(){
@@ -121,17 +152,10 @@ void MyAsyncWorker::Execute(){
 }
 
 void MyAsyncWorker::HandleOKCallback(){
-  std::string yoloSwag = "Yolo Swag";
-  v8::Local<v8::String> testing = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), yoloSwag.c_str());
-  std::cout << "======================\n";
-  std::cout << fileNamePng <<        "\n";
-  std::cout << "======================\n";
-  // v8::Local<v8::Value> reeee = ;
+  fileNamePngV8 = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), fileNamePng.c_str());
 
   v8::Local<v8::Value> arguments[] = {
-    // reeee
-    testing
-    // Nan::New(fileNamePng)
+    fileNamePngV8
   };
 
   size_t argumentCount = sizeof(arguments)/sizeof(*arguments);
@@ -198,18 +222,6 @@ bool MyAsyncWorker::SaveBitmap(HBITMAP bmp, HPALETTE pal){
   LONG bytes_streamed;
   res = picture->SaveAsFile(stream, true, &bytes_streamed);
 
-  char characters[] = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-
-  fileName = "tmp-";
-
-  srand((unsigned int)time(NULL));
-
-  for(size_t i = 0; i < 6; i++)
-    fileName += characters[rand() % 62];
-
-  fileNameBmp = fileName + ".bmp";
-  fileNamePng = fileName + ".png";
-
   HANDLE file = CreateFile(fileNameBmp.c_str(), GENERIC_WRITE, FILE_SHARE_READ, 0, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0);
 
   if(!SUCCEEDED(res) || !file){
@@ -224,8 +236,8 @@ bool MyAsyncWorker::SaveBitmap(HBITMAP bmp, HPALETTE pal){
 
   DWORD bytes_written;
 
-  result   = !!WriteFile(file, data, bytes_streamed, &bytes_written, 0);
-  result  &= (bytes_written == static_cast<DWORD>(bytes_streamed));
+  result  = !!WriteFile(file, data, bytes_streamed, &bytes_written, 0);
+  result &= (bytes_written == static_cast<DWORD>(bytes_streamed));
 
   GlobalUnlock(mem);
   CloseHandle(file);
@@ -291,6 +303,9 @@ void MyAsyncWorker::ConvertBmpToPng(){
 
   // Delete the lock that the program has on the .bmp file (it does NOT delete the file itself)
   delete image;
+
+  // Delete the .bmp file
+  remove(fileNameBmp.c_str());
 
   // Clean up resources used by Windows GDI+
   Gdiplus::GdiplusShutdown(gdiplusToken);

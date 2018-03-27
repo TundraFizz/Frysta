@@ -255,7 +255,11 @@ function TakeScreenshot(){
   win.hide();
   // win.minimize();
 
-  screenCapture.TakeScreenshot(123, 5, true, function(result){
+  // screenCapture.TakeScreenshot("My Custom String", function(result){
+  screenCapture.TakeScreenshot(function(result){
+
+    console.log("=== Electron =============================");
+    console.log(result);
 
     // If the user clicked on the "Screenshot" button, then we'll display the window again
     if(clickedOnButton)
