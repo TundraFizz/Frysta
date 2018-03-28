@@ -255,12 +255,7 @@ function TakeScreenshot(){
   win.hide();
   // win.minimize();
 
-  // screenCapture.TakeScreenshot("My Custom String", function(result){
   screenCapture.TakeScreenshot(function(result){
-
-    console.log("=== Electron =============================");
-    console.log(result);
-
     // If the user clicked on the "Screenshot" button, then we'll display the window again
     if(clickedOnButton)
       win.show();
@@ -294,11 +289,46 @@ function TakeScreenshot(){
       clipboard.write({"text": body["url"]});
 
       tray.displayBalloon({
-        "title"  : "TESTING",
         "icon"   : path.join(__dirname, "img/icon64x64.png"),
-        "title"  : "Uploaded image",
+        "title"  : "Image uploaded",
         "content": lastUploadedScreenshotUrl
       });
+
+      // Delete the file
+
+      // Move/Rename the file if the option to do so is active
+      if(options["LocalCopy"]){
+        var newPath = `${options["LocalCopy"]}/${body["fileName"]}`;
+        console.log(newPath);
+
+        var readStream  = fs.createReadStream(result);
+        var writeStream = fs.createWriteStream(newPath);
+
+        // readStream.on("error", callback);
+        writeStream.on("error", function(err){
+          var errorMessage = "The directory to save a local copy no longer exists. ";
+          errorMessage    += "You should disable this feature in the settings, or declare a new valid path.";
+
+          tray.displayBalloon({
+            "icon"   : path.join(__dirname, "img/icon64x64.png"),
+            "title"  : "Error!",
+            "content": errorMessage
+          });
+        });
+
+        readStream.on("close", function(){
+          console.log("File has been moved, deleting");
+          fs.unlink(result, function(){console.log("File has been deleted")});
+        });
+
+        readStream.pipe(writeStream);
+
+        // fs.copyFile(result, newPath, function(err){console.log(err)});
+
+        // fs.rename(result, newPath, function(err){console.log(err)});
+      }else{
+        fs.unlink(result, function(){});
+      }
 
       SendMessage("PlaySfxNotification");
     });

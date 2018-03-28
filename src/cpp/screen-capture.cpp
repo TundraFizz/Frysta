@@ -8,23 +8,9 @@ NAN_METHOD(ScreenCapture::TakeScreenshot){
   Nan::AsyncQueueWorker(new MyAsyncWorker(
     new Nan::Callback(info[0].As<v8::Function>())
   ));
-
-  /*
-  Nan::AsyncQueueWorker(new MyAsyncWorker(
-    // All parameters (except the final one) are variables passed from Node.JS
-    std::string(*Nan::Utf8String(info[0]->ToString())),
-
-    // The final parameter in MyAsyncWorker will always be the callback function
-    new Nan::Callback(info[1].As<v8::Function>())
-  ));
-  */
 }
 
-// MyAsyncWorker::MyAsyncWorker(std::string directory, Nan::Callback *callback) : Nan::AsyncWorker(callback){
 MyAsyncWorker::MyAsyncWorker(Nan::Callback *callback) : Nan::AsyncWorker(callback){
-  // Set all private variables to a default value
-  std::string imageDirectory = "";
-
   selectX1  = 0;
   selectY1  = 0;
   selectX2  = 0;
@@ -44,14 +30,7 @@ MyAsyncWorker::MyAsyncWorker(Nan::Callback *callback) : Nan::AsyncWorker(callbac
   fileNameBmp = "temp.bmp";
   fileNamePng = "temp.png";
 
-  itIsTime = false;
-
   programState = 0;
-
-  // Set incoming variables
-  // imageDirectory = directory;
-  std::cout << "=== C++ ==================================\n";
-  std::cout << imageDirectory << "\n";
 }
 
 void MyAsyncWorker::Execute(){
@@ -363,13 +342,11 @@ LRESULT CALLBACK MyAsyncWorker::WindowProcBotStatic(HWND hwnd, UINT msg, WPARAM 
 LRESULT MyAsyncWorker::WindowProcTop(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
   switch(msg){
     case WM_CLOSE:{
-      itIsTime = true;
       DestroyWindow(hwnd);
       break;
     }
 
     case WM_DESTROY:{
-      itIsTime = true;
       PostQuitMessage(0);
       break;
     }
