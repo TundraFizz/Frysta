@@ -331,6 +331,7 @@ ipc.on("message", (event, msg) => {
   if(func == "AccountWasCreated")   AccountWasCreated(data);
   if(func == "LoginPageToMainApp")  LoginPageToMainApp(data);
   if(func == "PlaySfxNotification") PlaySfxNotification(data);
+  if(func == "PlaySfxError")        PlaySfxError(data);
   if(func == "GetOptions")          GetOptions(data);
 });
 
@@ -352,6 +353,27 @@ function PlaySfxNotification(){
     var audioObject = `<audio class="sfx-notification" src="sfx/notification.ogg" preload="auto" playing="false" onended="$(this).attr('playing', 'false')"></audio>`;
     $("body").append(audioObject);
     PlaySfxNotification();
+  }
+}
+
+function PlaySfxError(){
+  var done = false;
+
+  $(".sfx-error").each(function(){
+    var playing = $(this).attr("playing");
+
+    if(playing == "false"){
+      $(this).attr("playing", "true");
+      $(this)[0].play();
+      done = true;
+      return false;
+    }
+  });
+
+  if(done == false){
+    var audioObject = `<audio class="sfx-error" src="sfx/error.mp3" preload="auto" playing="false" onended="$(this).attr('playing', 'false')"></audio>`;
+    $("body").append(audioObject);
+    PlaySfxError();
   }
 }
 

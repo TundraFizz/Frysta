@@ -251,86 +251,118 @@ function TakeScreenshotShortcut(){
   TakeScreenshot();
 }
 
+CheckIfSavePathExists = function(data){return new Promise((resolve) => {
+  if(options["LocalCopy"]){
+    fs.access(options["LocalCopy"], function(err){
+      if(err)
+        resolve(true);
+      else
+        resolve(false);
+    });
+  }
+})}
+
+function ErrorNoPathToSaveImageExists(){
+  var errorMessage = "The directory to save a local copy no longer exists. ";
+  errorMessage    += "You should disable this feature in the settings, or declare a new valid path.";
+
+  tray.displayBalloon({
+    "icon"   : path.join(__dirname, "img/icon64x64.png"),
+    "title"  : "Error!",
+    "content": errorMessage
+  });
+
+  SendMessage("PlaySfxError");
+}
+
+function UploadImageToServer(result){
+  var formData = {
+    "key": "This is the user's secret",
+    "file": fs.createReadStream(result)
+  };
+
+  request.post({url:"https://fizz.gg/send-screenshot", formData: formData, json: true}, function(err, res, body){
+
+    if(err){
+      if(err["code"] == "ENOTFOUND"){
+        console.log("Client was unable to communicate with the server");
+      }else{
+        console.log("An unknown error occurred when trying to communicate with the server");
+        console.log("Error code:", err["code"]);
+      }
+      return;
+    }
+
+    if(res["statusCode"] != 200){
+      console.log("Invalid response from the server");
+      console.log("Error code:", res["statusCode"]);
+      return;
+    }
+
+    lastUploadedScreenshotUrl = body["url"];
+    clipboard.write({"text": body["url"]});
+
+    tray.displayBalloon({
+      "icon"   : path.join(__dirname, "img/icon64x64.png"),
+      "title"  : "Image uploaded",
+      "content": lastUploadedScreenshotUrl
+    });
+
+    // Delete the file
+
+    // Move/Rename the file if the option to do so is active
+    if(options["LocalCopy"]){
+      var newPath = `${options["LocalCopy"]}/${body["fileName"]}`;
+      console.log(newPath);
+
+      var readStream  = fs.createReadStream(result);
+      var writeStream = fs.createWriteStream(newPath);
+
+      // readStream.on("error", callback);
+      writeStream.on("error", function(err){
+        // var errorMessage = "The directory to save a local copy no longer exists. ";
+        // errorMessage    += "You should disable this feature in the settings, or declare a new valid path.";
+
+        // tray.displayBalloon({
+        //   "icon"   : path.join(__dirname, "img/icon64x64.png"),
+        //   "title"  : "Error!",
+        //   "content": errorMessage
+        // });
+      });
+
+      readStream.on("close", function(){
+        console.log("File has been moved, deleting");
+        fs.unlink(result, function(){console.log("File has been deleted")});
+      });
+
+      readStream.pipe(writeStream);
+
+      // fs.copyFile(result, newPath, function(err){console.log(err)});
+
+      // fs.rename(result, newPath, function(err){console.log(err)});
+    }else{
+      fs.unlink(result, function(){});
+    }
+
+    SendMessage("PlaySfxNotification");
+  });
+}
+
 function TakeScreenshot(){
   win.hide();
-  // win.minimize();
+  // win.minimize(); // I don't think I need this anymore
 
   screenCapture.TakeScreenshot(function(result){
     // If the user clicked on the "Screenshot" button, then we'll display the window again
-    if(clickedOnButton)
-      win.show();
-    else
-      win.hide();
+    if(clickedOnButton) win.show();
+    else                win.hide();
 
-    var formData = {
-      "key": "This is the user's secret",
-      "file": fs.createReadStream(result)
-    };
-
-    request.post({url:"https://fizz.gg/send-screenshot", formData: formData, json: true}, function(err, res, body){
-
-      if(err){
-        if(err["code"] == "ENOTFOUND"){
-          console.log("Client was unable to communicate with the server");
-        }else{
-          console.log("An unknown error occurred when trying to communicate with the server");
-          console.log("Error code:", err["code"]);
-        }
-        return;
-      }
-
-      if(res["statusCode"] != 200){
-        console.log("Invalid response from the server");
-        console.log("Error code:", res["statusCode"]);
-        return;
-      }
-
-      lastUploadedScreenshotUrl = body["url"];
-      clipboard.write({"text": body["url"]});
-
-      tray.displayBalloon({
-        "icon"   : path.join(__dirname, "img/icon64x64.png"),
-        "title"  : "Image uploaded",
-        "content": lastUploadedScreenshotUrl
-      });
-
-      // Delete the file
-
-      // Move/Rename the file if the option to do so is active
-      if(options["LocalCopy"]){
-        var newPath = `${options["LocalCopy"]}/${body["fileName"]}`;
-        console.log(newPath);
-
-        var readStream  = fs.createReadStream(result);
-        var writeStream = fs.createWriteStream(newPath);
-
-        // readStream.on("error", callback);
-        writeStream.on("error", function(err){
-          var errorMessage = "The directory to save a local copy no longer exists. ";
-          errorMessage    += "You should disable this feature in the settings, or declare a new valid path.";
-
-          tray.displayBalloon({
-            "icon"   : path.join(__dirname, "img/icon64x64.png"),
-            "title"  : "Error!",
-            "content": errorMessage
-          });
-        });
-
-        readStream.on("close", function(){
-          console.log("File has been moved, deleting");
-          fs.unlink(result, function(){console.log("File has been deleted")});
-        });
-
-        readStream.pipe(writeStream);
-
-        // fs.copyFile(result, newPath, function(err){console.log(err)});
-
-        // fs.rename(result, newPath, function(err){console.log(err)});
-      }else{
-        fs.unlink(result, function(){});
-      }
-
-      SendMessage("PlaySfxNotification");
+    // Check to see if the path to save a local copy of the image exists
+    // If the path doesn't exist, give the user an error
+    CheckIfSavePathExists()
+    .then((err) => {
+      if(err) ErrorNoPathToSaveImageExists();
+      else    UploadImageToServer(result);
     });
   });
 }
