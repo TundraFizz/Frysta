@@ -20,11 +20,11 @@ var lastUploadedScreenshotUrl = null;
 
 // Default options
 var options = {
-  "LaunchOnStartup" : true,
-  "CopyUrlOnSuccess": true,
-  "SfxOnSuccess"    : true,
-  "SfxOnFailure"    : true,
-  "LocalCopy"       : false
+  "LaunchOnStartup" : "true",
+  "CopyUrlOnSuccess": "false",
+  "SfxOnSuccess"    : "true",
+  "SfxOnFailure"    : "true",
+  "LocalCopy"       : "false"
 };
 
 storage.setDataPath(__dirname);
@@ -196,9 +196,19 @@ app.on("message", (msg) => {
   else if(func == "Quit")                 Quit                (data);
   else if(func == "CreateAccount")        CreateAccount       (data);
   else if(func == "Login")                Login               (data);
+  else if(func == "SetOption")            SetOption           (data);
   else if(func == "TestSave")             TestSave            (data);
   else if(func == "TestLoad")             TestLoad            (data);
 });
+
+function SetOption(data){
+  data = JSON.parse(data);
+
+  for(key in data)
+    options[key] = data[key];
+
+  storage.set("config", options, function(error){});
+}
 
 // Functions for the messages received from the client
 

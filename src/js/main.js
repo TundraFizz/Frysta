@@ -18,6 +18,8 @@ $("#btn-quit").click(function(){
   SendMessage("Quit");
 });
 
+// The "menu-button" class has an attribute called "function"
+// assigned to it, which is called when the button is clicked
 $(".menu-button").click(function(){
   if($(this).attr("active") == "false"){
     // Make all visible menu buttons inactive, except for the clicked one
@@ -28,6 +30,30 @@ $(".menu-button").click(function(){
     window[$(this).attr("function")]();
   }
 });
+
+// The "option-toggle" class has an attribute called "function"
+// assigned to it, which is called when the button is clicked
+$(".option-toggle").click(function(){
+  // Execute the menu button's function
+  window[$(this).attr("function")](this);
+});
+
+function Toggle(self){
+  var option = $(self).attr("option");
+  var data   = {};
+
+  if($(self).attr("active") == "true")
+    data[option] = "false";
+  else
+    data[option] = "true";
+
+  $(self).attr("active", data[option])
+  SendMessage("SetOption", data);
+}
+
+function ToggleDirectory(self){
+  console.log($(self).attr("option"));
+}
 
 $(".menu-button").hover(function(){
   var self  = this;
