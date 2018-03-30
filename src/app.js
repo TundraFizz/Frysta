@@ -110,7 +110,8 @@ function createWindow(){
   });
 
   tray.on("balloon-click", function(){
-    shell.openExternal(lastUploadedScreenshotUrl);
+    if(lastUploadedScreenshotUrl)
+      shell.openExternal(lastUploadedScreenshotUrl);
   });
 
   win.once("ready-to-show", function(){
@@ -275,6 +276,7 @@ CheckIfSavePathExists = function(data){return new Promise((resolve) => {
 function ErrorNoPathToSaveImageExists(){
   var errorMessage = "The directory to save a local copy no longer exists. ";
   errorMessage    += "You should disable this feature in the settings, or declare a new valid path.";
+  lastUploadedScreenshotUrl = null;
 
   tray.displayBalloon({
     "icon"   : path.join(__dirname, "img/icon64x64.png"),
