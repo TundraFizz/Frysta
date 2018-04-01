@@ -66,25 +66,33 @@
 
       <div class="container" data="general">
         <div class="option-container">
-          <div class="option-toggle" option="LaunchOnStartup" function="Toggle" active=""></div>
+          <div class="option-toggle" option="LaunchOnStartup" function="Toggle" active="">
+            <div class="option-circle"></div>
+          </div>
           <div class="option-text">Launch Frysta on startup</div>
         </div>
         <div class="option-container">
-          <div class="option-toggle" option="CopyUrlOnSuccess" function="Toggle" active=""></div>
+          <div class="option-toggle" option="CopyUrlOnSuccess" function="Toggle" active="">
+            <div class="option-circle"></div>
+          </div>
           <div class="option-text">Copy URL to clipboard on successful upload</div>
         </div>
         <div class="option-container">
           <div class="option-toggle" option="SfxOnSuccess" function="Toggle" active="">
-            <!-- <div class="test-object"></div> -->
+            <div class="option-circle"></div>
           </div>
           <div class="option-text">Play sound effect on successful upload</div>
         </div>
         <div class="option-container">
-          <div class="option-toggle" option="SfxOnFailure" function="Toggle" active=""></div>
+          <div class="option-toggle" option="SfxOnFailure" function="Toggle" active="">
+            <div class="option-circle"></div>
+          </div>
           <div class="option-text">Play sound effect on failed upload</div>
         </div>
         <div class="option-container">
-          <div class="option-toggle" option="LocalCopy" function="ToggleDirectory" active=""></div>
+          <div class="option-toggle" option="LocalCopy" function="ToggleDirectory" active="">
+            <div class="option-circle"></div>
+          </div>
           <div class="option-text">Save a local copy</div>
           <div id="local-copy-dir"></div>
         </div>
@@ -117,6 +125,7 @@
   <footer>
     <script>if(typeof module === "object") {window.module = module; module = undefined;}</script>
     <script src="./js/jquery-3-3-1.js"></script>
+    <script src="./js/jquery-ui-1-12-1.js"></script>
     <script src="./js/jquery-animate-shadow.js"></script>
     <script src="./js/main.js"></script>
   </footer>

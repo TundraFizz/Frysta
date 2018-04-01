@@ -42,12 +42,25 @@ function Toggle(self){
   var option = $(self).attr("option");
   var data   = {};
 
-  if($(self).attr("active") == "true")
+  if($(self).attr("active") == "true"){
     data[option] = "false";
-  else
+
+    $(".option-circle", $(self)).animate({
+      "left"            : "4px",
+      "background-color": "#e60000",
+      "box-shadow"      : "0px 0px 6px 2.4px #ff5f5f"
+    }, {duration: 200, queue: false});
+  }else{
     data[option] = "true";
 
-  $(self).attr("active", data[option])
+    $(".option-circle", $(self)).animate({
+      "left"            : "20px",
+      "background-color": "#00bf00",
+      "box-shadow"      : "0px 0px 6px 2.4px #5fff79"
+    }, {duration: 200, queue: false});
+  }
+
+  $(self).attr("active", data[option]);
   SendMessage("SetOption", data);
 }
 
