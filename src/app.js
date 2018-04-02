@@ -43,13 +43,13 @@ const dataPath = storage.getDataPath();
 function createWindow(){
   // Create the browser window
   win = new BrowserWindow({
-    width: 400,
-    height: 300,
-    show: false,
-    frame: false,
-    backgroundColor: "#33363f",
-    // resizable: false,
-    icon: path.join(__dirname, "img/icon64x64.png")
+    "width"          : 400,
+    "height"         : 300,
+    "show"           : false,
+    "frame"          : false,
+    "backgroundColor": "#33363f",
+    "resizable"      : false,
+    "icon"           : path.join(__dirname, "img/icon64x64.png")
   });
 
   win.toggleDevTools();

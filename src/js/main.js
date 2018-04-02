@@ -1,5 +1,6 @@
-const ipc         = require("electron").ipcRenderer;
-const EmitMessage = require("electron").remote.app.emit;
+var ipc         = require("electron").ipcRenderer;
+var EmitMessage = require("electron").remote.app.emit;
+var dialog      = require("electron").remote.dialog;
 
 var options = {};
 
@@ -65,7 +66,35 @@ function Toggle(self){
 }
 
 function ToggleDirectory(self){
-  console.log($(self).attr("option"));
+  var option = $(self).attr("option");
+  var data   = {};
+
+  if($(self).attr("active") != "false"){
+    data[option] = "false";
+    $($(".local-copy-dir")[0]).text("");
+
+    $(".option-circle", $(self)).animate({
+      "left"            : "4px",
+      "background-color": "#e60000",
+      "box-shadow"      : "0px 0px 6px 2.4px #ff5f5f"
+    }, {duration: 200, queue: false});
+  }else{
+    var path = dialog.showOpenDialog({properties: ["openDirectory"]});
+    $($(".local-copy-dir")[0]).text(path);
+
+    if(path == undefined){}else{
+      data[option] = path[0];
+
+      $(".option-circle", $(self)).animate({
+        "left"            : "20px",
+        "background-color": "#00bf00",
+        "box-shadow"      : "0px 0px 6px 2.4px #5fff79"
+      }, {duration: 200, queue: false});
+    }
+  }
+
+  $(self).attr("active", data[option]);
+  SendMessage("SetOption", data);
 }
 
 $(".menu-button").hover(function(){
