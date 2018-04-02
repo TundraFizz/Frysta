@@ -8,7 +8,12 @@ var request       = require("request"); // POST request to the server
 var storage       = require("electron-json-storage");
 var screenCapture = require("../build/Release/screen-capture.node"); // C++ module for screen capturing
 
-var {app, BrowserWindow, Tray, Menu, globalShortcut, ipcMain, clipboard, shell} = require("electron");
+var {app, BrowserWindow, Tray, Menu, globalShortcut, ipcMain, clipboard, shell, autoUpdater, dialog} = require("electron");
+
+// Set up application updates
+// const server = 'https://your-deployment-url.com'
+// const feed = `${server}/update/${process.platform}/${app.getVersion()}`
+// autoUpdater.setFeedURL(feed)
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.

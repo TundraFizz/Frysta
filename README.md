@@ -25,3 +25,40 @@ Generating public and private keys
 openssl rsa -in priv.key -pubout -out public.key
 openssl genrsa -out private.key 2048
 ```
+
+Generating a Windows installer
+
+First make sure you have Electron Forge installed
+```
+npm install -g electron-forge
+```
+
+Clean the project first by deleting `node_modules` and then run this
+```
+npm i
+electron-forge import .
+Y
+Y
+.
+Y
+Y
+Y
+```
+
+Verify that the project was forged successfully
+```
+electron-forge start
+```
+
+-------------------------------------------------------------------------------
+npm install -g electron-installer-windows
+electron-packager . app --platform win32 --arch x64 --out dist/
+electron-installer-windows --src . --dest dist/
+-------------------------------------------------------------------------------
+npm i -g electron-builder
+
+
+
+
+npm install electron-builder --save-dev
+-------------------------------------------------------------------------------
