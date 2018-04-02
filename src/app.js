@@ -21,7 +21,7 @@ var lastUploadedScreenshotUrl = null;
 // Default options
 var options = {
   "LaunchOnStartup" : "true",
-  "CopyUrlOnSuccess": "false",
+  "CopyUrlOnSuccess": "true",
   "SfxOnSuccess"    : "true",
   "SfxOnFailure"    : "true",
   "LocalCopy"       : "false"
