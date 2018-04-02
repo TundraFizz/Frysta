@@ -284,7 +284,8 @@ function ErrorNoPathToSaveImageExists(){
     "content": errorMessage
   });
 
-  SendMessage("PlaySfxError");
+  if(options["SfxOnFailure"] == "true")
+    SendMessage("PlaySfxError");
 }
 
 function UploadImageToServer(result){
@@ -312,7 +313,9 @@ function UploadImageToServer(result){
     }
 
     lastUploadedScreenshotUrl = body["url"];
-    clipboard.write({"text": body["url"]});
+
+    if(options["CopyUrlOnSuccess"] == "true")
+      clipboard.write({"text": body["url"]});
 
     tray.displayBalloon({
       "icon"   : path.join(__dirname, "img/icon64x64.png"),
@@ -320,43 +323,28 @@ function UploadImageToServer(result){
       "content": lastUploadedScreenshotUrl
     });
 
-    // Delete the file
-
     // Move/Rename the file if the option to do so is active
-    if(options["LocalCopy"]){
-      var newPath = `${options["LocalCopy"]}/${body["fileName"]}`;
-      console.log(newPath);
-
+    if(options["LocalCopy"] != "false"){
+      var newPath     = `${options["LocalCopy"]}/${body["fileName"]}`;
       var readStream  = fs.createReadStream(result);
       var writeStream = fs.createWriteStream(newPath);
 
-      // readStream.on("error", callback);
-      writeStream.on("error", function(err){
-        // var errorMessage = "The directory to save a local copy no longer exists. ";
-        // errorMessage    += "You should disable this feature in the settings, or declare a new valid path.";
+      // Note: Error handling is done earlier so this function can stay empty
+      writeStream.on("error", function(err){});
 
-        // tray.displayBalloon({
-        //   "icon"   : path.join(__dirname, "img/icon64x64.png"),
-        //   "title"  : "Error!",
-        //   "content": errorMessage
-        // });
-      });
-
+      // Remove the first temporary file when it's done copying to the new directory
       readStream.on("close", function(){
-        console.log("File has been moved, deleting");
-        fs.unlink(result, function(){console.log("File has been deleted")});
+        fs.unlink(result, function(){});
       });
 
+      // Copy the original file to the new destination
       readStream.pipe(writeStream);
-
-      // fs.copyFile(result, newPath, function(err){console.log(err)});
-
-      // fs.rename(result, newPath, function(err){console.log(err)});
     }else{
       fs.unlink(result, function(){});
     }
 
-    SendMessage("PlaySfxNotification");
+    if(options["SfxOnSuccess"] == "true")
+      SendMessage("PlaySfxNotification");
   });
 }
 
@@ -371,11 +359,16 @@ function TakeScreenshot(){
 
     // Check to see if the path to save a local copy of the image exists
     // If the path doesn't exist, give the user an error
-    CheckIfSavePathExists()
-    .then((err) => {
-      if(err) ErrorNoPathToSaveImageExists();
-      else    UploadImageToServer(result);
-    });
+
+    if(options["LocalCopy"] != "false"){
+      CheckIfSavePathExists()
+      .then((err) => {
+        if(err) ErrorNoPathToSaveImageExists();
+        else    UploadImageToServer(result);
+      });
+    }else{
+      UploadImageToServer(result)
+    }
   });
 }
 
