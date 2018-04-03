@@ -31,3 +31,8 @@ Generating a Windows installer
 ```
 npm run dist
 ```
+
+Useful?
+```
+node-gyp clean configure build --verbose --arch=ia32
+```
