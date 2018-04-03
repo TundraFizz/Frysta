@@ -137,12 +137,21 @@ void MyAsyncWorker::HandleOKCallback(){
     fileNamePngV8
   };
 
+  // ..\src\cpp\screen-capture.cpp(145): error C2220: warning treated as error - no
+  // 'object' file generated [C:\Users\leif.coleman\Desktop\Git\Frysta\build\screen-
+  // capture.vcxproj]
+  // ..\src\cpp\screen-capture.cpp(145): warning C4267: 'argument': conversion from
+  // 'size_t' to 'int', possible loss of data [C:\Users\leif.coleman\Desktop\Git\Fry
+  // sta\build\screen-capture.vcxproj]
+  // gyp ERR! build error
+
   size_t argumentCount = sizeof(arguments)/sizeof(*arguments);
+  int argumentCount2 = (int)argumentCount;
 
   // A dummy AsyncResource object needs to be created as a placeholder
   Nan::AsyncResource *dummy = new Nan::AsyncResource(Nan::New("").ToLocalChecked());
 
-  callback->Call(argumentCount, arguments, dummy);
+  callback->Call(argumentCount2, arguments, dummy);
 }
 
 int MyAsyncWorker::GetEncoderClsid(const WCHAR *format, CLSID *pClsid){
