@@ -6,26 +6,57 @@
   "main": "binding.gyp",
   "dependencies": {
     "bcrypt": "latest",
-    "electron": "latest",
     "electron-json-storage": "latest",
-    "electron-rebuild": "latest",
     "form-data": "latest",
     "jquery": "latest",
     "nan": "latest"
   },
   "devDependencies": {
-    "electron-rebuild": "^1.7.3"
+    "electron": "latest",
+    "electron-rebuild": "latest"
   },
   "scripts": {
     "all": "cls && npm run clean && npm run compile && npm start",
     "clean": "node-gyp clean",
     "compile": "electron-rebuild",
-    "start": "electron ./src/app.js"
+    "start": "electron ./src/app.js",
+
+    "postinstall": "install-app-deps",
+    "pack": "build --dir",
+    "dist": "build"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/TundraFizz/Frysta"
   },
   "gypfile": true,
-  "license": "ISC"
+  "license": "ISC",
+
+  "build": {
+    "appId": "yourappid",
+    "dmg": {
+      "contents": [
+        {
+          "x": 110,
+          "y": 150
+        },
+        {
+          "x": 240,
+          "y": 150,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ]
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ]
+    },
+    "win": {
+      "target": "NSIS",
+      "icon": "src/img/icon.ico"
+    }
+  }
 }
