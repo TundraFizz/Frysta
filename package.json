@@ -13,7 +13,8 @@
   },
   "devDependencies": {
     "electron": "latest",
-    "electron-rebuild": "latest"
+    "electron-rebuild": "latest",
+    "electron-builder": "latest"
   },
   "scripts": {
     "all": "cls && npm run clean && npm run compile && npm start",
