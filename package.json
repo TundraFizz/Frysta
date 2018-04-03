@@ -5,7 +5,6 @@
   "description": "Desktop application to capture screenshots and send them to a server",
   "main": "binding.gyp",
   "dependencies": {
-    "bcrypt": "latest",
     "electron-json-storage": "latest",
     "form-data": "latest",
     "jquery": "latest",
