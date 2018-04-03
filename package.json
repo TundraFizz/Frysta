@@ -22,7 +22,7 @@
     "compile": "electron-rebuild",
     "start": "electron ./src/app.js",
 
-    "postinstall": "install-app-deps",
+    "postinstall": "electron-builder install-app-deps",
     "pack": "build --dir",
     "dist": "build"
   },
@@ -35,6 +35,7 @@
 
   "build": {
     "appId": "yourappid",
+    "nodeGypRebuild": "true",
     "dmg": {
       "contents": [
         {
