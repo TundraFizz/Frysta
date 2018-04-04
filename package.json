@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "author": "Tundra Fizz",
   "description": "Desktop application to capture screenshots and send them to a server",
-  "main": "binding.gyp",
+  "main": "src/app.js",
   "dependencies": {
     "electron-json-storage": "latest",
     "form-data": "latest",
@@ -23,13 +23,18 @@
 
     "postinstall": "electron-builder install-app-deps",
     "pack": "build --dir",
-    "dist": "build"
+    "dist": "build",
+
+    "step1": "node-gyp clean",
+    "step2": "node-gyp configure",
+    "step3": "electron-rebuild",
+    "step4": "electron ./src/app.js",
+    "reeee": "cls && npm run step1 && npm run step2 && npm run step3 && npm run step4"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/TundraFizz/Frysta"
   },
-  "gypfile": true,
   "license": "ISC",
 
   "build": {
