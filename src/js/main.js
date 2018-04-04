@@ -170,7 +170,7 @@ function SubmitCreateAccount(email, username, password){
   }
 }
 
-AnimateSubmitButtonToLoading = function(app){return new Promise((resolve) => {
+function AnimateSubmitButtonToLoading(app){return new Promise((resolve) => {
   $(".loading-spinner", app).css("display", "block");
 
   // Fade out the "Submit" text while shrinking the Submit button.

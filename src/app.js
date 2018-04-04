@@ -267,17 +267,6 @@ function TakeScreenshotShortcut(){
   TakeScreenshot();
 }
 
-CheckIfSavePathExists = function(data){return new Promise((resolve) => {
-  if(options["LocalCopy"]){
-    fs.access(options["LocalCopy"], function(err){
-      if(err)
-        resolve(true);
-      else
-        resolve(false);
-    });
-  }
-})}
-
 function ErrorNoPathToSaveImageExists(){
   var errorMessage = "The directory to save a local copy no longer exists. ";
   errorMessage    += "You should disable this feature in the settings, or declare a new valid path.";
@@ -353,6 +342,17 @@ function UploadImageToServer(result){
   });
 }
 
+function CheckIfSavePathExists(data){return new Promise((resolve) => {
+  if(options["LocalCopy"]){
+    fs.access(options["LocalCopy"], function(err){
+      if(err)
+        resolve(true);
+      else
+        resolve(false);
+    });
+  }
+})}
+
 function TakeScreenshot(){
   win.hide();
   // win.minimize(); // I don't think I need this anymore
@@ -388,7 +388,7 @@ fs.readFile(path.join(__dirname, "public-key/public.key"), (err, data) => {
   crypto.publicEncrypt(publicKey, new Buffer(""));
 });
 
-EncryptData = function(data){return new Promise((resolve) => {
+function EncryptData(data){return new Promise((resolve) => {
   var encryptedData = crypto.publicEncrypt(publicKey, Buffer.from(data));
   encryptedData = Buffer.from(encryptedData).toString("base64");
   resolve(encryptedData);
