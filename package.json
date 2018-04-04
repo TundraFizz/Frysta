@@ -2,12 +2,12 @@
   "name": "frysta",
   "version": "0.1.0",
   "author": "Tundra Fizz",
-  "description": "Desktop application to capture screenshots and send them to a server",
+  "description": "Frysta",
   "main": "src/app.js",
+  "license": "ISC",
   "dependencies": {
     "electron-compile": "^6.4.2",
     "electron-json-storage": "latest",
-    "electron-squirrel-startup": "^1.0.0",
     "form-data": "latest",
     "jquery": "latest",
     "nan": "latest",
@@ -17,54 +17,30 @@
     "electron": "latest",
     "electron-rebuild": "latest",
     "electron-builder": "latest",
-    "electron-forge": "^5.1.1",
-    "electron-prebuilt-compile": "1.8.4"
+    "electron-prebuilt-compile": "1.8.4",
+    "node-gyp": "latest"
   },
   "scripts": {
-    "start": "electron-forge start",
-    "package": "electron-forge package",
-    "make": "electron-forge make",
     "step1": "node-gyp clean",
     "step2": "node-gyp configure",
     "step3": "electron-rebuild",
     "step4": "electron ./src/app.js",
-    "reeee": "cls && npm run step1 && npm run step2 && npm run step3 && npm run step4"
+    "reeee": "cls && npm run step1 && npm run step2 && npm run step3 && npm run step4",
+    "build": "build"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/TundraFizz/Frysta"
   },
-  "license": "ISC",
-  "config": {
-    "forge": {
-      "make_targets": {
-        "win32": [
-          "squirrel"
-        ],
-        "darwin": [
-          "zip"
-        ],
-        "linux": [
-          "deb",
-          "rpm"
-        ]
-      },
-      "electronPackagerConfig": {
-        "packageManager": "npm"
-      },
-      "electronWinstallerConfig": {
-        "name": "my_app_sample_thing"
-      },
-      "electronInstallerDebian": {},
-      "electronInstallerRedhat": {},
-      "github_repository": {
-        "owner": "",
-        "name": ""
-      },
-      "windowsStoreConfig": {
-        "packageName": "",
-        "name": "myappthingsample"
-      }
+  "build": {
+    "appId": "mytestingid",
+    "productName": "frysta",
+    "copyright": "Leif Coleman",
+    "win": {
+      "target": "nsis"
+    },
+    "nsis": {
+      "oneClick": "false"
     }
   }
 }
