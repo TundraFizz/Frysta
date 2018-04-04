@@ -5,12 +5,13 @@
   "description": "Desktop application to capture screenshots and send them to a server",
   "main": "src/app.js",
   "dependencies": {
+    "electron-compile": "^6.4.2",
     "electron-json-storage": "latest",
+    "electron-squirrel-startup": "^1.0.0",
     "form-data": "latest",
     "jquery": "latest",
     "nan": "latest",
-    "electron-compile": "^6.4.2",
-    "electron-squirrel-startup": "^1.0.0"
+    "request": "^2.85.0"
   },
   "devDependencies": {
     "electron": "latest",

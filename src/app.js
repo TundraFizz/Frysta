@@ -210,7 +210,7 @@ app.on("message", (msg) => {
 function SetOption(data){
   data = JSON.parse(data);
 
-  for(key in data)
+  for(var key in data)
     options[key] = data[key];
 
   storage.set("config", options, function(error){});
