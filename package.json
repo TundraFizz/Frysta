@@ -8,23 +8,21 @@
     "electron-json-storage": "latest",
     "form-data": "latest",
     "jquery": "latest",
-    "nan": "latest"
+    "nan": "latest",
+    "electron-compile": "^6.4.2",
+    "electron-squirrel-startup": "^1.0.0"
   },
   "devDependencies": {
     "electron": "latest",
     "electron-rebuild": "latest",
-    "electron-builder": "latest"
+    "electron-builder": "latest",
+    "electron-forge": "^5.1.1",
+    "electron-prebuilt-compile": "1.8.4"
   },
   "scripts": {
-    "all": "cls && npm run clean && npm run compile && npm start",
-    "clean": "node-gyp clean",
-    "compile": "electron-rebuild",
-    "start": "electron ./src/app.js",
-
-    "postinstall": "electron-builder install-app-deps",
-    "pack": "build --dir",
-    "dist": "build",
-
+    "start": "electron-forge start",
+    "package": "electron-forge package",
+    "make": "electron-forge make",
     "step1": "node-gyp clean",
     "step2": "node-gyp configure",
     "step3": "electron-rebuild",
@@ -36,33 +34,36 @@
     "url": "https://github.com/TundraFizz/Frysta"
   },
   "license": "ISC",
-
-  "build": {
-    "appId": "yourappid",
-    "nodeGypRebuild": "true",
-    "dmg": {
-      "contents": [
-        {
-          "x": 110,
-          "y": 150
-        },
-        {
-          "x": 240,
-          "y": 150,
-          "type": "link",
-          "path": "/Applications"
-        }
-      ]
-    },
-    "linux": {
-      "target": [
-        "AppImage",
-        "deb"
-      ]
-    },
-    "win": {
-      "target": "NSIS",
-      "icon": "src/img/icon.ico"
+  "config": {
+    "forge": {
+      "make_targets": {
+        "win32": [
+          "squirrel"
+        ],
+        "darwin": [
+          "zip"
+        ],
+        "linux": [
+          "deb",
+          "rpm"
+        ]
+      },
+      "electronPackagerConfig": {
+        "packageManager": "npm"
+      },
+      "electronWinstallerConfig": {
+        "name": "my_app_sample_thing"
+      },
+      "electronInstallerDebian": {},
+      "electronInstallerRedhat": {},
+      "github_repository": {
+        "owner": "",
+        "name": ""
+      },
+      "windowsStoreConfig": {
+        "packageName": "",
+        "name": "myappthingsample"
+      }
     }
   }
 }
