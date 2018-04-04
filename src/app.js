@@ -2,11 +2,13 @@ var path          = require("path");    // -
 var url           = require("url");     // -
 var fs            = require("fs");      // File system
 var crypto        = require("crypto");  // -
-// var bcrypt        = require("bcrypt");  // -
 var $             = require("jquery");  // jQuery
 var request       = require("request"); // POST request to the server
 var storage       = require("electron-json-storage");
-var screenCapture = require("../build/Release/screen-capture.node"); // C++ module for screen capturing
+
+var screenCapture; // C++ module for screen capturing
+try{screenCapture = require("../build/Release/screen-capture.node");}catch(err){}
+try{screenCapture = require("./screen-capture.node");}               catch(err){}
 
 var {app, BrowserWindow, Tray, Menu, globalShortcut, ipcMain, clipboard, shell, autoUpdater, dialog} = require("electron");
 
