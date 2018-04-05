@@ -71,49 +71,48 @@ function createWindow(){
 
   var contextMenu = Menu.buildFromTemplate([
     {
-      "label": "Item 1",
-      "type" : "radio",
-      "icon" : path.join(__dirname, "img/icon64x64.png")
-    },
-    {
-      "label": "Item 2",
-      "submenu": [
-        {"label": "submenu 1"},
-        {"label": "submenu 2"},
-      ]
-    },
-    {
-      "label": "Item 3",
-      "type" : "radio",
-      "checked": true
-    },
-    {
-      "label": "Toggle Tools",
-      "accelerator": "Ctrl+I",
-      "click": function(){
-        win.webContents.toggleDevTools();
-      }
-    },
-    {
       "label": "Quit Frysta",
       "click": function(){
         quit = true;
         win.close();
       }
     }
+    // All of this stuff is used for future reference
+    // ,{
+    //   "label": "Item 1",
+    //   "type" : "radio",
+    //   "icon" : path.join(__dirname, "img/icon64x64.png")
+    // },
+    // {
+    //   "label": "Item 2",
+    //   "submenu": [
+    //     {"label": "submenu 1"},
+    //     {"label": "submenu 2"},
+    //   ]
+    // },
+    // {
+    //   "label": "Item 3",
+    //   "type" : "radio",
+    //   "checked": true
+    // },
+    // {
+    //   "label": "Toggle Tools",
+    //   "accelerator": "Ctrl+I",
+    //   "click": function(){
+    //     win.webContents.toggleDevTools();
+    //   }
+    // }
   ]);
 
   tray.setToolTip("App icon tooltip!");
   tray.setContextMenu(contextMenu);
 
   tray.on("click", function(){
-    console.log("Single click");
-    win.showInactive();
+    win.show();
   });
 
   tray.on("double-click", function(){
-    console.log("Double click");
-    win.focus();
+    win.show();
   });
 
   tray.on("balloon-click", function(){
