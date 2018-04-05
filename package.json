@@ -24,8 +24,8 @@
     "step1": "node-gyp clean",
     "step2": "node-gyp configure",
     "step3": "electron-rebuild",
-    "step4": "electron ./src/app.js",
-    "reeee": "cls && npm run step1 && npm run step2 && npm run step3 && npm run step4",
+    "compile": "cls && npm run step1 && npm run step2 && npm run step3",
+    "start": "electron ./src/app.js",
     "build": "build"
   },
   "repository": {
