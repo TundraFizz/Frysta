@@ -10,12 +10,47 @@ var screenCapture; // C++ module for screen capturing
 try{screenCapture = require("../build/Release/screen-capture.node");}catch(err){}
 try{screenCapture = require("./screen-capture.node");}               catch(err){}
 
-var {app, BrowserWindow, Tray, Menu, globalShortcut, ipcMain, clipboard, shell, autoUpdater, dialog} = require("electron");
+var {app, BrowserWindow, Tray, Menu, globalShortcut, ipcMain, clipboard, shell, dialog} = require("electron");
 
-// Set up application updates
-// const server = 'https://your-deployment-url.com'
-// const feed = `${server}/update/${process.platform}/${app.getVersion()}`
-// autoUpdater.setFeedURL(feed)
+//////////////////////////////
+///// CHECK FOR UPDATES! /////
+
+var {autoUpdater} = require("electron-updater");
+
+console.log(`PLATFORM: |${process.platform}|`);
+console.log(`VERSION : |${app.getVersion()}|`);
+console.log(`VERSION : |${autoUpdater.currentVersion}|`);
+
+const server = "https://fizz.gg/";
+autoUpdater.autoDownload = false;
+autoUpdater.setFeedURL(server);
+// autoUpdater.checkForUpdates();
+
+autoUpdater.on("update-available", (info) => {
+  // If there's an update available, download it. But do not
+  // automatically install it since I'll let the user decide
+  // when they want to exit and install the update.
+  autoUpdater.downloadUpdate();
+});
+
+autoUpdater.on("update-not-available", () => {
+});
+
+autoUpdater.on("update-downloaded", () => {
+  console.log("STATUS: A new version has been downloaded. Click on this notification to restart Frysta and apply the updates.");
+  // autoUpdater.quitAndInstall();
+});
+
+autoUpdater.on("download-progress", (ev, progressObj) => {
+  console.log(ev["percent"]);
+  var data = {
+    "percent": ev["percent"]
+  }
+  SendMessage("DownloadProgress", data);
+});
+
+///// CHECK FOR UPDATES! /////
+//////////////////////////////
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -206,6 +241,7 @@ app.on("message", (msg) => {
   else if(func == "SetOption")            SetOption           (data);
   else if(func == "TestSave")             TestSave            (data);
   else if(func == "TestLoad")             TestLoad            (data);
+  else if(func == "UpdateManager")        UpdateManager       (data);
 });
 
 function SetOption(data){
@@ -257,6 +293,16 @@ function TestSave(data){
 
 function TestLoad(data){
   console.log("========== TestLoad ==========");
+}
+
+function UpdateManager(data){
+  data = JSON.parse(data);
+  var text = data["text"];
+
+  if(text == "Check for updates")
+    autoUpdater.checkForUpdates();
+  else if(text == "Install update!")
+    autoUpdater.quitAndInstall();
 }
 
 /////////////////////////////
