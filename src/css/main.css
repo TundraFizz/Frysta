@@ -169,7 +169,8 @@ body {
   height: 28px;
 }
 
-.submit-button {
+.submit-button,
+.misc-button {
   position: absolute;
   transform: translateX(-50%);
   left: 50%;
@@ -183,7 +184,8 @@ body {
   text-align: center;
 }
 
-.submit-button > div {
+.submit-button > div,
+.misc-button   > div {
   margin: 0px 4px;
 }
 
