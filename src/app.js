@@ -59,7 +59,7 @@ function createWindow(){
     "icon"           : path.join(__dirname, "img/icon64x64.png")
   });
 
-  win.toggleDevTools();
+  // win.toggleDevTools();
 
   win.setMenu(null);
 

@@ -34,13 +34,20 @@
   },
   "build": {
     "appId": "mytestingid",
-    "productName": "frysta",
+    "productName": "Frysta",
     "copyright": "Leif Coleman",
     "win": {
-      "target": "nsis"
+      "target": "nsis",
+      "icon": "make/icon.ico"
     },
     "nsis": {
-      "oneClick": "false"
+      "oneClick": "false",
+      "allowToChangeInstallationDirectory": "true",
+      "installerIcon": "make/icon.ico",
+      "uninstallerIcon": "make/icon.ico",
+      "installerHeader": "make/header.bmp",
+      "installerSidebar": "make/sidebar.bmp",
+      "uninstallDisplayName": "Frysta"
     }
   }
 }
