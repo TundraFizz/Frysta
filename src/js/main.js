@@ -1,6 +1,7 @@
 var ipc         = require("electron").ipcRenderer;
 var EmitMessage = require("electron").remote.app.emit;
 var dialog      = require("electron").remote.dialog;
+var autoUpdater = require("electron-updater").remote;
 
 var options = {};
 
@@ -301,6 +302,15 @@ function TakeScreenshotButton(){
   $(".submit-button").removeAttr("busy");
 }
 
+// Update Manager that will check for updates, or install a currently downloaded update
+function UpdateManager(self){
+  var data = {
+    "text": $("div", self).text()
+  }
+
+  SendMessage("UpdateManager", data);
+}
+
 $(".submit-button").click(function(){
   if($(".submit-button").attr("busy") != undefined)
     return;
@@ -329,6 +339,34 @@ $(".submit-button").mousedown(function(){
 });
 
 $(".submit-button").mouseup(function(){
+  $(this).animate({
+    "box-shadow": "0px 0px 5px 0px #5fb9ff"
+  }, 50);
+});
+
+// TODO: Merge .submit-button with .misc-button
+
+$(".misc-button").click(function(){
+  window[$(this).attr("function")](this);
+});
+
+$(".misc-button").hover(function(){
+  $(this).animate({
+    "box-shadow": "0px 0px 10px 0px #5fb9ff"
+  }, 50);
+}, function(){
+  $(this).animate({
+    "box-shadow": "0px 0px 5px 0px #5fb9ff"
+  }, 50);
+});
+
+$(".misc-button").mousedown(function(){
+  $(this).animate({
+    "box-shadow": "0px 0px 0px 0px #5fb9ff"
+  }, 50);
+});
+
+$(".misc-button").mouseup(function(){
   $(this).animate({
     "box-shadow": "0px 0px 5px 0px #5fb9ff"
   }, 50);
@@ -401,6 +439,7 @@ ipc.on("message", (event, msg) => {
   if(func == "PlaySfxNotification") PlaySfxNotification(data);
   if(func == "PlaySfxError")        PlaySfxError(data);
   if(func == "GetOptions")          GetOptions(data);
+  if(func == "DownloadProgress")    DownloadProgress(data);
 });
 
 function PlaySfxNotification(){
@@ -460,6 +499,17 @@ function GetOptions(data){
     $("[option='LocalCopy']").attr("active", "true");
     $($(".local-copy-dir")[0]).text(options["LocalCopy"]);
   }
+}
+
+function DownloadProgress(data){
+  var updateButton = $("[function='UpdateManager'] > div")[0];
+  var percent      = data["percent"];
+  percent          = Math.floor(percent) + "%";
+
+  if(percent == "100%")
+    percent = "Install update!";
+
+  $(updateButton).text(percent);
 }
 
 // Determine the width and starting position of the menu line forground
