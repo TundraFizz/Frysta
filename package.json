@@ -11,7 +11,8 @@
     "form-data": "latest",
     "jquery": "latest",
     "nan": "latest",
-    "request": "^2.85.0"
+    "request": "^2.85.0",
+    "electron-updater": "^2.21.4"
   },
   "devDependencies": {
     "electron": "latest",
@@ -28,10 +29,6 @@
     "start": "electron ./src/app.js",
     "build": "build"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/TundraFizz/Frysta"
-  },
   "build": {
     "appId": "mytestingid",
     "productName": "Frysta",
@@ -41,13 +38,17 @@
       "icon": "make/icon.ico"
     },
     "nsis": {
-      "oneClick": "false",
-      "allowToChangeInstallationDirectory": "true",
       "installerIcon": "make/icon.ico",
       "uninstallerIcon": "make/icon.ico",
+      "uninstallDisplayName": "Frysta",
+      "oneClick": "false",
+      "allowToChangeInstallationDirectory": "true",
       "installerHeader": "make/header.bmp",
-      "installerSidebar": "make/sidebar.bmp",
-      "uninstallDisplayName": "Frysta"
+      "installerSidebar": "make/sidebar.bmp"
     }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/TundraFizz/Frysta"
   }
 }
