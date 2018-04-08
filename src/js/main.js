@@ -236,18 +236,27 @@ function MenuButtonLogin(){
     $("[input-field='email']").css("display", "none");
   }});
 
+  $("[input-field='password-confirm']").animate({
+    "opacity": "0"
+  }, {duration: 250, queue: false, complete: function(){
+    $("[input-field='password-confirm']").css("display", "none");
+  }});
+
   $("[input-field='username']").animate({
-    "top": "12.66px"
+    "top": "22px"
   }, {duration: 250, queue: false});
 
   $("[input-field='password']").animate({
-    "top": "47.33px"
+    "top": "65px"
   }, {duration: 250, queue: false});
 }
 
 function MenuButtonCreateAccount(){
   $("[input-field='email']").stop();
   $("[input-field='email']").css("display", "block");
+
+  $("[input-field='password-confirm']").stop();
+  $("[input-field='password-confirm']").css("display", "block");
 
   $("[input-field='email']").animate({
     "opacity": "1"
@@ -259,6 +268,11 @@ function MenuButtonCreateAccount(){
 
   $("[input-field='password']").animate({
     "top": "56px"
+  }, {duration: 250, queue: false});
+
+  $("[input-field='password-confirm']").animate({
+    "top": "82px",
+    "opacity": "1"
   }, {duration: 250, queue: false});
 }
 
