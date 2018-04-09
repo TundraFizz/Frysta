@@ -21,9 +21,9 @@ var frystaAutoLaunch = new autoLaunch({
 //////////////////////////////
 ///// CHECK FOR UPDATES! /////
 
-console.log(`PLATFORM: |${process.platform}|`);
-console.log(`VERSION : |${app.getVersion()}|`);
-console.log(`VERSION : |${autoUpdater.currentVersion}|`);
+// console.log(`PLATFORM: |${process.platform}|`);
+// console.log(`VERSION : |${app.getVersion()}|`);
+// console.log(`VERSION : |${autoUpdater.currentVersion}|`);
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -60,22 +60,20 @@ autoUpdater.on("update-available", (info) => {
   // If there's an update available, download it. But do not
   // automatically install it since I'll let the user decide
   // when they want to exit and install the update.
-  console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-  console.log("update-available");
-  console.log(info);
+
+  // console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+  // console.log("update-available");
+  // console.log(info);
 
   autoUpdater.downloadUpdate();
 });
 
-autoUpdater.on("update-not-available", () => {
-  console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-  console.log("update-not-available");
+autoUpdater.on("update-not-available", () => {console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+  // console.log("update-not-available");
+  //
 });
 
 autoUpdater.on("update-downloaded", () => {
-  console.log("STATUS: A new version has been downloaded. Click on this notification to restart Frysta and apply the updates.");
-  // autoUpdater.quitAndInstall();
-
   baloonUpdateFrysta = true;
 
   tray.displayBalloon({
