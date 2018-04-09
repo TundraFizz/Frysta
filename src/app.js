@@ -5,17 +5,21 @@ var crypto        = require("crypto");  // -
 var $             = require("jquery");  // jQuery
 var request       = require("request"); // POST request to the server
 var storage       = require("electron-json-storage");
+var autoLaunch    = require("auto-launch");
+var {autoUpdater} = require("electron-updater");
+var {app, BrowserWindow, Tray, Menu, globalShortcut, ipcMain, clipboard, shell, dialog} = require("electron");
 
 var screenCapture; // C++ module for screen capturing
 try{screenCapture = require("../build/Release/screen-capture.node");}catch(err){}
 try{screenCapture = require("./screen-capture.node");}               catch(err){}
 
-var {app, BrowserWindow, Tray, Menu, globalShortcut, ipcMain, clipboard, shell, dialog} = require("electron");
+var frystaAutoLaunch = new autoLaunch({
+  "name"    : "Frysta",
+  "isHidden": "true"
+});
 
 //////////////////////////////
 ///// CHECK FOR UPDATES! /////
-
-var {autoUpdater} = require("electron-updater");
 
 console.log(`PLATFORM: |${process.platform}|`);
 console.log(`VERSION : |${app.getVersion()}|`);
@@ -164,6 +168,9 @@ function createWindow(){
       if("SfxOnFailure"     in data) options["SfxOnFailure"]     = data["SfxOnFailure"];
       if("LocalCopy"        in data) options["LocalCopy"]        = data["LocalCopy"];
 
+      if     (options["LaunchOnStartup"] == "true")  frystaAutoLaunch.enable();
+      else if(options["LaunchOnStartup"] == "false") frystaAutoLaunch.disable();
+
       SendMessage("GetOptions", options);
       storage.set("config", options, function(error){});
     });
@@ -248,8 +255,15 @@ app.on("message", (msg) => {
 function SetOption(data){
   data = JSON.parse(data);
 
-  for(var key in data)
+  for(var key in data){
     options[key] = data[key];
+
+    // Special cases for options
+    if(key == "LaunchOnStartup"){
+      if     (options["LaunchOnStartup"] == "true")  frystaAutoLaunch.enable();
+      else if(options["LaunchOnStartup"] == "false") frystaAutoLaunch.disable();
+    }
+  }
 
   storage.set("config", options, function(error){});
 }
@@ -295,14 +309,6 @@ function RecoverAccount(data){
       SendMessage("RecoverAccountResponse", msg);
     });
   });
-}
-
-function TestSave(data){
-  console.log("========== TestSave ==========");
-}
-
-function TestLoad(data){
-  console.log("========== TestLoad ==========");
 }
 
 function UpdateManager(data){
