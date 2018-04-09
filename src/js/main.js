@@ -173,12 +173,12 @@ function SubmitCreateAccount(email, username, password, passwordConfirm){
   }
 }
 
-function SubmitForgotPassword(email){
+function SubmitRecoverAccount(email){
   if(email.length == 0){
     ShowSubmitMessage("Email address isn't valid", "red");
   }else{
     AnimateSubmitButtonToLoading("#app-1 .submit-container").then(() => {
-      SendMessage("ForgotPassword", {
+      SendMessage("RecoverAccount", {
         "email": email
       });
     });
@@ -307,7 +307,7 @@ function MenuButtonCreateAccount(){
   }, {duration: 250, queue: false});
 }
 
-function MenuButtonForgotPassword(){
+function MenuButtonRecoverAccount(){
   $("[input-field='email']").stop();
 
   $("[input-field='email']").css("display", "block");
@@ -363,8 +363,8 @@ function SubmitApp1(){
     SubmitLogin(username, password);
   else if(selection == "Create Account")
     SubmitCreateAccount(email, username, password, passwordConfirm);
-  else if(selection == "Forgot Password")
-    SubmitForgotPassword(email);
+  else if(selection == "Recover Account")
+    SubmitRecoverAccount(email);
 }
 
 // Submit button functions (2/2)
@@ -478,7 +478,7 @@ ipc.on("message", (event, msg) => {
 
   if     (func == "LoginPageToMainApp")     LoginPageToMainApp(data);
   else if(func == "AccountWasCreated")      AccountWasCreated(data);
-  else if(func == "ForgotPasswordResponse") ForgotPasswordResponse(data);
+  else if(func == "RecoverAccountResponse") RecoverAccountResponse(data);
   else if(func == "PlaySfxNotification")    PlaySfxNotification(data);
   else if(func == "PlaySfxError")           PlaySfxError(data);
   else if(func == "GetOptions")             GetOptions(data);
@@ -505,7 +505,7 @@ function AccountWasCreated(data){
   AnimateLoadingToSubmitButton("#app-1 .submit-container");
 }
 
-function ForgotPasswordResponse(data){
+function RecoverAccountResponse(data){
   var msg   = data["msg"];
   var color = data["color"];
   ShowSubmitMessage(msg, color);
