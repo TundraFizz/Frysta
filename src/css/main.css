@@ -189,6 +189,25 @@ body {
   margin: 0px 4px;
 }
 
+.update-button {
+  width: 100px;
+  height: 22px;
+  border-radius: 4px;
+  line-height: 22px;
+  cursor: pointer;
+  text-align: center;
+  background-color: #194e1f;
+  border: 1px solid #2eb13c;
+  box-shadow: 0px 0px 5px 0px #24dc48;
+}
+
+.footer-container {
+  position: fixed;
+  width: 100%;
+  bottom: 0px;
+  margin: 4px 6px;
+}
+
 .loading-spinner {
   position: absolute;
   transform: translateX(-50%);
