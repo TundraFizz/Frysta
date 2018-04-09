@@ -25,7 +25,16 @@ console.log(`PLATFORM: |${process.platform}|`);
 console.log(`VERSION : |${app.getVersion()}|`);
 console.log(`VERSION : |${autoUpdater.currentVersion}|`);
 
-const server = "https://fizz.gg/";
+// Keep a global reference of the window object, if you don't, the window will
+// be closed automatically when the JavaScript object is garbage collected.
+var win  = null;
+var tray = null;
+var quit = false;
+var clickedOnButton = null;
+var lastUploadedScreenshotUrl = null;
+var baloonUpdateFrysta = false;
+var server = "https://fizz.gg/";
+
 autoUpdater.autoDownload = false;
 autoUpdater.setFeedURL(server);
 
@@ -47,8 +56,6 @@ autoUpdater.logger.error = function(msg){
   }
 }
 
-// autoUpdater.checkForUpdates();
-
 autoUpdater.on("update-available", (info) => {
   // If there's an update available, download it. But do not
   // automatically install it since I'll let the user decide
@@ -68,6 +75,16 @@ autoUpdater.on("update-not-available", () => {
 autoUpdater.on("update-downloaded", () => {
   console.log("STATUS: A new version has been downloaded. Click on this notification to restart Frysta and apply the updates.");
   // autoUpdater.quitAndInstall();
+
+  baloonUpdateFrysta = true;
+
+  tray.displayBalloon({
+    "icon"   : path.join(__dirname, "img/icon64x64.png"),
+    "title"  : "Update Ready",
+    "content": "Click on this notification to restart and update Frysta"
+  });
+
+  SendMessage("PlaySfxNotification");
 });
 
 autoUpdater.on("download-progress", (ev, progressObj) => {
@@ -78,16 +95,10 @@ autoUpdater.on("download-progress", (ev, progressObj) => {
   SendMessage("DownloadProgress", data);
 });
 
+autoUpdater.checkForUpdates();
+
 ///// CHECK FOR UPDATES! /////
 //////////////////////////////
-
-// Keep a global reference of the window object, if you don't, the window will
-// be closed automatically when the JavaScript object is garbage collected.
-var win  = null;
-var tray = null;
-var quit = false;
-var clickedOnButton = null;
-var lastUploadedScreenshotUrl = null;
 
 // Default options
 var options = {
@@ -180,7 +191,9 @@ function createWindow(){
   });
 
   tray.on("balloon-click", function(){
-    if(lastUploadedScreenshotUrl)
+    if(baloonUpdateFrysta)
+      autoUpdater.quitAndInstall();
+    else if(lastUploadedScreenshotUrl)
       shell.openExternal(lastUploadedScreenshotUrl);
   });
 
@@ -275,6 +288,7 @@ app.on("message", (msg) => {
   else if(func == "TestSave")             TestSave            (data);
   else if(func == "TestLoad")             TestLoad            (data);
   else if(func == "UpdateManager")        UpdateManager       (data);
+  else if(func == "UpdateFrysta")         UpdateFrysta        (data);
 });
 
 function SetOption(data){
@@ -363,6 +377,10 @@ function UpdateManager(data){
   }
 }
 
+function UpdateFrysta(){
+  console.log("UpdateFrysta()");
+}
+
 /////////////////////////////
 // Miscellaneous functions //
 /////////////////////////////
@@ -411,6 +429,7 @@ function UploadImageToServer(result){
       return;
     }
 
+    baloonUpdateFrysta        = false;
     lastUploadedScreenshotUrl = body["url"];
 
     if(options["CopyUrlOnSuccess"] == "true")
