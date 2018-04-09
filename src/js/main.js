@@ -629,12 +629,10 @@ $("input").on("input", function(){
     $(span).show();
 });
 
-$("#test-save").click(function(){
-  SendMessage("TestSave");
-});
-
-$("#test-load").click(function(){
-  SendMessage("TestLoad");
+$("input").keypress(function(e){
+  if(e.which == 13){
+    $(".submit-button").trigger("click");
+  }
 });
 
 //////////////////////////////////////////
