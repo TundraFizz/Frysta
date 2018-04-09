@@ -28,16 +28,41 @@ console.log(`VERSION : |${autoUpdater.currentVersion}|`);
 const server = "https://fizz.gg/";
 autoUpdater.autoDownload = false;
 autoUpdater.setFeedURL(server);
+
+// Silence console logging for the autoUpdater
+autoUpdater.logger.info  = function(m){}
+autoUpdater.logger.warn  = function(m){}
+autoUpdater.logger.error = function(m){}
+autoUpdater.logger.debug = function(m){}
+
+autoUpdater.logger.error = function(msg){
+  if(msg.indexOf("Cannot parse update info from latest.yml") >=0){
+    console.log("========== ERROR ==========");
+    console.log("Could not get latest.yml from the server");
+    console.log();
+  }else if(msg.indexOf("status 404: Not Found") >=0){
+    console.log("========== ERROR ==========");
+    console.log("latest.yml pointed to a file that doesn't exist");
+    console.log();
+  }
+}
+
 // autoUpdater.checkForUpdates();
 
 autoUpdater.on("update-available", (info) => {
   // If there's an update available, download it. But do not
   // automatically install it since I'll let the user decide
   // when they want to exit and install the update.
+  console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+  console.log("update-available");
+  console.log(info);
+
   autoUpdater.downloadUpdate();
 });
 
 autoUpdater.on("update-not-available", () => {
+  console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+  console.log("update-not-available");
 });
 
 autoUpdater.on("update-downloaded", () => {
@@ -315,10 +340,27 @@ function UpdateManager(data){
   data = JSON.parse(data);
   var text = data["text"];
 
-  if(text == "Check for updates")
-    autoUpdater.checkForUpdates();
-  else if(text == "Install update!")
+  if(text == "Check for updates"){
+    autoUpdater.checkForUpdates()
+    .then((res) => {
+      console.log("============================================");
+      console.log(res);
+      // { versionInfo: { version: '0.2.0', files: [ [Object] ] },
+      // updateInfo: { version: '0.2.0', files: [ [Object] ] },
+      // cancellationToken:
+      //  CancellationToken {
+      //    domain: null,
+      //    _events: {},
+      //    _eventsCount: 0,
+      //    _maxListeners: undefined,
+      //    parentCancelHandler: null,
+      //    _parent: null,
+      //    _cancelled: false },
+      // downloadPromise: null }
+    });
+  }else if(text == "Install update!"){
     autoUpdater.quitAndInstall();
+  }
 }
 
 /////////////////////////////
