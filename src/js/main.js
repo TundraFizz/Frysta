@@ -135,11 +135,11 @@ $(".menu-button").hover(function(){
 
 function SubmitLogin(username, password){
   if(username.length == 0 && password.length == 0)
-    ShowSubmitMessage("Username/password fields are empty", true);
+    ShowSubmitMessage("Username/password fields are empty", "red");
   else if(username.length == 0)
-    ShowSubmitMessage("Username field is empty", true);
+    ShowSubmitMessage("Username field is empty", "red");
   else if(password.length == 0)
-    ShowSubmitMessage("Password field is empty", true);
+    ShowSubmitMessage("Password field is empty", "red");
   else{
     AnimateSubmitButtonToLoading("#app-1 .submit-container").then(() => {
       SendMessage("Login", {
@@ -150,22 +150,36 @@ function SubmitLogin(username, password){
   }
 }
 
-function SubmitCreateAccount(email, username, password){
-  if(email.length == 0 || username.length == 0 || password.length == 0){
-    ShowSubmitMessage("All fields must be filled in", true);
+function SubmitCreateAccount(email, username, password, passwordConfirm){
+  if(email.length == 0 || username.length == 0 || password.length == 0 || passwordConfirm.length == 0){
+    ShowSubmitMessage("All fields must be filled in", "red");
   }else if(false){
     // Check if email address is valid
-    ShowSubmitMessage("Email address isn't valid", true);
+    ShowSubmitMessage("Email address isn't valid", "red");
   }else if(username.length < 3){
-    ShowSubmitMessage("Username must be at least three characters", true);
+    ShowSubmitMessage("Username must be at least three characters", "red");
   }else if(password.length < 6){
-    ShowSubmitMessage("Password must be at least six characters", true);
+    ShowSubmitMessage("Password must be at least six characters", "red");
+  }else if(password != passwordConfirm){
+    ShowSubmitMessage("Passwords do not match", "red");
   }else{
     AnimateSubmitButtonToLoading("#app-1 .submit-container").then(() => {
       SendMessage("CreateAccount", {
         "email"   : email,
         "username": username,
         "password": password
+      });
+    });
+  }
+}
+
+function SubmitForgotPassword(email){
+  if(email.length == 0){
+    ShowSubmitMessage("Email address isn't valid", "red");
+  }else{
+    AnimateSubmitButtonToLoading("#app-1 .submit-container").then(() => {
+      SendMessage("ForgotPassword", {
+        "email": email
       });
     });
   }
@@ -230,49 +244,89 @@ function AnimateLoadingToOkIcon(app){
 
 // App 1
 function MenuButtonLogin(){
+  $("[input-field='username']").stop();
+  $("[input-field='password']").stop();
+
+  $("[input-field='username']").css("display", "block");
+  $("[input-field='password']").css("display", "block");
+
   $("[input-field='email']").animate({
+    "top": "4px",
     "opacity": "0"
   }, {duration: 250, queue: false, complete: function(){
     $("[input-field='email']").css("display", "none");
   }});
 
+  $("[input-field='username']").animate({
+    "top": "22px",
+    "opacity": "1"
+  }, {duration: 250, queue: false});
+
+  $("[input-field='password']").animate({
+    "top": "65px",
+    "opacity": "1"
+  }, {duration: 250, queue: false});
+
   $("[input-field='password-confirm']").animate({
+    "top": "82px",
     "opacity": "0"
   }, {duration: 250, queue: false, complete: function(){
     $("[input-field='password-confirm']").css("display", "none");
   }});
-
-  $("[input-field='username']").animate({
-    "top": "22px"
-  }, {duration: 250, queue: false});
-
-  $("[input-field='password']").animate({
-    "top": "65px"
-  }, {duration: 250, queue: false});
 }
 
 function MenuButtonCreateAccount(){
   $("[input-field='email']").stop();
-  $("[input-field='email']").css("display", "block");
-
+  $("[input-field='username']").stop();
+  $("[input-field='password']").stop();
   $("[input-field='password-confirm']").stop();
+
+  $("[input-field='email']").css("display", "block");
+  $("[input-field='username']").css("display", "block");
+  $("[input-field='password']").css("display", "block");
   $("[input-field='password-confirm']").css("display", "block");
 
   $("[input-field='email']").animate({
+    "top": "4px",
     "opacity": "1"
   }, {duration: 250, queue: false});
 
   $("[input-field='username']").animate({
-    "top": "30px"
+    "top": "30px",
+    "opacity": "1"
   }, {duration: 250, queue: false});
 
   $("[input-field='password']").animate({
-    "top": "56px"
+    "top": "56px",
+    "opacity": "1"
   }, {duration: 250, queue: false});
 
   $("[input-field='password-confirm']").animate({
     "top": "82px",
     "opacity": "1"
+  }, {duration: 250, queue: false});
+}
+
+function MenuButtonForgotPassword(){
+  $("[input-field='email']").stop();
+
+  $("[input-field='email']").css("display", "block");
+
+  $("[input-field='email']").animate({
+    "opacity": "1",
+    "top": "43px"
+  }, {duration: 250, queue: false});
+
+  $("[input-field='username']").animate({
+    "opacity": "0"
+  }, {duration: 250, queue: false});
+
+  $("[input-field='password']").animate({
+    "opacity": "0"
+  }, {duration: 250, queue: false});
+
+  $("[input-field='password-confirm']").animate({
+    "opacity": "0"
   }, {duration: 250, queue: false});
 }
 
@@ -299,15 +353,18 @@ function MenuButtonAbout(){
 
 // Submit button functions (1/2)
 function SubmitApp1(){
-  var selection = $($(".menu-button[active='true']", "#app-1")[0]).text();
-  var email     = $("input[name='email']"   , "#app-1").val();
-  var username  = $("input[name='username']", "#app-1").val();
-  var password  = $("input[name='password']", "#app-1").val();
+  var selection       = $($(".menu-button[active='true']",  "#app-1")[0]).text();
+  var email           = $("input[name='email']"   ,         "#app-1").val();
+  var username        = $("input[name='username']",         "#app-1").val();
+  var password        = $("input[name='password']",         "#app-1").val();
+  var passwordConfirm = $("input[name='password-confirm']", "#app-1").val();
 
   if(selection == "Login")
     SubmitLogin(username, password);
   else if(selection == "Create Account")
-    SubmitCreateAccount(email, username, password);
+    SubmitCreateAccount(email, username, password, passwordConfirm);
+  else if(selection == "Forgot Password")
+    SubmitForgotPassword(email);
 }
 
 // Submit button functions (2/2)
@@ -386,18 +443,14 @@ $(".misc-button").mouseup(function(){
   }, 50);
 });
 
-function ShowSubmitMessage(msg, err){
-  // The error code may come from an external source which could
-  // means it enters as a string. If so, correct it here
-  if     (err == "true")  err = true;
-  else if(err == "false") err = false;
-
-  $(".message").text(msg);
+function ShowSubmitMessage(msg, color){
+  // Possible colors are: red, green, orange
   $(".message").removeClass("alert-red");
   $(".message").removeClass("alert-green");
-
-  if     (err == true)  $(".message").addClass("alert-red");
-  else if(err == false) $(".message").addClass("alert-green");
+  $(".message").removeClass("alert-orange");
+  console.log(color);
+  $(".message").addClass(`alert-${color}`);
+  $(".message").text(msg);
 
   $(".message").animate({
     "opacity": "1"
@@ -412,31 +465,6 @@ $(".message").click(function(){
   }, 100);
 });
 
-function AccountWasCreated(data){
-  var msg = data["msg"];
-  var err = data["err"];
-  ShowSubmitMessage(msg, err);
-  AnimateLoadingToSubmitButton("#app-1 .submit-container");
-}
-
-function LoginPageToMainApp(data){
-  var msg = data["msg"];
-  var err = data["err"];
-  ShowSubmitMessage(msg, err);
-
-  if(err == "false"){
-    AnimateLoadingToOkIcon("#app-1 .submit-container");
-    setTimeout(TransitionToMain, 1000);
-  }else if(err == "true"){
-    AnimateLoadingToSubmitButton("#app-1 .submit-container");
-  }
-}
-
-function TransitionToMain(){
-  $("#app-1").css("display", "none");
-  $("#app-2").css("display", "block");
-}
-
 // Receiving a message from main.js
 ipc.on("message", (event, msg) => {
   var func = msg["function"];
@@ -448,13 +476,41 @@ ipc.on("message", (event, msg) => {
   if(typeof data != "object")
     data = JSON.parse(data);
 
-  if(func == "AccountWasCreated")   AccountWasCreated(data);
-  if(func == "LoginPageToMainApp")  LoginPageToMainApp(data);
-  if(func == "PlaySfxNotification") PlaySfxNotification(data);
-  if(func == "PlaySfxError")        PlaySfxError(data);
-  if(func == "GetOptions")          GetOptions(data);
-  if(func == "DownloadProgress")    DownloadProgress(data);
+  if     (func == "LoginPageToMainApp")     LoginPageToMainApp(data);
+  else if(func == "AccountWasCreated")      AccountWasCreated(data);
+  else if(func == "ForgotPasswordResponse") ForgotPasswordResponse(data);
+  else if(func == "PlaySfxNotification")    PlaySfxNotification(data);
+  else if(func == "PlaySfxError")           PlaySfxError(data);
+  else if(func == "GetOptions")             GetOptions(data);
+  else if(func == "DownloadProgress")       DownloadProgress(data);
 });
+
+function LoginPageToMainApp(data){
+  var msg   = data["msg"];
+  var color = data["color"];
+  ShowSubmitMessage(msg, color);
+
+  if(err == "false"){
+    AnimateLoadingToOkIcon("#app-1 .submit-container");
+    setTimeout(TransitionToMain, 1000);
+  }else if(err == "true"){
+    AnimateLoadingToSubmitButton("#app-1 .submit-container");
+  }
+}
+
+function AccountWasCreated(data){
+  var msg   = data["msg"];
+  var color = data["color"];
+  ShowSubmitMessage(msg, color);
+  AnimateLoadingToSubmitButton("#app-1 .submit-container");
+}
+
+function ForgotPasswordResponse(data){
+  var msg   = data["msg"];
+  var color = data["color"];
+  ShowSubmitMessage(msg, color);
+  AnimateLoadingToSubmitButton("#app-1 .submit-container");
+}
 
 function PlaySfxNotification(){
   var done = false;
@@ -524,6 +580,11 @@ function DownloadProgress(data){
     percent = "Install update!";
 
   $(updateButton).text(percent);
+}
+
+function TransitionToMain(){
+  $("#app-1").css("display", "none");
+  $("#app-2").css("display", "block");
 }
 
 // Determine the width and starting position of the menu line forground

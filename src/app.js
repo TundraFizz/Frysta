@@ -236,8 +236,9 @@ app.on("message", (msg) => {
   if     (func == "TakeScreenshotButton") TakeScreenshotButton(data);
   else if(func == "Minimize")             Minimize            (data);
   else if(func == "Quit")                 Quit                (data);
-  else if(func == "CreateAccount")        CreateAccount       (data);
   else if(func == "Login")                Login               (data);
+  else if(func == "CreateAccount")        CreateAccount       (data);
+  else if(func == "ForgotPassword")       ForgotPassword      (data);
   else if(func == "SetOption")            SetOption           (data);
   else if(func == "TestSave")             TestSave            (data);
   else if(func == "TestLoad")             TestLoad            (data);
@@ -269,6 +270,15 @@ function Quit(){
   win.close();
 }
 
+function Login(data){
+  EncryptData(data)
+  .then((data) => {
+    request.post({url:"https://fizz.gg/login", form: {"data":data}}, function(err, res, msg){
+      SendMessage("LoginPageToMainApp", msg);
+    });
+  });
+}
+
 function CreateAccount(data){
   EncryptData(data)
   .then((data) => {
@@ -278,11 +288,11 @@ function CreateAccount(data){
   });
 }
 
-function Login(data){
+function ForgotPassword(data){
   EncryptData(data)
   .then((data) => {
-    request.post({url:"https://fizz.gg/login", form: {"data":data}}, function(err, res, msg){
-      SendMessage("LoginPageToMainApp", msg);
+    request.post({url:"https://fizz.gg/forgot-password", form: {"data":data}}, function(err, res, msg){
+      SendMessage("ForgotPasswordResponse", msg);
     });
   });
 }

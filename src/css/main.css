@@ -203,6 +203,7 @@ body {
 .message {
   position: relative;
   display: inline-block;
+  max-width: 90%;
   border-radius: 4px;
   cursor: default;
   line-height: 18px;
@@ -221,6 +222,12 @@ body {
   background-color: #630000;
   border: #900000;
   box-shadow: 0px 0px 5px 0px #ff4040;
+}
+
+.alert-orange {
+  background-color: #8a3a0a;
+  border: #905d00;
+  box-shadow: 0px 0px 5px 0px #ffa140;
 }
 
 .spacer {
