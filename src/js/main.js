@@ -490,10 +490,10 @@ function LoginPageToMainApp(data){
   var color = data["color"];
   ShowSubmitMessage(msg, color);
 
-  if(err == "false"){
+  if(color == "green"){
     AnimateLoadingToOkIcon("#app-1 .submit-container");
     setTimeout(TransitionToMain, 1000);
-  }else if(err == "true"){
+  }else if(color == "red"){
     AnimateLoadingToSubmitButton("#app-1 .submit-container");
   }
 }
