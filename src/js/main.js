@@ -382,6 +382,10 @@ function UpdateManager(self){
   SendMessage("UpdateManager", data);
 }
 
+function UpdateFrysta(){
+  SendMessage("UpdateFrysta");
+}
+
 $(".submit-button").click(function(){
   if($(".submit-button").attr("busy") != undefined)
     return;
@@ -415,7 +419,10 @@ $(".submit-button").mouseup(function(){
   }, 50);
 });
 
-// TODO: Merge .submit-button with .misc-button
+// TODO: Merge these three buttons:
+// .submit-button
+// .misc-button
+// .update-button
 
 $(".misc-button").click(function(){
   window[$(this).attr("function")](this);
@@ -440,6 +447,32 @@ $(".misc-button").mousedown(function(){
 $(".misc-button").mouseup(function(){
   $(this).animate({
     "box-shadow": "0px 0px 5px 0px #5fb9ff"
+  }, 50);
+});
+
+$(".update-button").click(function(){
+  window[$(this).attr("function")](this);
+});
+
+$(".update-button").hover(function(){
+  $(this).animate({
+    "box-shadow": "0px 0px 10px 0px #24dc48"
+  }, 50);
+}, function(){
+  $(this).animate({
+    "box-shadow": "0px 0px 5px 0px #24dc48"
+  }, 50);
+});
+
+$(".update-button").mousedown(function(){
+  $(this).animate({
+    "box-shadow": "0px 0px 0px 0px #24dc48"
+  }, 50);
+});
+
+$(".update-button").mouseup(function(){
+  $(this).animate({
+    "box-shadow": "0px 0px 5px 0px #24dc48"
   }, 50);
 });
 
