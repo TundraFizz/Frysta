@@ -13,7 +13,8 @@
     "jquery": "latest",
     "nan": "latest",
     "request": "^2.85.0",
-    "electron-updater": "^2.21.4"
+    "electron-updater": "^2.21.4",
+    "auto-launch": "latest"
   },
   "devDependencies": {
     "electron": "latest",
