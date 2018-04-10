@@ -321,7 +321,7 @@ body {
 
 .option-text {
   text-align: left;
-  margin-left: 6px;
+  margin: 0px 6px;
 }
 
 .local-copy-dir {
@@ -329,6 +329,12 @@ body {
   left: 32px;
   text-align: left;
   margin-left: 6px;
+}
+
+.open-in-external-browser {
+  display: inline;
+  color: #36a1ff;
+  cursor: pointer;
 }
 
 /*********************/
