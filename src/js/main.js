@@ -593,7 +593,6 @@ function GetOptions(data){
   $("[option='CopyUrlOnSuccess']").attr("active", options["CopyUrlOnSuccess"]);
   $("[option='SfxOnSuccess']"    ).attr("active", options["SfxOnSuccess"]    );
   $("[option='SfxOnFailure']"    ).attr("active", options["SfxOnFailure"]    );
-  // $("[option='LocalCopy']"       ).attr("active", options["LocalCopy"]       );
 
   // Special case for LocalCopy since it's more complex than a simple on/off
   if(options["LocalCopy"] == "false"){

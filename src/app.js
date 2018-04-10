@@ -56,21 +56,12 @@ autoUpdater.logger.error = function(msg){
   }
 }
 
-autoUpdater.on("update-available", (info) => {
+autoUpdater.on("update-not-available", (info) => {});
+autoUpdater.on("update-available",     (info) => {
   // If there's an update available, download it. But do not
   // automatically install it since I'll let the user decide
   // when they want to exit and install the update.
-
-  // console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-  // console.log("update-available");
-  // console.log(info);
-
   autoUpdater.downloadUpdate();
-});
-
-autoUpdater.on("update-not-available", () => {console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-  // console.log("update-not-available");
-  //
 });
 
 autoUpdater.on("update-downloaded", () => {
@@ -86,11 +77,13 @@ autoUpdater.on("update-downloaded", () => {
 });
 
 autoUpdater.on("download-progress", (ev, progressObj) => {
+  /*
   console.log(ev["percent"]);
   var data = {
     "percent": ev["percent"]
   }
   SendMessage("DownloadProgress", data);
+  */
 });
 
 autoUpdater.checkForUpdates();
@@ -104,7 +97,9 @@ var options = {
   "CopyUrlOnSuccess": "true",
   "SfxOnSuccess"    : "true",
   "SfxOnFailure"    : "true",
-  "LocalCopy"       : "false"
+  "LocalCopy"       : "false",
+  "Username"        : "",
+  "LoginToken"      : ""
 };
 
 storage.setDataPath(__dirname);
@@ -177,7 +172,7 @@ function createWindow(){
     // }
   ]);
 
-  tray.setToolTip("App icon tooltip!");
+  tray.setToolTip("Frysta");
   tray.setContextMenu(contextMenu);
 
   tray.on("click", function(){
@@ -196,27 +191,32 @@ function createWindow(){
   });
 
   win.once("ready-to-show", function(){
-
     storage.get("config", function(error, data){
       if("LaunchOnStartup"  in data) options["LaunchOnStartup"]  = data["LaunchOnStartup"];
       if("CopyUrlOnSuccess" in data) options["CopyUrlOnSuccess"] = data["CopyUrlOnSuccess"];
       if("SfxOnSuccess"     in data) options["SfxOnSuccess"]     = data["SfxOnSuccess"];
       if("SfxOnFailure"     in data) options["SfxOnFailure"]     = data["SfxOnFailure"];
       if("LocalCopy"        in data) options["LocalCopy"]        = data["LocalCopy"];
+      if("Username"         in data) options["Username"]         = data["Username"];
+      if("LoginToken"       in data) options["LoginToken"]       = data["LoginToken"];
 
       if     (options["LaunchOnStartup"] == "true")  frystaAutoLaunch.enable();
       else if(options["LaunchOnStartup"] == "false") frystaAutoLaunch.disable();
 
       SendMessage("GetOptions", options);
       storage.set("config", options, function(error){});
+
+      // If a username and login token is defined in the options, attempt to login automatically
+      if(options["Username"] && options["LoginToken"]){
+        var data = {
+          "username"  : options["Username"],
+          "loginToken": options["LoginToken"]
+        };
+
+        data = JSON.stringify(data);
+        LoginWithToken(data);
+      }
     });
-
-    var loggedIn = false; // DEBUG VARIABLE
-
-    if(loggedIn)
-      win.hide();
-    else
-      win.show();
   });
 
   // Load main page of the application
@@ -325,6 +325,36 @@ function Login(data){
   EncryptData(data)
   .then((data) => {
     request.post({url:"https://fizz.gg/login", form: {"data":data}}, function(err, res, msg){
+      // If this login attempt was successful, the server will have given us a login token
+      // that should should be stored in the config file. This token is used to automatically
+      // login to Frysta whenever it's launched so that the user doesn't need to supply
+      // their username and password every single time.
+      var username   = JSON.parse(msg)["username"];
+      var loginToken = JSON.parse(msg)["loginToken"];
+
+      if(typeof loginToken != "undefined"){
+        options["Username"]   = username;
+        options["LoginToken"] = loginToken;
+        storage.set("config", options, function(error){});
+      }
+
+      SendMessage("LoginPageToMainApp", msg);
+    });
+  });
+}
+
+function LoginWithToken(data){
+  EncryptData(data)
+  .then((data) => {
+    request.post({url:"https://fizz.gg/login-with-token", form: {"data":data}}, function(err, res, msg){
+      // If we can sucesfully log in automatically on startup by using the token,
+      // make sure that Frysta is hidden. If logging in via token failed,
+      // show the window so that the user knows.
+      var color = JSON.parse(msg)["color"];
+
+      if(color == "green")    win.hide();
+      else if(color == "red") win.show();
+
       SendMessage("LoginPageToMainApp", msg);
     });
   });
@@ -520,6 +550,5 @@ function SendMessage(func, data=null){
   win.webContents.send("message", {
     "function": func,
     "data"    : data
-    // "data"    : JSON.stringify(data)
   });
 }
