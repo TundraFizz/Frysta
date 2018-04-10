@@ -1,7 +1,8 @@
-var ipc         = require("electron").ipcRenderer;
-var EmitMessage = require("electron").remote.app.emit;
-var dialog      = require("electron").remote.dialog;
-var autoUpdater = require("electron-updater").remote;
+var versionNumber = require("electron").remote.app.getVersion();
+var ipc           = require("electron").ipcRenderer;
+var EmitMessage   = require("electron").remote.app.emit;
+var dialog        = require("electron").remote.dialog;
+var autoUpdater   = require("electron-updater").remote;
 
 var options = {};
 
@@ -672,3 +673,5 @@ $("input").keypress(function(e){
 //////////////////////////////////////////
 $(".submit-button").attr("ready", "true");
 MenuButtonGeneral();
+
+$(".version-number").text(versionNumber);
