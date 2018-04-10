@@ -2,6 +2,7 @@ var versionNumber = require("electron").remote.app.getVersion();
 var ipc           = require("electron").ipcRenderer;
 var EmitMessage   = require("electron").remote.app.emit;
 var dialog        = require("electron").remote.dialog;
+var shell         = require("electron").remote.shell;
 var autoUpdater   = require("electron-updater").remote;
 
 var options = {};
@@ -666,6 +667,10 @@ $("input").keypress(function(e){
   if(e.which == 13){
     $(".submit-button").trigger("click");
   }
+});
+
+$(".open-in-external-browser").click(function(){
+  shell.openExternal($(this).attr("url"));
 });
 
 //////////////////////////////////////////
