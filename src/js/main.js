@@ -483,7 +483,7 @@ function ShowSubmitMessage(msg, color){
   $(".message").removeClass("alert-red");
   $(".message").removeClass("alert-green");
   $(".message").removeClass("alert-orange");
-  console.log(color);
+
   $(".message").addClass(`alert-${color}`);
   $(".message").text(msg);
 
