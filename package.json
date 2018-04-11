@@ -1,7 +1,7 @@
 {
   "name": "frysta",
   "version": "0.1.0",
-  "author": "Leif Coleman",
+  "author": "Leif Coleman <coleman.leif@gmail.com>",
   "description": "Frysta",
   "main": "src/app.js",
   "license": "ISC",
@@ -38,6 +38,9 @@
     "win": {
       "target": "nsis-web",
       "icon": "make/icon.ico"
+    },
+    "linux": {
+      "target": "deb"
     },
     "nsis": {
       "installerIcon": "make/icon.ico",
