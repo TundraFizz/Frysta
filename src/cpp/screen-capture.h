@@ -67,9 +67,9 @@ class MyAsyncWorker: public Nan::AsyncWorker{
   std::string fileNamePng;
   v8::Local<v8::String> fileNamePngV8;
 
-  bool itIsTime;
+  bool takeScreenshot;
 
-  int programState;
+  int programState; // This variable isn't really used
   // 0 = Idle
   // 1 = Mask active, waiting for user to select screen region
   // 2 = Generating file
