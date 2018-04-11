@@ -30,7 +30,9 @@ MyAsyncWorker::MyAsyncWorker(Nan::Callback *callback) : Nan::AsyncWorker(callbac
   fileNameBmp = "temp.bmp";
   fileNamePng = "temp.png";
 
-  programState = 0;
+  takeScreenshot = true;
+
+  // programState = 0;
 }
 
 void MyAsyncWorker::Execute(){
@@ -131,7 +133,10 @@ void MyAsyncWorker::Execute(){
 }
 
 void MyAsyncWorker::HandleOKCallback(){
-  fileNamePngV8 = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), fileNamePng.c_str());
+  if(takeScreenshot)
+    fileNamePngV8 = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), fileNamePng.c_str());
+  else
+    fileNamePngV8 = v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), "null");
 
   v8::Local<v8::Value> arguments[] = {
     fileNamePngV8
@@ -390,9 +395,6 @@ LRESULT MyAsyncWorker::WindowProcTop(HWND hwnd, UINT msg, WPARAM wParam, LPARAM 
       SendMessage(hwndBot, WM_CLOSE, 0, NULL);
       SendMessage(hwndTop, WM_CLOSE, 0, NULL);
 
-      // CloseWindow(hwndBot);
-      // CloseWindow(hwndTop);
-
       int width  = abs(selectX1 - selectX2);
       int height = abs(selectY1 - selectY2);
 
@@ -408,9 +410,22 @@ LRESULT MyAsyncWorker::WindowProcTop(HWND hwnd, UINT msg, WPARAM wParam, LPARAM 
       smallestX += smallestLeft;
       smallestY += smallestTop;
 
+      takeScreenshot = true;
+
       ScreenCapturePart(smallestX, smallestY, width, height);
       ConvertBmpToPng();
+      break;
+    }
 
+    case WM_KEYDOWN:{
+      switch(wParam){
+        case VK_ESCAPE:{
+          takeScreenshot = false;
+          SendMessage(hwndBot, WM_CLOSE, 0, NULL);
+          SendMessage(hwndTop, WM_CLOSE, 0, NULL);
+          break;
+        }
+      }
       break;
     }
 
