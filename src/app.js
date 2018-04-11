@@ -10,8 +10,8 @@ var {autoUpdater} = require("electron-updater");
 var {app, BrowserWindow, Tray, Menu, globalShortcut, ipcMain, clipboard, shell, dialog} = require("electron");
 
 var screenCapture; // C++ module for screen capturing
+// try{screenCapture = require("./screen-capture.node");}               catch(err){}
 try{screenCapture = require("../build/Release/screen-capture.node");}catch(err){}
-try{screenCapture = require("./screen-capture.node");}               catch(err){}
 
 var frystaAutoLaunch = new autoLaunch({
   "name"    : "Frysta",
@@ -31,6 +31,7 @@ var win  = null;
 var tray = null;
 var quit = false;
 var clickedOnButton = null;
+var screenshotMaskActive = false;
 var lastUploadedScreenshotUrl = null;
 var baloonUpdateFrysta = false;
 var server = "https://fizz.gg/";
@@ -440,7 +441,6 @@ function UploadImageToServer(result){
   };
 
   request.post({url:"https://fizz.gg/send-screenshot", formData: formData, json: true}, function(err, res, body){
-
     if(err){
       if(err["code"] == "ENOTFOUND"){
         console.log("Client was unable to communicate with the server");
@@ -506,17 +506,33 @@ function CheckIfSavePathExists(data){return new Promise((resolve) => {
 })}
 
 function TakeScreenshot(){
+  // Do not execute this function if we're already currently taking a screenshot
+  if(screenshotMaskActive)
+    return;
+  else
+    screenshotMaskActive = false;
+
+  // The screenshot mask will now be active, so I don't want to allow
+  // another screenshot to be taken while already in progress of taking one
+  screenshotMaskActive = true;
+
   win.hide();
-  // win.minimize(); // I don't think I need this anymore
 
   screenCapture.TakeScreenshot(function(result){
-    // If the user clicked on the "Screenshot" button, then we'll display the window again
+    // The C++ function has resolved, completing the callback
+    // It's now safe to set set the screenshot mask to be inactive
+    screenshotMaskActive = false;
+
+    // If the user clicked on the "Screenshot" button, then the window will be displayed again
     if(clickedOnButton) win.show();
     else                win.hide();
 
+    // The C++ function returns the result as "null" if the user hit Escape to cancel a screenshot
+    if(result == "null")
+      return;
+
     // Check to see if the path to save a local copy of the image exists
     // If the path doesn't exist, give the user an error
-
     if(options["LocalCopy"] != "false"){
       CheckIfSavePathExists()
       .then((err) => {
