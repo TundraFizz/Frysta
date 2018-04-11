@@ -10,8 +10,8 @@ var {autoUpdater} = require("electron-updater");
 var {app, BrowserWindow, Tray, Menu, globalShortcut, ipcMain, clipboard, shell, dialog} = require("electron");
 
 var screenCapture; // C++ module for screen capturing
-// try{screenCapture = require("./screen-capture.node");}               catch(err){}
-try{screenCapture = require("../build/Release/screen-capture.node");}catch(err){}
+try{screenCapture = require("./screen-capture.node");}               catch(err){}
+// try{screenCapture = require("../build/Release/screen-capture.node");}catch(err){}
 
 var frystaAutoLaunch = new autoLaunch({
   "name"    : "Frysta",
