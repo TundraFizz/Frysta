@@ -335,6 +335,12 @@ body {
   display: inline;
   color: #36a1ff;
   cursor: pointer;
+  text-shadow: 0;
+  transition: text-shadow 0.15s ease-in-out;
+}
+
+.open-in-external-browser:hover {
+  text-shadow: 0px 0px 8px #36a1ff, 0px 0px 8px #36a1ff;
 }
 
 /*********************/
