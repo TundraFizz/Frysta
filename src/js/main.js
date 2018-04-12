@@ -245,9 +245,24 @@ function AnimateLoadingToOkIcon(app){
 }
 
 function Logout(){
+  // Switch to the first display of the application
   $("#app-1").css("display", "block");
   $("#app-2").css("display", "none");
+
+  // Reset the login page
   $(".message").css("opacity", "0");
+
+  var app = $("#app-1")[0];
+  $(".submit-button", app).css("display", "block");
+  $(".submit-button", app).css("opacity", "1");
+  $(".submit-button", app).css("width", "54px");
+  $(".submit-button", app).css("border-radius", "4px");
+  $(".submit-button > div", app).css("opacity", "1");
+
+  $(".loading-spinner", app).css("display", "none");
+  $(".loading-spinner", app).css("opacity", "0");
+  $(".loading-spinner", app).css("background-image", "url(img/loading.svg)");
+
   SendMessage("Logout");
 }
 
