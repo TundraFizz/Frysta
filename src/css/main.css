@@ -234,6 +234,7 @@ body {
   width: 24px;
   height: 24px;
   background-image: url(../img/loading.svg);
+  background-size: cover;
   opacity: 0;
   display: none;
 }
