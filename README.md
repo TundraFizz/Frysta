@@ -21,6 +21,21 @@ Generating installers
 npm run build
 ```
 
+## Installer and updater notes:
+
+To make it more convenient for Windows users to install and update Frysta, a regular NSIS package and an NSIS web package are built. Each release will contain three files:
+```
+Frysta-Setup.exe
+frysta-x.y.z-x64.nsis.7z
+frysta-x.y.z-win32-x64.exe
+```
+
+`Frysta-Setup.exe` is the compact web installer
+
+`frysta-x.y.z-x64.nsis.7z` is the application itself that'll be downloaded through the web installer
+
+`frysta-x.y.z-win32-x64.exe` is an NSIS one-click installer. While it technically can be downloaded and installed by the user, they should instead use the web installer due to the initial filesize being much smaller. This file is automatically downloaded through Frysta when it detects an update through the following URL: `https://fizz.gg/releases/win32-x64/latest.yml`
+
 ## Other notes:
 
 Frysta is an application that allows you to select regions of your computer screen which are then uploaded to a server. The image URL is copied to your clipboard to make the images easily shareable.
