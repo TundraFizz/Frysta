@@ -21,9 +21,6 @@ var frystaAutoLaunch = new autoLaunch({
 //////////////////////////////
 ///// CHECK FOR UPDATES! /////
 
-// console.log(`PLATFORM: |${process.platform}|`);
-// console.log(`VERSION : |${app.getVersion()}|`);
-
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 var win                       = null;
@@ -34,7 +31,14 @@ var quit                      = false;
 var loggedIn                  = false;
 var baloonUpdateFrysta        = false;
 var screenshotMaskActive      = false;
-var server                    = "https://fizz.gg/";
+var platformArch              = `${process.platform}-${process.arch}`;
+var server                    = `https://fizz.gg/releases/${platformArch}`;
+
+// List of platforms:
+// - win32 [Windows]
+//
+// List of architectures:
+// - x64 [64-bit]
 
 autoUpdater.autoDownload = false;
 autoUpdater.setFeedURL(server);
@@ -78,13 +82,11 @@ autoUpdater.on("update-downloaded", () => {
 });
 
 autoUpdater.on("download-progress", (ev, progressObj) => {
-  /*
-  console.log(ev["percent"]);
-  var data = {
-    "percent": ev["percent"]
-  }
-  SendMessage("DownloadProgress", data);
-  */
+  // console.log(ev["percent"]);
+  // var data = {
+  //   "percent": ev["percent"]
+  // }
+  // SendMessage("DownloadProgress", data);
 });
 
 autoUpdater.checkForUpdates();
