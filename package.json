@@ -36,13 +36,22 @@
     "productName": "Frysta",
     "copyright": "Leif Coleman",
     "win": {
-      "target": "nsis-web",
+      "target": ["nsis", "nsis-web"],
       "icon": "make/icon.ico"
     },
     "linux": {
       "target": "deb"
     },
     "nsis": {
+      "installerIcon": "make/icon.ico",
+      "uninstallerIcon": "make/icon.ico",
+      "uninstallDisplayName": "Frysta",
+      "oneClick": "false",
+      "allowToChangeInstallationDirectory": "true",
+      "installerHeader": "make/header.bmp",
+      "installerSidebar": "make/sidebar.bmp"
+    },
+    "nsisWeb": {
       "installerIcon": "make/icon.ico",
       "uninstallerIcon": "make/icon.ico",
       "uninstallDisplayName": "Frysta",
