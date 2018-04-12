@@ -50,16 +50,16 @@ openssl genrsa -out private.key 2048
 
 - [x] `npm run build`
 - [x] Collect these files in the "dist" directory:
-  1. `latest.yml`
-  2. `Frysta Setup x.y.z.exe`
-  3. `nsis-web/Frysta Web Setup x.y.z.exe`
-  4. `nsis-web/frysta-x.y.z-x64.nsis.7z`
+1. `latest.yml`
+2. `Frysta Setup x.y.z.exe`
+3. `nsis-web/Frysta Web Setup x.y.z.exe`
+4. `nsis-web/frysta-x.y.z-x64.nsis.7z`
 - [x] Rename file #2 to: `frysta-x.y.z-win32-x64.exe`
 - [x] Rename file #3 to: `Frysta-Setup.exe`
 - [x] Create a new Frysta release on GitHub:
-  1. Tag version: `x.y.z`
-  2. Release title: `Frysta vx.y.z`
-  3. Describe this release: `Whatever you want`
-  4. Upload files `#2`, `#3`, and `#4` (everything except `latest.yml`)
-  5. Publish release
+1. Tag version: `x.y.z`
+2. Release title: `Frysta vx.y.z`
+3. Describe this release: `Whatever you want`
+4. Upload files `#2`, `#3`, and `#4` (everything except `latest.yml`)
+5. Publish release
 - [x] Open `latest.yml` and replace the values of the `url` and `path` keys with the following line: `https://github.com/TundraFizz/Frysta/releases/download/vx.y.z/frysta-x.y.z-win32-x64.exe`
