@@ -32,7 +32,7 @@
     "build": "build"
   },
   "build": {
-    "appId": "mytestingid",
+    "appId": "8c25d59d-1ec7-4f79-9f07-6307daf915fd",
     "productName": "Frysta",
     "copyright": "Leif Coleman",
     "win": {
