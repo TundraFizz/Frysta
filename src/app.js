@@ -23,7 +23,6 @@ var frystaAutoLaunch = new autoLaunch({
 
 // console.log(`PLATFORM: |${process.platform}|`);
 // console.log(`VERSION : |${app.getVersion()}|`);
-// console.log(`VERSION : |${autoUpdater.currentVersion}|`);
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -205,7 +204,6 @@ function createWindow(){
       if     (options["LaunchOnStartup"] == "true")  frystaAutoLaunch.enable();
       else if(options["LaunchOnStartup"] == "false") frystaAutoLaunch.disable();
 
-      SendMessage("GetOptions", options);
       storage.set("config", options, function(error){});
 
       // If a username and login token is defined in the options, attempt to login automatically
@@ -285,10 +283,9 @@ app.on("message", (msg) => {
   else if(func == "CreateAccount")        CreateAccount       (data);
   else if(func == "RecoverAccount")       RecoverAccount      (data);
   else if(func == "SetOption")            SetOption           (data);
-  else if(func == "TestSave")             TestSave            (data);
-  else if(func == "TestLoad")             TestLoad            (data);
   else if(func == "UpdateManager")        UpdateManager       (data);
   else if(func == "UpdateFrysta")         UpdateFrysta        (data);
+  else if(func == "Logout")               Logout              (data);
 });
 
 function SetOption(data){
@@ -324,6 +321,8 @@ function Quit(){
 }
 
 function Login(data){
+  SendMessage("GetOptions", options);
+
   EncryptData(data)
   .then((data) => {
     request.post({url:"https://fizz.gg/login", form: {"data":data}}, function(err, res, msg){
@@ -349,6 +348,8 @@ function Login(data){
 }
 
 function LoginWithToken(data){
+  SendMessage("GetOptions", options);
+
   EncryptData(data)
   .then((data) => {
     request.post({url:"https://fizz.gg/login-with-token", form: {"data":data}}, function(err, res, msg){
@@ -416,8 +417,15 @@ function UpdateManager(data){
   }
 }
 
-function UpdateFrysta(){
+function UpdateFrysta(data){
   console.log("UpdateFrysta()");
+}
+
+function Logout(data){
+  // Upon logging out, remove the username and login token from the config file
+  options["Username"]   = "";
+  options["LoginToken"] = "";
+  storage.set("config", options, function(error){});
 }
 
 /////////////////////////////

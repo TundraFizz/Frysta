@@ -244,6 +244,13 @@ function AnimateLoadingToOkIcon(app){
   $(".loading-spinner", app).css("background-size",  "cover");
 }
 
+function Logout(){
+  $("#app-1").css("display", "block");
+  $("#app-2").css("display", "none");
+  $(".message").css("opacity", "0");
+  SendMessage("Logout");
+}
+
 // App 1
 function MenuButtonLogin(){
   $("[input-field='username']").stop();
@@ -425,6 +432,7 @@ $(".submit-button").mouseup(function(){
 // .submit-button
 // .misc-button
 // .update-button
+// .logout-button
 
 $(".misc-button").click(function(){
   window[$(this).attr("function")](this);
@@ -478,6 +486,32 @@ $(".update-button").mouseup(function(){
   }, 50);
 });
 
+$(".logout-button").click(function(){
+  window[$(this).attr("function")](this);
+});
+
+$(".logout-button").hover(function(){
+  $(this).animate({
+    "box-shadow": "0px 0px 10px 0px #ff0000"
+  }, 50);
+}, function(){
+  $(this).animate({
+    "box-shadow": "0px 0px 5px 0px #ff0000"
+  }, 50);
+});
+
+$(".logout-button").mousedown(function(){
+  $(this).animate({
+    "box-shadow": "0px 0px 0px 0px #ff0000"
+  }, 50);
+});
+
+$(".logout-button").mouseup(function(){
+  $(this).animate({
+    "box-shadow": "0px 0px 5px 0px #ff0000"
+  }, 50);
+});
+
 function ShowSubmitMessage(msg, color){
   // Possible colors are: red, green, orange
   $(".message").removeClass("alert-red");
@@ -500,7 +534,7 @@ $(".message").click(function(){
   }, 100);
 });
 
-// Receiving a message from main.js
+// Receiving a message from app.js
 ipc.on("message", (event, msg) => {
   var func = msg["function"];
   var data = msg["data"];
