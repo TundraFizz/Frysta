@@ -128,7 +128,7 @@ function createWindow(){
     "icon"           : path.join(__dirname, "img/icon64x64.png")
   });
 
-  win.toggleDevTools();
+  // win.toggleDevTools();
 
   win.setMenu(null);
 
@@ -215,6 +215,9 @@ function createWindow(){
 
         data = JSON.stringify(data);
         LoginWithToken(data);
+      }else{
+        // Show the window to the user if there's no username/token to login automatically
+        win.show();
       }
     });
   });
@@ -361,8 +364,7 @@ function LoginWithToken(data){
       if(color == "green"){
         loggedIn = true;
         win.hide();
-      }
-      else if(color == "red"){
+      }else if(color == "red"){
         loggedIn = false;
         win.show();
       }
