@@ -27,14 +27,15 @@ var frystaAutoLaunch = new autoLaunch({
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
-var win  = null;
-var tray = null;
-var quit = false;
-var clickedOnButton = null;
-var screenshotMaskActive = false;
+var win                       = null;
+var tray                      = null;
+var clickedOnButton           = null;
 var lastUploadedScreenshotUrl = null;
-var baloonUpdateFrysta = false;
-var server = "https://fizz.gg/";
+var quit                      = false;
+var loggedIn                  = false;
+var baloonUpdateFrysta        = false;
+var screenshotMaskActive      = false;
+var server                    = "https://fizz.gg/";
 
 autoUpdater.autoDownload = false;
 autoUpdater.setFeedURL(server);
@@ -334,9 +335,12 @@ function Login(data){
       var loginToken = JSON.parse(msg)["loginToken"];
 
       if(typeof loginToken != "undefined"){
+        loggedIn = true;
         options["Username"]   = username;
         options["LoginToken"] = loginToken;
         storage.set("config", options, function(error){});
+      }else{
+        loggedIn = false;
       }
 
       SendMessage("LoginPageToMainApp", msg);
@@ -353,8 +357,14 @@ function LoginWithToken(data){
       // show the window so that the user knows.
       var color = JSON.parse(msg)["color"];
 
-      if(color == "green")    win.hide();
-      else if(color == "red") win.show();
+      if(color == "green"){
+        loggedIn = true;
+        win.hide();
+      }
+      else if(color == "red"){
+        loggedIn = false;
+        win.show();
+      }
 
       SendMessage("LoginPageToMainApp", msg);
     });
@@ -506,8 +516,8 @@ function CheckIfSavePathExists(data){return new Promise((resolve) => {
 })}
 
 function TakeScreenshot(){
-  // Do not execute this function if we're already currently taking a screenshot
-  if(screenshotMaskActive)
+  // Do not execute this function if already taking a screenshot or not logged in
+  if(screenshotMaskActive || !loggedIn)
     return;
   else
     screenshotMaskActive = false;
