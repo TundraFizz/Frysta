@@ -422,10 +422,21 @@ function UpdateFrysta(data){
 }
 
 function Logout(data){
+  var data = JSON.stringify({
+    "username"  : options["Username"],
+    "loginToken": options["LoginToken"]
+  });
+
   // Upon logging out, remove the username and login token from the config file
   options["Username"]   = "";
   options["LoginToken"] = "";
   storage.set("config", options, function(error){});
+
+  EncryptData(data)
+  .then((data) => {
+    request.post({url:"https://fizz.gg/logout-of-frysta-app", form: {"data":data}}, function(err, res, msg){
+    });
+  });
 }
 
 /////////////////////////////
