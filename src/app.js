@@ -105,19 +105,6 @@ var options = {
   "LoginToken"      : ""
 };
 
-storage.setDataPath(__dirname);
-
-// Get options. If there are no options, create a file with default options
-// storage.set("foobar", {"foo": "bar"}, function(error){
-//   storage.get("foobar", function(error, data){
-//     if(error)
-//       throw error;
-//     console.log(data);
-//   });
-// });
-
-const dataPath = storage.getDataPath();
-
 function createWindow(){
   // Create the browser window
   win = new BrowserWindow({
