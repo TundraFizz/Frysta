@@ -29,7 +29,7 @@
     "step3": "electron-rebuild",
     "compile": "cls && npm run step1 && npm run step2 && npm run step3",
     "start": "electron ./src/app.js",
-    "build": "build"
+    "build": "build && node release.js"
   },
   "build": {
     "appId": "8c25d59d-1ec7-4f79-9f07-6307daf915fd",

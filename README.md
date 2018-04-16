@@ -55,7 +55,7 @@ openssl genrsa -out private.key 2048
 3. `nsis-web/Frysta Web Setup x.y.z.exe`
 4. `nsis-web/frysta-x.y.z-x64.nsis.7z`
 - [ ] Rename file #2 to: `frysta-x.y.z-win32-x64.exe`
-- [ ] Rename file #3 to: `Frysta-Setup.exe`
+- [ ] Rename file #3 to: `Frysta Setup.exe`
 - [ ] Create a new Frysta release on GitHub:
 1. Tag version: `x.y.z`
 2. Release title: `Frysta vx.y.z`
