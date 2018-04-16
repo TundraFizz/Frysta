@@ -29,7 +29,7 @@ var clickedOnButton           = null;
 var lastUploadedScreenshotUrl = null;
 var quit                      = false;
 var loggedIn                  = false;
-var baloonUpdateFrysta        = false;
+var balloonUpdateFrysta       = false;
 var screenshotMaskActive      = false;
 var platformArch              = `${process.platform}-${process.arch}`;
 var server                    = `https://fizz.gg/releases/${platformArch}`;
@@ -70,7 +70,7 @@ autoUpdater.on("update-available",     (info) => {
 });
 
 autoUpdater.on("update-downloaded", () => {
-  baloonUpdateFrysta = true;
+  balloonUpdateFrysta = true;
 
   tray.displayBalloon({
     "icon"   : path.join(__dirname, "img/icon64x64.png"),
@@ -117,7 +117,7 @@ function createWindow(){
     "icon"           : path.join(__dirname, "img/icon64x64.png")
   });
 
-  // win.toggleDevTools();
+  win.toggleDevTools();
 
   win.setMenu(null);
 
@@ -174,7 +174,7 @@ function createWindow(){
   });
 
   tray.on("balloon-click", function(){
-    if(baloonUpdateFrysta)
+    if(balloonUpdateFrysta)
       autoUpdater.quitAndInstall();
     else if(lastUploadedScreenshotUrl)
       shell.openExternal(lastUploadedScreenshotUrl);
@@ -477,7 +477,7 @@ function UploadImageToServer(result){
       return;
     }
 
-    baloonUpdateFrysta        = false;
+    balloonUpdateFrysta       = false;
     lastUploadedScreenshotUrl = body["url"];
 
     if(options["CopyUrlOnSuccess"] == "true")

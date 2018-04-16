@@ -57,8 +57,8 @@ openssl genrsa -out private.key 2048
 - [ ] Rename file #2 to: `frysta-x.y.z-win32-x64.exe`
 - [ ] Rename file #3 to: `Frysta Setup.exe`
 - [ ] Create a new Frysta release on GitHub:
-1. Tag version: `x.y.z`
-2. Release title: `Frysta vx.y.z`
+1. Tag version: `vx.y.z`
+2. Release title: `Frysta x.y.z`
 3. Describe this release: `Whatever you want`
 4. Upload files `#2`, `#3`, and `#4` (everything except `latest.yml`)
 5. Publish release
