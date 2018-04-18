@@ -31,8 +31,9 @@ var quit                      = false;
 var loggedIn                  = false;
 var balloonUpdateFrysta       = false;
 var screenshotMaskActive      = false;
-var platformArch              = `${process.platform}-${process.arch}`;
-var server                    = `https://fizz.gg/releases/${platformArch}`;
+// var platformArch              = `${process.platform}-${process.arch}`;
+// var server                    = `https://fizz.gg/releases/${platformArch}`;
+var server                    = `https://fizz.gg/releases/${process.platform}`;
 
 // List of platforms:
 // - win32 [Windows]

@@ -1,6 +1,6 @@
 {
   "name": "frysta",
-  "version": "0.2.0",
+  "version": "0.1.0",
   "author": "Leif Coleman <coleman.leif@gmail.com>",
   "description": "Frysta",
   "main": "src/app.js",
@@ -29,15 +29,22 @@
     "step3": "electron-rebuild",
     "compile": "cls && npm run step1 && npm run step2 && npm run step3",
     "start": "electron src/app.js",
-    "build": "build && node make/release"
+    "build": "build",
+    "build2": "build && node make/release"
   },
   "build": {
     "appId": "8c25d59d-1ec7-4f79-9f07-6307daf915fd",
-    "productName": "Frysta",
     "copyright": "Leif Coleman",
+    "productName": "Frysta",
     "win": {
-      "target": ["nsis-web"],
-      "icon": "make/icon.ico"
+      "icon": "make/icon.ico",
+      "target": [{
+        "target": "nsis-web",
+        "arch": [
+          "x64",
+          "ia32"
+        ]
+      }]
     },
     "linux": {
       "target": "deb"
@@ -52,7 +59,8 @@
       "installerIcon": "make/icon.ico",
       "uninstallerIcon": "make/icon.ico",
       "uninstallDisplayName": "Frysta",
-      "oneClick": "true"
+      "oneClick": "true",
+      "artifactName": "${name}-setup.${ext}"
     }
   }
 }

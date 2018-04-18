@@ -46,6 +46,14 @@ openssl rsa -in priv.key -pubout -out public.key
 openssl genrsa -out private.key 2048
 ```
 
+In this file:
+`node_modules/electron-updater/out/BaseUpdater.js`
+
+You need to change this line of code...
+`const packageFile = packageInfo == null ? null : path.join(cacheDir, \`package-${version}.${path.extname(packageInfo.path) || "7z"}\`);`
+...to this:
+`const packageFile = packageInfo == null ? null : path.join(cacheDir, fileInfo["packageInfo"]["file"]);`
+
 ## Release checklist:
 
 - [ ] `npm run build`
