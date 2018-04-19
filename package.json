@@ -13,7 +13,7 @@
     "jquery": "latest",
     "nan": "latest",
     "request": "^2.85.0",
-    "electron-updater": "^2.21.4",
+    "electron-updater": "2.21.8",
     "auto-launch": "latest"
   },
   "devDependencies": {
@@ -38,13 +38,14 @@
     "productName": "Frysta",
     "win": {
       "icon": "make/icon.ico",
-      "target": [{
-        "target": "nsis-web",
-        "arch": [
-          "x64",
-          "ia32"
-        ]
-      }]
+      "target": [
+        {
+          "target": "nsis-web",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
     },
     "linux": {
       "target": "deb"
@@ -53,14 +54,17 @@
       "installerIcon": "make/icon.ico",
       "uninstallerIcon": "make/icon.ico",
       "uninstallDisplayName": "Frysta",
+      "artifactName": "${name}-setup.${ext}",
+      "deleteAppDataOnUninstall": "true",
       "oneClick": "true"
     },
     "nsisWeb": {
       "installerIcon": "make/icon.ico",
       "uninstallerIcon": "make/icon.ico",
       "uninstallDisplayName": "Frysta",
-      "oneClick": "true",
-      "artifactName": "${name}-setup.${ext}"
+      "artifactName": "${name}-setup.${ext}",
+      "deleteAppDataOnUninstall": "true",
+      "oneClick": "true"
     }
   }
 }

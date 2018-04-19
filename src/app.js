@@ -41,14 +41,15 @@ var server                    = `https://fizz.gg/releases/${process.platform}`;
 // List of architectures:
 // - x64 [64-bit]
 
-autoUpdater.autoDownload = false;
+// autoUpdater.autoDownload = false;
+autoUpdater.autoDownload = true;
 autoUpdater.setFeedURL(server);
 
 // Silence console logging for the autoUpdater
-autoUpdater.logger.info  = function(m){}
-autoUpdater.logger.warn  = function(m){}
-autoUpdater.logger.error = function(m){}
-autoUpdater.logger.debug = function(m){}
+autoUpdater.logger.info  = function(m){console.log(m)}
+autoUpdater.logger.warn  = function(m){console.log(m)}
+autoUpdater.logger.error = function(m){console.log(m)}
+autoUpdater.logger.debug = function(m){console.log(m)}
 
 autoUpdater.logger.error = function(msg){
   if(msg.indexOf("Cannot parse update info from latest.yml") >=0){
@@ -71,6 +72,16 @@ autoUpdater.on("update-available",     (info) => {
 });
 
 autoUpdater.on("update-downloaded", () => {
+  // setImmediate(() => {
+  //   app.removeAllListeners("window-all-closed");
+  //   win.close();
+  //   autoUpdater.quitAndInstall(false);
+  // });
+
+
+
+
+
   balloonUpdateFrysta = true;
 
   tray.displayBalloon({
@@ -175,8 +186,14 @@ function createWindow(){
   });
 
   tray.on("balloon-click", function(){
-    if(balloonUpdateFrysta)
+    if(balloonUpdateFrysta){
+      setImmediate(function(){
+        app.removeAllListeners("window-all-closed");
+        win.close();
+        autoUpdater.quitAndInstall(true, true);
+      });
       autoUpdater.quitAndInstall();
+    }
     else if(lastUploadedScreenshotUrl)
       shell.openExternal(lastUploadedScreenshotUrl);
   });
