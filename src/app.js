@@ -41,8 +41,7 @@ var server                    = `https://fizz.gg/releases/${process.platform}`;
 // List of architectures:
 // - x64 [64-bit]
 
-// autoUpdater.autoDownload = false;
-autoUpdater.autoDownload = true;
+autoUpdater.autoDownload = false;
 autoUpdater.setFeedURL(server);
 
 // Silence console logging for the autoUpdater
@@ -186,14 +185,8 @@ function createWindow(){
   });
 
   tray.on("balloon-click", function(){
-    if(balloonUpdateFrysta){
-      setImmediate(function(){
-        app.removeAllListeners("window-all-closed");
-        win.close();
-        autoUpdater.quitAndInstall(true, true);
-      });
+    if(balloonUpdateFrysta)
       autoUpdater.quitAndInstall();
-    }
     else if(lastUploadedScreenshotUrl)
       shell.openExternal(lastUploadedScreenshotUrl);
   });
