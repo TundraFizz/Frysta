@@ -18,9 +18,9 @@
   },
   "devDependencies": {
     "electron": "latest",
-    "electron-rebuild": "latest",
     "electron-builder": "latest",
     "electron-prebuilt-compile": "1.8.4",
+    "electron-rebuild": "latest",
     "node-gyp": "latest"
   },
   "scripts": {
@@ -40,6 +40,12 @@
       "icon": "make/icon.ico",
       "target": [
         {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
           "target": "nsis-web",
           "arch": [
             "x64"
@@ -54,7 +60,7 @@
       "installerIcon": "make/icon.ico",
       "uninstallerIcon": "make/icon.ico",
       "uninstallDisplayName": "Frysta",
-      "artifactName": "${name}-setup.${ext}",
+      "artifactName": "frysta-update.exe",
       "deleteAppDataOnUninstall": "true",
       "oneClick": "true"
     },
@@ -62,7 +68,7 @@
       "installerIcon": "make/icon.ico",
       "uninstallerIcon": "make/icon.ico",
       "uninstallDisplayName": "Frysta",
-      "artifactName": "${name}-setup.${ext}",
+      "artifactName": "frysta-setup.exe",
       "deleteAppDataOnUninstall": "true",
       "oneClick": "true"
     }
