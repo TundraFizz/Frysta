@@ -76,3 +76,21 @@ You need to change this line of code...
 5. Publish release
 - [ ] Open `latest.yml` and replace the values of the `url` and `path` keys with the following line: `https://github.com/TundraFizz/Frysta/releases/download/vx.y.z/frysta-x.y.z-win32-x64.exe`
 - [ ] Update `latest.yml` here: `https://fizz.gg/releases/win32-x64/latest.yml`
+
+## Other:
+
+Windows:
+
+- Web installer AND full installer must be created
+- Three files will be uploaded for the Windows release
+- frysta-0.1.0-x64.nsis
+- frysta-setup.exe
+- frysta-update.exe
+
+Linux:
+
+- TBA
+
+MacOS:
+
+- TBA
