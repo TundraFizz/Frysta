@@ -5,7 +5,7 @@
   "description": "Frysta",
   "main": "src/app.js",
   "license": "ISC",
-  "repository": "https://github.com/TundraFizz/release-test",
+  "repository": "https://github.com/TundraFizz/Frysta",
   "dependencies": {
     "electron-compile": "^6.4.2",
     "electron-json-storage": "latest",
