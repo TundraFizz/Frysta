@@ -1,0 +1,370 @@
+/**********/
+/* Global */
+/**********/
+html {
+  font: 14px/24px "lato", sans-serif;
+  background-color: #33363f;
+  color: #c0c0c0;
+}
+
+body {
+  margin: 0;
+  cursor: default;
+}
+
+.no-select {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/************/
+/* Titlebar */
+/************/
+#titlebar {
+  -webkit-user-select: none;
+  -webkit-app-region: drag;
+  height: 18px;
+  border: solid black;
+  border-width: 0px 0px 1px 0px;
+  box-shadow: 0px 0px 6px 0px #5fb9ff;
+}
+
+.titlebar-element {
+  display: inline-block;
+}
+
+.titlebar-button {
+  -webkit-app-region: no-drag;
+  width: 22px;
+  height: 18px;
+  float: right;
+  cursor: pointer;
+}
+
+#title-text {
+  position: relative;
+  top: -3px;
+  left: 4px;
+  height: 18px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+#btn-minimize {
+  text-align: center;
+  line-height: 1.25;
+}
+
+#btn-minimize:hover {
+  background-color: #3336c8;
+}
+
+#btn-minimize:active {
+  background-color: #3336e1;
+}
+
+#btn-quit {
+  text-align: center;
+  line-height: 1.25;
+}
+
+#btn-quit:hover {
+  background-color: #c8363f;
+}
+
+#btn-quit:active {
+  background-color: #e1363f;
+}
+
+/******************/
+/* Menu Container */
+/******************/
+.menu-buttons {
+  width: 100%;
+  font-size: 0px;
+  height: 30px;
+  display: table;
+  table-layout: fixed;
+}
+
+.menu-button {
+  display: inline-block;
+  font-size: 16px;
+  text-align: center;
+  display: table-cell;
+  vertical-align: middle;
+}
+
+.menu-button[active="true"] {
+  text-shadow: 0px 0px 10px #5fff79,
+               0px 0px 10px #5fff79;
+}
+
+.menu-button[active="false"] {
+  cursor: pointer;
+}
+
+.menu-button[active="false"]:hover {
+  cursor: pointer;
+}
+
+.menu-line-bg {
+  background-color: black;
+  height: 1px;
+}
+
+.menu-line-fg {
+  position: relative;
+  height: 1px;
+  border-width: 0px 0px 1px 0px;
+  box-shadow: 0px 0px 6px 0.2px #5fb9ff;
+  background-color: #006fc5
+}
+
+/*********************/
+/* Generic Container */
+/*********************/
+.container {
+  position: relative;
+  text-align: center;
+  width: 100%;
+}
+
+/***************/
+/* Input Field */
+/***************/
+.input-field {
+  position: absolute;
+  width: 50%;
+  left: 25%;
+}
+
+.input-label {
+  position: absolute;
+  left: 6px;
+  color: rgba(0, 0, 0, 0.7);
+  pointer-events: none;
+  height: 100%;
+}
+
+.input-entry {
+  width: 100%;
+  display: block;
+}
+
+
+
+
+
+
+
+
+/************/
+/* Unsorted */
+/************/
+.submit-container {
+  position: relative;
+  height: 28px;
+}
+
+.submit-button,
+.misc-button {
+  position: absolute;
+  transform: translateX(-50%);
+  left: 50%;
+  height: 22px;
+  border-radius: 4px;
+  border: 1px solid #4d515c;
+  background-color: #3e424e;
+  box-shadow: 0px 0px 5px 0px #5fb9ff;
+  line-height: 22px;
+  cursor: pointer;
+  text-align: center;
+}
+
+.submit-button > div,
+.misc-button   > div {
+  margin: 0px 4px;
+}
+
+.update-button {
+  display: none;
+  width: 100px;
+  height: 22px;
+  border-radius: 4px;
+  line-height: 22px;
+  cursor: pointer;
+  text-align: center;
+  background-color: #194e1f;
+  border: 1px solid #2eb13c;
+  box-shadow: 0px 0px 5px 0px #24dc48;
+}
+
+.footer-container {
+  position: fixed;
+  width: 100%;
+  bottom: 0px;
+}
+
+.logout-button {
+  height: 14px;
+  border-radius: 4px;
+  border: 1px solid #a81414;
+  background-color: #721010;
+  box-shadow: 0px 0px 5px 0px #ff0000;
+  line-height: 14px;
+  cursor: pointer;
+  text-align: center;
+  width: 50px;
+  float: right;
+  margin: 4px;
+}
+
+.logout-button > div {
+  font-size: 12px;
+  /*margin: 0px 4px;*/
+}
+
+.loading-spinner {
+  position: absolute;
+  transform: translateX(-50%);
+  left: 50%;
+  width: 24px;
+  height: 24px;
+  background-image: url(../img/loading.svg);
+  background-size: cover;
+  opacity: 0;
+  display: none;
+}
+
+.message {
+  position: relative;
+  display: inline-block;
+  max-width: 90%;
+  border-radius: 4px;
+  cursor: default;
+  line-height: 18px;
+  padding: 0px 2px;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.alert-green {
+  background-color: #194e1f;
+  border: #2eb13c;
+  box-shadow: 0px 0px 5px 0px #24dc48;
+}
+
+.alert-red {
+  background-color: #630000;
+  border: #900000;
+  box-shadow: 0px 0px 5px 0px #ff4040;
+}
+
+.alert-orange {
+  background-color: #8a3a0a;
+  border: #905d00;
+  box-shadow: 0px 0px 5px 0px #ffa140;
+}
+
+.spacer {
+  height: 36px;
+}
+
+#buttons {
+  text-align: center;
+}
+
+/***********/
+/* Options */
+/***********/
+.option-container {
+  display: flex;
+  text-align: left;
+  align-items: center;
+  margin-top: 4px;
+  margin-bottom: 4px;
+  margin-left: 6px;
+  overflow: hidden;
+}
+
+.option-toggle {
+  width: 30px;
+  height: 16px;
+  border: 1px solid black;
+  background-color: #3e424e;
+  border-radius: 10px;
+  cursor: pointer;
+  /*overflow: hidden;*/
+
+  /*margin-left: 6px;
+  margin-top: 4px;
+  margin-bottom: 0px;*/
+}
+
+.option-toggle[active="true"] {
+  /*display: inline-block;*/
+}
+
+.option-toggle[active="false"] {
+  /*display: inline-block;*/
+}
+
+.option-circle {
+  position: relative;
+  top: 5px;
+  width: 6px;
+  height: 6px;
+  border-radius: 18px;
+
+  /* left: 4px;                             */
+  /* background-color: #00bf00;             */
+  /* box-shadow: 0px 0px 6px 2.4px #5fff79; */
+}
+
+/* Defaults for an option circle that's currently enabled */
+.option-toggle[active="true"] > .option-circle {
+  left: 20px;
+  background-color: #00bf00;
+  box-shadow: 0px 0px 6px 2.4px #5fff79;
+}
+
+/* Defaults for an option circle that's currently disabled */
+.option-toggle[active="false"] > .option-circle {
+  left: 4px;
+  background-color: #e60000;
+  box-shadow: 0px 0px 6px 2.4px #ff5f5f;
+}
+
+.option-text {
+  text-align: left;
+  margin: 0px 6px;
+}
+
+.local-copy-dir {
+  position: relative;
+  left: 32px;
+  text-align: left;
+  margin-left: 6px;
+}
+
+.open-in-external-browser {
+  display: inline;
+  color: #36a1ff;
+  cursor: pointer;
+  text-shadow: 0;
+  transition: text-shadow 0.15s ease-in-out;
+}
+
+.open-in-external-browser:hover {
+  text-shadow: 0px 0px 8px #36a1ff, 0px 0px 8px #36a1ff;
+}
+
+/*********************/
+/* Application Views */
+/*********************/
+[id*="app-"] {position: relative;}
+#app-1 {}
+#app-2 {display: none;}

@@ -1,0 +1,83 @@
+var fs      = require("fs");
+var package = require("../package.json");
+
+// These files need to be collected in directory: dist
+//
+// latest.yml
+// Frysta Setup x.y.z.exe
+// nsis-web/Frysta Web Setup x.y.z.exe
+// nsis-web/frysta-x.y.z-x64.nsis.7z
+
+// Navigate to the directory: dist
+process.chdir("dist");
+
+var DeleteFolderSync = function(path){
+  if(fs.existsSync(path)){
+    fs.readdirSync(path).forEach(function(file, index){
+      var curPath = `${path}/${file}`;
+      if(fs.lstatSync(curPath).isDirectory()){
+        DeleteFolderSync(curPath);
+      }else{
+        fs.unlinkSync(curPath);
+      }
+    });
+    fs.rmdirSync(path);
+  }
+}
+
+var version        = package["version"];
+var latestYml      = "latest.yml";
+var fullInstaller  = `Frysta Setup ${version}.exe`;
+var fullInstaller2 = `frysta-${version}-win32-x64.exe`;
+var webInstaller   = `Frysta Web Setup ${version}.exe`;
+var webPackage     = `frysta-${version}-x64.nsis.7z`;
+
+// Create a temporary folder in distribution
+if(!fs.existsSync("tmp"))
+  fs.mkdirSync("tmp");
+
+// Move all of the files I need into the temp folder
+// fs.renameSync(`${latestYml}`,             `tmp/${latestYml}`);
+// fs.renameSync(`${fullInstaller}`,         `tmp/${fullInstaller2}`);
+fs.renameSync(`nsis-web/${webInstaller}`, `tmp/Frysta Setup.exe`);
+fs.renameSync(`nsis-web/${webPackage}`,   `tmp/${webPackage}`);
+
+// Get a list of everything in the distribution folder
+var items = fs.readdirSync(".");
+
+// Delete everything in the distribution folder except for the temp folder
+for(var i = 0; i < items.length; i++){
+  if(fs.lstatSync(`${items[i]}`).isDirectory()){
+    if(items[i] == "tmp")
+      continue;
+    DeleteFolderSync(`${items[i]}`);
+  }else{
+    fs.unlinkSync(`${items[i]}`);
+  }
+}
+
+// Move everything inside temp into the distribution folder
+var items = fs.readdirSync("tmp");
+
+for(var i = 0; i < items.length; i++)
+  fs.renameSync(`tmp/${items[i]}`, `${items[i]}`);
+
+// Delete the temporary folder
+DeleteFolderSync("tmp");
+
+//
+
+var before = `frysta-setup-${version}.exe`;
+var after  = `https://github.com/TundraFizz/Frysta/releases/download/v${version}/frysta-x.y.z-win32-x64.exe`
+
+// nsisWeb without one-click
+//
+// "nsisWeb": {
+//   "installerIcon": "make/icon.ico",
+//   "uninstallerIcon": "make/icon.ico",
+//   "uninstallDisplayName": "Frysta",
+//   "oneClick": "false",
+//   "allowToChangeInstallationDirectory": "true",
+//   "installerHeader": "make/header.bmp",
+//   "installerSidebar": "make/sidebar.bmp"
+// }

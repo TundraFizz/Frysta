@@ -1,29 +1,76 @@
 {
-  "name": "electron-hello-world",
-  "version": "1.0.0",
-  "gypfile": true,
-  "description": "Sample hello world example for Electron.",
-  "main": "bindings.js",
-  "author": "Tundra Fizz",
+  "name": "frysta",
+  "version": "0.1.0",
+  "author": "Leif Coleman <coleman.leif@gmail.com>",
+  "description": "Frysta",
+  "main": "src/app.js",
   "license": "ISC",
+  "repository": "https://github.com/TundraFizz/Frysta",
   "dependencies": {
-    "electron": "latest",
-    "electron-rebuild": "^1.7.3",
-    "form-data": "^2.3.2",
+    "electron-compile": "^6.4.2",
+    "electron-json-storage": "latest",
+    "form-data": "latest",
     "jquery": "latest",
-    "nan": "latest"
+    "nan": "latest",
+    "request": "^2.85.0",
+    "electron-updater": "2.21.8",
+    "auto-launch": "latest"
   },
   "devDependencies": {
-    "electron-rebuild": "^1.7.3"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/TundraFizz/Tundra-Fizz"
+    "electron": "latest",
+    "electron-builder": "latest",
+    "electron-prebuilt-compile": "1.8.4",
+    "electron-rebuild": "latest",
+    "node-gyp": "latest"
   },
   "scripts": {
-    "a": "cls && npm run clean && npm run compile && npm start",
-    "clean": "node-gyp clean",
-    "compile": "./node_modules/.bin/electron-rebuild",
-    "start": "electron ./main.js"
+    "step1": "node-gyp clean",
+    "step2": "node-gyp configure",
+    "step3": "electron-rebuild",
+    "compile": "cls && npm run step1 && npm run step2 && npm run step3",
+    "start": "electron src/app.js",
+    "build": "build",
+    "build2": "build && node make/release"
+  },
+  "build": {
+    "appId": "8c25d59d-1ec7-4f79-9f07-6307daf915fd",
+    "copyright": "Leif Coleman",
+    "productName": "Frysta",
+    "win": {
+      "icon": "make/icon.ico",
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "nsis-web",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "linux": {
+      "target": "deb"
+    },
+    "nsis": {
+      "installerIcon": "make/icon.ico",
+      "uninstallerIcon": "make/icon.ico",
+      "uninstallDisplayName": "Frysta",
+      "artifactName": "frysta-update.exe",
+      "deleteAppDataOnUninstall": "true",
+      "oneClick": "true"
+    },
+    "nsisWeb": {
+      "installerIcon": "make/icon.ico",
+      "uninstallerIcon": "make/icon.ico",
+      "uninstallDisplayName": "Frysta",
+      "artifactName": "frysta-setup.exe",
+      "deleteAppDataOnUninstall": "true",
+      "oneClick": "true"
+    }
   }
 }
